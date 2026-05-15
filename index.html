@@ -1946,45 +1946,167 @@ if('serviceWorker' in navigator){
   var isFB      = /FBAN|FBAV|FB_IAB/i.test(ua);
   var isIG      = /Instagram/i.test(ua);
   var isTikTok  = /musical_ly|TikTok/i.test(ua);
+  var isAndroid = /Android/i.test(ua);
+  var isIOS     = /iPhone|iPad|iPod/i.test(ua);
   var isInApp   = isLine || isFB || isIG || isTikTok;
   var isStandalone = window.matchMedia('(display-mode:standalone)').matches || window.navigator.standalone;
 
-  if(isInApp && !isStandalone){
-    // สร้าง overlay บังทั้งหน้า บอกให้เปิดใน browser
-    var url = window.location.href;
-    var div = document.createElement('div');
-    div.style.cssText = 'position:fixed;inset:0;z-index:9999;background:#0F1923;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:32px;font-family:Noto Sans Thai,sans-serif;text-align:center;';
-    div.innerHTML = 
-      '<div style="font-size:48px;margin-bottom:16px;">🌐</div>'
-      +'<div style="font-size:18px;font-weight:700;color:#E8F0F7;margin-bottom:10px;">กรุณาเปิดใน Browser</div>'
-      +'<div style="font-size:13px;color:#8FA8BE;margin-bottom:24px;line-height:1.7;">'
-      +'แอพนี้ทำงานได้ดีที่สุดใน<br><b style="color:#00BFD8;">Chrome</b> หรือ <b style="color:#00BFD8;">Safari</b><br>'
-      +'กรุณาคัดลอก URL แล้วเปิดใน browser</div>'
-      +'<div id="_oicUrl" style="background:#16232F;border:1px solid rgba(0,191,216,.3);border-radius:8px;padding:12px 16px;font-size:11px;color:#00BFD8;word-break:break-all;margin-bottom:20px;width:100%;max-width:380px;cursor:pointer;">'+url+'</div>'
-      +'<button id="_oicCopy" style="background:#00BFD8;color:#0F1923;border:none;border-radius:8px;padding:14px 32px;font-size:14px;font-weight:700;cursor:pointer;font-family:inherit;width:100%;max-width:380px;margin-bottom:10px;">📋 คัดลอก URL</button>'
-      +'<button id="_oicClose" style="background:none;border:1px solid rgba(255,255,255,.15);color:#8FA8BE;border-radius:8px;padding:10px 32px;font-size:13px;cursor:pointer;font-family:inherit;width:100%;max-width:380px;">ใช้งานต่อใน '+( isLine?'Line':isFB?'Facebook':'แอพนี้')+'</button>';
-    document.body.appendChild(div);
+  if(!isInApp || isStandalone) return;
 
-    function doCopy(){
-      if(navigator.clipboard){
-        navigator.clipboard.writeText(url).then(function(){
-          document.getElementById('_oicCopy').textContent='✅ คัดลอกแล้ว!';
-        }).catch(fallbackCopy);
-      } else { fallbackCopy(); }
-    }
-    function fallbackCopy(){
-      var t=document.createElement('textarea');
-      t.value=url;t.style.position='fixed';t.style.opacity='0';
-      document.body.appendChild(t);t.focus();t.select();
-      try{document.execCommand('copy');}catch(e){}
-      document.body.removeChild(t);
-      document.getElementById('_oicCopy').textContent='✅ คัดลอกแล้ว!';
-    }
-    document.getElementById('_oicCopy').addEventListener('click', doCopy);
-    document.getElementById('_oicUrl').addEventListener('click', doCopy);
-    document.getElementById('_oicClose').addEventListener('click', function(){ div.remove(); });
-    return; // หยุด init PWA banner ส่วนที่เหลือ
+  var url = window.location.href;
+
+  // ── วิธีที่ 1: พยายาม redirect ออกไปเปิดใน browser ภายนอกเลย ──
+  // Android: ใช้ intent:// scheme บังคับเปิด Chrome
+  // iOS: ใช้ window.open กับ _blank (Line iOS บางเวอร์ชันยอม)
+  var redirected = false;
+
+  if(isAndroid){
+    // intent scheme บังคับให้ Android เปิดใน browser ที่ตั้งไว้เป็น default
+    var intent = 'intent://' + url.replace(/^https?:\/\//,'')
+      + '#Intent;scheme=https;action=android.intent.action.VIEW;'
+      + 'category=android.intent.category.BROWSABLE;'
+      + 'package=com.android.chrome;end';
+    // fallback ถ้าไม่มี Chrome ให้เปิด browser ไหนก็ได้
+    var intentGeneric = 'intent://' + url.replace(/^https?:\/\//,'')
+      + '#Intent;scheme=https;action=android.intent.action.VIEW;'
+      + 'category=android.intent.category.BROWSABLE;end';
+    try {
+      window.location.href = intent;
+      redirected = true;
+    } catch(e){}
+  } else if(isIOS){
+    // iOS Line: ลอง x-safari เพื่อบังคับเปิด Safari
+    try {
+      // x-safari-https:// เปิดใน Safari โดยตรง
+      window.location.href = url.replace(/^https:\/\//,'x-safari-https://');
+      redirected = true;
+    } catch(e){}
   }
+
+  // ── วิธีที่ 2: แสดง Overlay พร้อม Copy + ปุ่มเปิด Browser ──
+  // แสดงทันที (redirect อาจใช้เวลา หรืออาจไม่สำเร็จ)
+  var appName = isLine?'LINE':isFB?'Facebook':isIG?'Instagram':'แอพนี้';
+  var div = document.createElement('div');
+  div.id = '_oicOverlay';
+  div.style.cssText = [
+    'position:fixed;inset:0;z-index:99999;',
+    'background:#0F1923;',
+    'display:flex;flex-direction:column;align-items:center;justify-content:center;',
+    'padding:28px 24px;font-family:"Noto Sans Thai",sans-serif;text-align:center;',
+    '-webkit-tap-highlight-color:transparent;'
+  ].join('');
+
+  // สร้าง HTML ของ overlay
+  div.innerHTML =
+    // ไอคอน + หัวข้อ
+    '<div style="font-size:52px;margin-bottom:14px;line-height:1;">🌐</div>'
+    +'<div style="font-size:19px;font-weight:700;color:#E8F0F7;margin-bottom:8px;">เปิดใน Browser ภายนอก</div>'
+    +'<div style="font-size:13px;color:#8FA8BE;margin-bottom:6px;line-height:1.8;">'
+    +  'แอพนี้ไม่รองรับการใช้งานใน <b style="color:#F5A623;">'+appName+'</b><br>'
+    +  'กรุณาเปิดใน <b style="color:#00BFD8;">Chrome</b> หรือ <b style="color:#00BFD8;">Safari</b>'
+    +'</div>'
+
+    // คำแนะนำตาม OS
+    +(isIOS
+      ? '<div style="font-size:12px;color:#4F6B82;margin-bottom:20px;line-height:1.7;">'
+        +'แตะปุ่ม <b style="color:#E8F0F7;">เปิดใน Safari</b> ด้านล่าง<br>'
+        +'หรือกด <b style="color:#E8F0F7;">⋯</b> มุมขวาบน → "เปิดใน Safari"'
+        +'</div>'
+      : '<div style="font-size:12px;color:#4F6B82;margin-bottom:20px;line-height:1.7;">'
+        +'แตะปุ่ม <b style="color:#E8F0F7;">เปิดใน Chrome</b> ด้านล่าง<br>'
+        +'หรือคัดลอก URL แล้ววางใน browser'
+        +'</div>'
+    )
+
+    // URL box (กดเพื่อ copy)
+    +'<div id="_oicUrl" style="'
+    +  'background:#16232F;border:1px solid rgba(0,191,216,.3);border-radius:10px;'
+    +  'padding:10px 14px;font-size:11px;color:#00BFD8;word-break:break-all;'
+    +  'margin-bottom:16px;width:100%;max-width:400px;cursor:pointer;'
+    +  'font-family:"JetBrains Mono",monospace;line-height:1.5;'
+    +'">'+url+'</div>'
+
+    // ปุ่มหลัก: เปิดใน browser
+    +'<button id="_oicOpen" style="'
+    +  'background:#00BFD8;color:#0F1923;border:none;border-radius:10px;'
+    +  'padding:15px 32px;font-size:15px;font-weight:700;cursor:pointer;'
+    +  'font-family:inherit;width:100%;max-width:400px;margin-bottom:10px;'
+    +  'display:flex;align-items:center;justify-content:center;gap:8px;'
+    +'"><span style="font-size:18px;">'+(isIOS?'🧭':'🌐')+'</span> เปิดใน '+(isIOS?'Safari':'Chrome')+'</button>'
+
+    // ปุ่มรอง: copy URL
+    +'<button id="_oicCopy" style="'
+    +  'background:#16232F;color:#00BFD8;border:1px solid rgba(0,191,216,.4);border-radius:10px;'
+    +  'padding:12px 32px;font-size:13px;font-weight:600;cursor:pointer;'
+    +  'font-family:inherit;width:100%;max-width:400px;margin-bottom:10px;'
+    +'">📋 คัดลอก URL</button>'
+
+    // ปุ่มปิด (ใช้งานต่อใน in-app ยอมรับความเสี่ยง)
+    +'<button id="_oicClose" style="'
+    +  'background:none;border:none;color:#4F6B82;font-size:12px;cursor:pointer;'
+    +  'font-family:inherit;padding:8px;margin-top:4px;'
+    +'">ใช้งานต่อใน '+appName+' (ไม่แนะนำ)</button>';
+
+  document.body.appendChild(div);
+
+  // ── Copy function ──
+  function doCopy(){
+    var copyBtn = document.getElementById('_oicCopy');
+    if(navigator.clipboard && navigator.clipboard.writeText){
+      navigator.clipboard.writeText(url).then(function(){
+        copyBtn.textContent='✅ คัดลอกแล้ว! วางใน browser ได้เลย';
+        copyBtn.style.color='#2ECC71';
+        copyBtn.style.borderColor='rgba(46,204,113,.4)';
+      }).catch(fallbackCopy);
+    } else { fallbackCopy(); }
+  }
+  function fallbackCopy(){
+    var ta=document.createElement('textarea');
+    ta.value=url;ta.style.cssText='position:fixed;top:-9999px;opacity:0;';
+    document.body.appendChild(ta);ta.focus();ta.select();
+    try{document.execCommand('copy');}catch(e){}
+    document.body.removeChild(ta);
+    var copyBtn = document.getElementById('_oicCopy');
+    if(copyBtn){
+      copyBtn.textContent='✅ คัดลอกแล้ว! วางใน browser ได้เลย';
+      copyBtn.style.color='#2ECC71';
+      copyBtn.style.borderColor='rgba(46,204,113,.4)';
+    }
+  }
+
+  // ── ปุ่มเปิดใน browser ──
+  document.getElementById('_oicOpen').addEventListener('click', function(){
+    if(isIOS){
+      // iOS: x-safari-https:// → เปิด Safari โดยตรง
+      window.location.href = url.replace(/^https:\/\//,'x-safari-https://');
+      // fallback: copy แล้วบอกให้ paste
+      setTimeout(function(){
+        doCopy();
+        var btn = document.getElementById('_oicOpen');
+        if(btn) btn.textContent = '✅ คัดลอกแล้ว — วางใน Safari ได้เลย';
+      }, 800);
+    } else {
+      // Android: intent scheme → Chrome
+      var intent = 'intent://' + url.replace(/^https?:\/\//,'')
+        + '#Intent;scheme=https;action=android.intent.action.VIEW;'
+        + 'category=android.intent.category.BROWSABLE;'
+        + 'package=com.android.chrome;S.browser_fallback_url='
+        + encodeURIComponent(url) + ';end';
+      window.location.href = intent;
+      // fallback ถ้า intent ไม่ทำงาน
+      setTimeout(function(){
+        doCopy();
+        var btn = document.getElementById('_oicOpen');
+        if(btn) btn.textContent = '✅ คัดลอกแล้ว — วางใน Chrome ได้เลย';
+      }, 1200);
+    }
+  });
+
+  document.getElementById('_oicCopy').addEventListener('click', doCopy);
+  document.getElementById('_oicUrl').addEventListener('click', doCopy);
+  document.getElementById('_oicClose').addEventListener('click', function(){
+    div.remove();
+  });
 })();
 
 // ── PWA INSTALL PROMPT ──
