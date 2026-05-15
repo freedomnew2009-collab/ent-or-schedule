@@ -354,8 +354,18 @@ body{font-family:'Noto Sans Thai',sans-serif;background:var(--bg);color:var(--t)
 .swap-doc-info{padding:10px 12px;background:var(--s2);border-radius:var(--rs);border:1px solid var(--b);font-size:13px;font-weight:700;margin-bottom:11px;}
 
 /* ─ TOAST ─ */
-.toast{position:fixed;bottom:18px;right:18px;z-index:500;background:var(--s);border:1px solid var(--b2);padding:10px 14px;border-radius:9px;font-size:12px;font-weight:500;box-shadow:0 8px 30px rgba(0,0,0,.5);display:flex;align-items:center;gap:8px;transform:translateY(70px);opacity:0;transition:all .3s cubic-bezier(.34,1.56,.64,1);max-width:360px;pointer-events:none;}
-.toast.show{transform:translateY(0);opacity:1;pointer-events:auto;}
+.toast{
+  position:fixed;bottom:80px;right:18px;z-index:499;
+  background:var(--s);border:1px solid var(--b2);
+  padding:10px 14px;border-radius:9px;font-size:12px;font-weight:500;
+  box-shadow:0 8px 30px rgba(0,0,0,.5);
+  display:none;align-items:center;gap:8px;
+  max-width:360px;
+  /* ซ่อนแบบ display:none ไม่ใช่ opacity เพื่อให้ LINE browser ไม่ดัก touch */
+  opacity:0;pointer-events:none;
+  transition:opacity .3s cubic-bezier(.34,1.56,.64,1);
+}
+.toast.show{display:flex;opacity:1;pointer-events:auto;}
 .toast.ok{border-left:3px solid var(--green);}
 .toast.warn{border-left:3px solid var(--yel);}
 .toast.err{border-left:3px solid var(--red);}
@@ -422,8 +432,8 @@ body{font-family:'Noto Sans Thai',sans-serif;background:var(--bg);color:var(--t)
   .sched-days{grid-template-columns:repeat(3,1fr);}
   .dp-overlay{align-items:flex-end;}
   .dp-modal{border-radius:16px 16px 0 0;width:100%;max-width:100%;padding:18px 16px 24px;}
-  .toast{bottom:auto;top:70px;left:12px;right:12px;max-width:none;font-size:12px;transform:translateY(-20px);}
-  .toast.show{transform:translateY(0);}
+  .toast{bottom:74px;top:auto;left:12px;right:12px;max-width:none;font-size:12px;}
+  .toast.show{display:flex;}
   .mob-bottom-nav{display:block;}
   #sideDocList{display:flex;flex-wrap:nowrap;overflow-x:auto;gap:5px;padding-bottom:4px;-webkit-overflow-scrolling:touch;}
   .doc-chip{white-space:nowrap;flex-shrink:0;padding:5px 10px;font-size:11px;}
@@ -1898,9 +1908,26 @@ function hideLdr(){
 }
 function toast(msg,type){
   type=type||'';
-  var t=document.getElementById('toast');t.textContent=msg;t.className='toast '+type;
-  requestAnimationFrame(function(){requestAnimationFrame(function(){t.classList.add('show');});});
-  setTimeout(function(){t.classList.remove('show');},3600);
+  var t=document.getElementById('toast');
+  // ซ่อนก่อน (display:none จริงๆ) แล้วค่อยแสดง
+  t.className='toast '+type;
+  t.textContent=msg;
+  t.style.display='none';
+  t.classList.remove('show');
+  // รอ 1 frame แล้วแสดง
+  requestAnimationFrame(function(){
+    t.style.display='';
+    requestAnimationFrame(function(){
+      t.classList.add('show');
+    });
+  });
+  // ซ่อนหลัง 3.6 วิ — ใช้ display:none ทันทีหลัง fade
+  clearTimeout(window._toastTimer);
+  window._toastTimer = setTimeout(function(){
+    t.classList.remove('show');
+    // รอ transition เสร็จ (0.3s) แล้ว display:none จริงๆ
+    setTimeout(function(){ t.style.display='none'; }, 350);
+  }, 3600);
 }
 
 // ── MOBILE SIDEBAR ──
