@@ -1923,35 +1923,84 @@ function toggleTheme(){
 
 // ── SERVICE WORKER (PWA) ──
 if('serviceWorker' in navigator){
-  window.addEventListener('load', function(){
+  window.addEventListener('load',function(){
     navigator.serviceWorker.register('sw.js').catch(function(){});
   });
 }
 
+// ── DETECT IN-APP BROWSER & REDIRECT ──
+(function(){
+  var ua = navigator.userAgent || '';
+  var isLine    = /Line\//i.test(ua);
+  var isFB      = /FBAN|FBAV|FB_IAB/i.test(ua);
+  var isIG      = /Instagram/i.test(ua);
+  var isTikTok  = /musical_ly|TikTok/i.test(ua);
+  var isInApp   = isLine || isFB || isIG || isTikTok;
+  var isStandalone = window.matchMedia('(display-mode:standalone)').matches || window.navigator.standalone;
+
+  if(isInApp && !isStandalone){
+    // สร้าง overlay บังทั้งหน้า บอกให้เปิดใน browser
+    var url = window.location.href;
+    var div = document.createElement('div');
+    div.style.cssText = 'position:fixed;inset:0;z-index:9999;background:#0F1923;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:32px;font-family:Noto Sans Thai,sans-serif;text-align:center;';
+    div.innerHTML = 
+      '<div style="font-size:48px;margin-bottom:16px;">🌐</div>'
+      +'<div style="font-size:18px;font-weight:700;color:#E8F0F7;margin-bottom:10px;">กรุณาเปิดใน Browser</div>'
+      +'<div style="font-size:13px;color:#8FA8BE;margin-bottom:24px;line-height:1.7;">'
+      +'แอพนี้ทำงานได้ดีที่สุดใน<br><b style="color:#00BFD8;">Chrome</b> หรือ <b style="color:#00BFD8;">Safari</b><br>'
+      +'กรุณาคัดลอก URL แล้วเปิดใน browser</div>'
+      +'<div id="_oicUrl" style="background:#16232F;border:1px solid rgba(0,191,216,.3);border-radius:8px;padding:12px 16px;font-size:11px;color:#00BFD8;word-break:break-all;margin-bottom:20px;width:100%;max-width:380px;cursor:pointer;">'+url+'</div>'
+      +'<button id="_oicCopy" style="background:#00BFD8;color:#0F1923;border:none;border-radius:8px;padding:14px 32px;font-size:14px;font-weight:700;cursor:pointer;font-family:inherit;width:100%;max-width:380px;margin-bottom:10px;">📋 คัดลอก URL</button>'
+      +'<button id="_oicClose" style="background:none;border:1px solid rgba(255,255,255,.15);color:#8FA8BE;border-radius:8px;padding:10px 32px;font-size:13px;cursor:pointer;font-family:inherit;width:100%;max-width:380px;">ใช้งานต่อใน '+( isLine?'Line':isFB?'Facebook':'แอพนี้')+'</button>';
+    document.body.appendChild(div);
+
+    function doCopy(){
+      if(navigator.clipboard){
+        navigator.clipboard.writeText(url).then(function(){
+          document.getElementById('_oicCopy').textContent='✅ คัดลอกแล้ว!';
+        }).catch(fallbackCopy);
+      } else { fallbackCopy(); }
+    }
+    function fallbackCopy(){
+      var t=document.createElement('textarea');
+      t.value=url;t.style.position='fixed';t.style.opacity='0';
+      document.body.appendChild(t);t.focus();t.select();
+      try{document.execCommand('copy');}catch(e){}
+      document.body.removeChild(t);
+      document.getElementById('_oicCopy').textContent='✅ คัดลอกแล้ว!';
+    }
+    document.getElementById('_oicCopy').addEventListener('click', doCopy);
+    document.getElementById('_oicUrl').addEventListener('click', doCopy);
+    document.getElementById('_oicClose').addEventListener('click', function(){ div.remove(); });
+    return; // หยุด init PWA banner ส่วนที่เหลือ
+  }
+})();
+
 // ── PWA INSTALL PROMPT ──
 var _pwaPrompt = null;
-window.addEventListener('beforeinstallprompt', function(e){
+window.addEventListener('beforeinstallprompt',function(e){
   e.preventDefault();
   _pwaPrompt = e;
-  // แสดง banner หลัง 3 วิ ถ้ายังไม่เคย dismiss
+  if(window.matchMedia('(display-mode:standalone)').matches) return;
   try{ if(localStorage.getItem('pwa_dismissed')) return; }catch(ex){}
-  setTimeout(function(){ document.getElementById('pwaBanner').classList.add('show'); }, 3000);
+  setTimeout(function(){ document.getElementById('pwaBanner').classList.add('show'); },2000);
 });
-document.getElementById('pwaInstallBtn').addEventListener('click', function(){
-  if(!_pwaPrompt) return;
-  _pwaPrompt.prompt();
-  _pwaPrompt.userChoice.then(function(r){
-    document.getElementById('pwaBanner').classList.remove('show');
-    _pwaPrompt = null;
-  });
+document.getElementById('pwaInstallBtn').addEventListener('click',function(){
+  if(_pwaPrompt){
+    _pwaPrompt.prompt();
+    _pwaPrompt.userChoice.then(function(){
+      document.getElementById('pwaBanner').classList.remove('show');
+      _pwaPrompt=null;
+    });
+  }
 });
 function dismissPWA(){
   document.getElementById('pwaBanner').classList.remove('show');
   try{ localStorage.setItem('pwa_dismissed','1'); }catch(e){}
 }
-// ซ่อน banner ถ้าติดตั้งแล้ว
-window.addEventListener('appinstalled', function(){
+window.addEventListener('appinstalled',function(){
   document.getElementById('pwaBanner').classList.remove('show');
+  toast('✅ ติดตั้งแอพสำเร็จ!','ok');
 });
 </script>
 
