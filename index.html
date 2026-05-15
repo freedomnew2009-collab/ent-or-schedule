@@ -225,14 +225,23 @@ body{font-family:'Noto Sans Thai',sans-serif;background:var(--bg);color:var(--t)
 .swap-tag{font-size:9px;color:var(--yel);display:block;margin-top:1px;}
 
 /* ─ PWA INSTALL BANNER ─ */
-.pwa-banner{position:fixed;bottom:0;left:0;right:0;z-index:700;background:var(--s);border-top:2px solid var(--teal);padding:12px 16px calc(12px + env(safe-area-inset-bottom,0px));display:none;align-items:center;gap:12px;box-shadow:0 -4px 20px rgba(0,0,0,.3);}
+.pwa-banner{position:fixed;top:64px;left:12px;right:12px;z-index:50;background:var(--s);border:1px solid var(--teal);border-radius:var(--r);padding:12px 14px;display:none;align-items:center;gap:12px;box-shadow:0 4px 20px rgba(0,0,0,.3);}
 .pwa-banner.show{display:flex;}
-.pwa-icon{width:44px;height:44px;border-radius:10px;background:var(--td2);border:1px solid var(--teal);display:flex;align-items:center;justify-content:center;font-size:22px;flex-shrink:0;}
+.pwa-icon{width:40px;height:40px;border-radius:10px;background:var(--td2);border:1px solid var(--teal);display:flex;align-items:center;justify-content:center;font-size:20px;flex-shrink:0;}
 .pwa-text{flex:1;}
-.pwa-text b{font-size:13px;color:var(--t);display:block;}
-.pwa-text span{font-size:11px;color:var(--t3);}
-.pwa-install-btn{background:var(--teal);color:#fff;border:none;border-radius:var(--rs);padding:8px 16px;font-size:12px;font-weight:700;cursor:pointer;white-space:nowrap;font-family:inherit;}
+.pwa-text b{font-size:12px;color:var(--t);display:block;}
+.pwa-text span{font-size:10px;color:var(--t3);}
+.pwa-install-btn{background:var(--teal);color:#fff;border:none;border-radius:var(--rs);padding:7px 14px;font-size:12px;font-weight:700;cursor:pointer;white-space:nowrap;font-family:inherit;}
 .pwa-dismiss{background:none;border:none;color:var(--t3);font-size:18px;cursor:pointer;padding:4px;line-height:1;flex-shrink:0;}
+/* open-in-chrome popup */
+.oic-overlay{position:fixed;inset:0;background:rgba(0,0,0,.6);z-index:900;display:none;align-items:flex-end;justify-content:center;}
+.oic-overlay.show{display:flex;}
+.oic-box{background:var(--s);border-radius:var(--r) var(--r) 0 0;padding:24px 20px calc(24px + env(safe-area-inset-bottom,0px));width:100%;max-width:480px;text-align:center;}
+.oic-box h3{font-size:15px;font-weight:700;color:var(--t);margin-bottom:8px;}
+.oic-box p{font-size:13px;color:var(--t2);line-height:1.6;margin-bottom:16px;}
+.oic-url{background:var(--s2);border:1px solid var(--b2);border-radius:var(--rs);padding:10px 14px;font-size:12px;color:var(--teal);word-break:break-all;margin-bottom:16px;cursor:pointer;-webkit-user-select:all;user-select:all;}
+.oic-copy-btn{background:var(--teal);color:#fff;border:none;border-radius:var(--rs);padding:10px 24px;font-size:13px;font-weight:700;cursor:pointer;font-family:inherit;width:100%;margin-bottom:8px;}
+.oic-cancel{background:none;border:1px solid var(--b2);color:var(--t2);border-radius:var(--rs);padding:10px 24px;font-size:13px;cursor:pointer;font-family:inherit;width:100%;}
 .set-pg{padding:14px 22px 22px;max-width:920px;flex:1;}
 .set-sec{background:var(--s);border:1px solid var(--b);border-radius:var(--r);padding:16px 18px;margin-bottom:14px;}
 .set-sec h3{font-size:13px;font-weight:700;margin-bottom:11px;color:var(--teal);display:flex;align-items:center;gap:6px;}
@@ -405,7 +414,8 @@ body{font-family:'Noto Sans Thai',sans-serif;background:var(--bg);color:var(--t)
   .sched-days{grid-template-columns:repeat(3,1fr);}
   .dp-overlay{align-items:flex-end;}
   .dp-modal{border-radius:16px 16px 0 0;width:100%;max-width:100%;padding:18px 16px 24px;}
-  .toast{bottom:calc(env(safe-area-inset-bottom,0px) + 76px);left:12px;right:12px;max-width:none;font-size:12px;}
+  .toast{bottom:auto;top:70px;left:12px;right:12px;max-width:none;font-size:12px;transform:translateY(-20px);}
+  .toast.show{transform:translateY(0);}
   .mob-bottom-nav{display:block;}
   #sideDocList{display:flex;flex-wrap:nowrap;overflow-x:auto;gap:5px;padding-bottom:4px;-webkit-overflow-scrolling:touch;}
   .doc-chip{white-space:nowrap;flex-shrink:0;padding:5px 10px;font-size:11px;}
@@ -1929,29 +1939,86 @@ if('serviceWorker' in navigator){
 
 // ── PWA INSTALL PROMPT ──
 var _pwaPrompt = null;
+
+function isStandalone(){
+  return window.matchMedia('(display-mode: standalone)').matches || window.navigator.standalone;
+}
+function isSupportedBrowser(){
+  // เฉพาะ Chrome และ Samsung Internet ที่ support beforeinstallprompt
+  // Line/Facebook in-app browser ไม่ support
+  var ua = navigator.userAgent;
+  var isLine = ua.indexOf('Line') > -1;
+  var isFbIab = ua.indexOf('FBAN') > -1 || ua.indexOf('FBAV') > -1;
+  var isInAppBrowser = isLine || isFbIab;
+  return !isInAppBrowser;
+}
+
 window.addEventListener('beforeinstallprompt', function(e){
   e.preventDefault();
   _pwaPrompt = e;
-  // แสดง banner หลัง 3 วิ ถ้ายังไม่เคย dismiss
+  if(isStandalone()) return;
   try{ if(localStorage.getItem('pwa_dismissed')) return; }catch(ex){}
-  setTimeout(function(){ document.getElementById('pwaBanner').classList.add('show'); }, 3000);
+  setTimeout(function(){
+    document.getElementById('pwaBanner').classList.add('show');
+  }, 2000);
 });
+
 document.getElementById('pwaInstallBtn').addEventListener('click', function(){
-  if(!_pwaPrompt) return;
-  _pwaPrompt.prompt();
-  _pwaPrompt.userChoice.then(function(r){
+  if(_pwaPrompt){
+    // Chrome — มี native prompt
+    _pwaPrompt.prompt();
+    _pwaPrompt.userChoice.then(function(){
+      document.getElementById('pwaBanner').classList.remove('show');
+      _pwaPrompt = null;
+    });
+  } else {
+    // Line / Samsung / Safari — แสดง open-in-chrome popup
     document.getElementById('pwaBanner').classList.remove('show');
-    _pwaPrompt = null;
-  });
+    var url = window.location.href;
+    document.getElementById('oicUrl').textContent = url;
+    document.getElementById('oicOverlay').classList.add('show');
+  }
 });
+
+function copyOicUrl(){
+  var url = window.location.href;
+  if(navigator.clipboard){
+    navigator.clipboard.writeText(url).then(function(){
+      toast('📋 คัดลอก URL แล้ว เปิดใน Chrome ได้เลย','ok');
+      setTimeout(function(){document.getElementById('oicOverlay').classList.remove('show');},1500);
+    });
+  } else {
+    // fallback
+    var el = document.createElement('textarea');
+    el.value = url; document.body.appendChild(el);
+    el.select(); document.execCommand('copy');
+    document.body.removeChild(el);
+    toast('📋 คัดลอก URL แล้ว','ok');
+    setTimeout(function(){document.getElementById('oicOverlay').classList.remove('show');},1500);
+  }
+}
+
 function dismissPWA(){
   document.getElementById('pwaBanner').classList.remove('show');
   try{ localStorage.setItem('pwa_dismissed','1'); }catch(e){}
 }
-// ซ่อน banner ถ้าติดตั้งแล้ว
+
 window.addEventListener('appinstalled', function(){
   document.getElementById('pwaBanner').classList.remove('show');
+  toast('✅ ติดตั้งแอพสำเร็จแล้ว!','ok');
 });
+
+// แสดง banner ถ้าเปิดจาก in-app browser (Line/Samsung) และยังไม่ได้ติดตั้ง
+(function(){
+  if(isStandalone()) return;
+  try{ if(localStorage.getItem('pwa_dismissed')) return; }catch(ex){}
+  if(!isSupportedBrowser()){
+    // Line/FB in-app — แสดง banner ให้กด เพื่อบอกให้เปิดใน Chrome
+    setTimeout(function(){
+      document.getElementById('pwaBanner').classList.add('show');
+    }, 2000);
+  }
+})();
 </script>
 
 <nav class="mob-bottom-nav" id="mobBottomNav">
@@ -1982,6 +2049,17 @@ window.addEventListener('appinstalled', function(){
   </div>
   <button class="pwa-install-btn" id="pwaInstallBtn">ติดตั้ง</button>
   <button class="pwa-dismiss" onclick="dismissPWA()">✕</button>
+</div>
+
+<!-- Open in Chrome overlay -->
+<div class="oic-overlay" id="oicOverlay">
+  <div class="oic-box">
+    <h3>📲 เปิดใน Chrome เพื่อติดตั้ง</h3>
+    <p>browser นี้ไม่รองรับการติดตั้ง PWA<br>กรุณาคัดลอก URL แล้วเปิดใน <b>Chrome</b> หรือ <b>Safari</b></p>
+    <div class="oic-url" id="oicUrl" onclick="copyOicUrl()"></div>
+    <button class="oic-copy-btn" onclick="copyOicUrl()">📋 คัดลอก URL</button>
+    <button class="oic-cancel" onclick="document.getElementById('oicOverlay').classList.remove('show')">ปิด</button>
+  </div>
 </div>
 
 </body>
