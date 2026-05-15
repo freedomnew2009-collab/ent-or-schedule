@@ -225,30 +225,14 @@ body{font-family:'Noto Sans Thai',sans-serif;background:var(--bg);color:var(--t)
 .swap-tag{font-size:9px;color:var(--yel);display:block;margin-top:1px;}
 
 /* ─ PWA INSTALL BANNER ─ */
-.pwa-banner{position:fixed;top:64px;left:12px;right:12px;z-index:55;background:var(--s);border:1px solid var(--teal);border-radius:var(--r);padding:12px 14px;display:flex;align-items:center;gap:12px;box-shadow:0 4px 20px rgba(0,0,0,.3);
-  /* ซ่อนด้วย visibility+opacity แทน display:none เพื่อให้ pointer-events ทำงานได้ */
-  opacity:0;visibility:hidden;pointer-events:none;
-  transform:translateY(-8px);transition:opacity .3s,visibility .3s,transform .3s;}
-.pwa-banner.show{opacity:1;visibility:visible;pointer-events:auto;transform:translateY(0);}
-/* mobile: banner อยู่ใต้ topbar และไม่ทับ bottom nav */
-@media (max-width: 768px){
-  .pwa-banner{top:60px;}
-}
-.pwa-icon{width:40px;height:40px;border-radius:10px;background:var(--td2);border:1px solid var(--teal);display:flex;align-items:center;justify-content:center;font-size:20px;flex-shrink:0;}
+.pwa-banner{position:fixed;bottom:0;left:0;right:0;z-index:700;background:var(--s);border-top:2px solid var(--teal);padding:12px 16px calc(12px + env(safe-area-inset-bottom,0px));display:none;align-items:center;gap:12px;box-shadow:0 -4px 20px rgba(0,0,0,.3);}
+.pwa-banner.show{display:flex;}
+.pwa-icon{width:44px;height:44px;border-radius:10px;background:var(--td2);border:1px solid var(--teal);display:flex;align-items:center;justify-content:center;font-size:22px;flex-shrink:0;}
 .pwa-text{flex:1;}
-.pwa-text b{font-size:12px;color:var(--t);display:block;}
-.pwa-text span{font-size:10px;color:var(--t3);}
-.pwa-install-btn{background:var(--teal);color:#fff;border:none;border-radius:var(--rs);padding:7px 14px;font-size:12px;font-weight:700;cursor:pointer;white-space:nowrap;font-family:inherit;}
+.pwa-text b{font-size:13px;color:var(--t);display:block;}
+.pwa-text span{font-size:11px;color:var(--t3);}
+.pwa-install-btn{background:var(--teal);color:#fff;border:none;border-radius:var(--rs);padding:8px 16px;font-size:12px;font-weight:700;cursor:pointer;white-space:nowrap;font-family:inherit;}
 .pwa-dismiss{background:none;border:none;color:var(--t3);font-size:18px;cursor:pointer;padding:4px;line-height:1;flex-shrink:0;}
-/* open-in-chrome popup */
-.oic-overlay{position:fixed;inset:0;background:rgba(0,0,0,.6);z-index:950;display:none;align-items:flex-end;justify-content:center;}
-.oic-overlay.show{display:flex;}
-.oic-box{background:var(--s);border-radius:var(--r) var(--r) 0 0;padding:24px 20px calc(24px + env(safe-area-inset-bottom,0px));width:100%;max-width:480px;text-align:center;}
-.oic-box h3{font-size:15px;font-weight:700;color:var(--t);margin-bottom:8px;}
-.oic-box p{font-size:13px;color:var(--t2);line-height:1.6;margin-bottom:16px;}
-.oic-url{background:var(--s2);border:1px solid var(--b2);border-radius:var(--rs);padding:10px 14px;font-size:12px;color:var(--teal);word-break:break-all;margin-bottom:16px;cursor:pointer;-webkit-user-select:all;user-select:all;}
-.oic-copy-btn{background:var(--teal);color:#fff;border:none;border-radius:var(--rs);padding:10px 24px;font-size:13px;font-weight:700;cursor:pointer;font-family:inherit;width:100%;margin-bottom:8px;}
-.oic-cancel{background:none;border:1px solid var(--b2);color:var(--t2);border-radius:var(--rs);padding:10px 24px;font-size:13px;cursor:pointer;font-family:inherit;width:100%;}
 .set-pg{padding:14px 22px 22px;max-width:920px;flex:1;}
 .set-sec{background:var(--s);border:1px solid var(--b);border-radius:var(--r);padding:16px 18px;margin-bottom:14px;}
 .set-sec h3{font-size:13px;font-weight:700;margin-bottom:11px;color:var(--teal);display:flex;align-items:center;gap:6px;}
@@ -354,34 +338,16 @@ body{font-family:'Noto Sans Thai',sans-serif;background:var(--bg);color:var(--t)
 .swap-doc-info{padding:10px 12px;background:var(--s2);border-radius:var(--rs);border:1px solid var(--b);font-size:13px;font-weight:700;margin-bottom:11px;}
 
 /* ─ TOAST ─ */
-.toast{
-  position:fixed;
-  /* ซ่อนโดยย้ายออกนอกหน้าจอ — วิธีเดียวที่ LINE browser ไม่ดัก touch */
-  bottom:-200px;
-  left:12px;right:12px;
-  z-index:499;
-  background:var(--s);border:1px solid var(--b2);
-  padding:10px 14px;border-radius:9px;font-size:12px;font-weight:500;
-  box-shadow:0 8px 30px rgba(0,0,0,.5);
-  display:flex;align-items:center;gap:8px;
-  max-width:calc(100% - 24px);
-  transition:bottom .3s cubic-bezier(.34,1.56,.64,1);
-  pointer-events:none;
-}
-.toast.show{bottom:74px;pointer-events:auto;}
+.toast{position:fixed;top:68px;right:18px;z-index:500;background:var(--s);border:1px solid var(--b2);padding:10px 14px;border-radius:9px;font-size:12px;font-weight:500;box-shadow:0 8px 30px rgba(0,0,0,.5);display:flex;align-items:center;gap:8px;transform:translateY(-20px);opacity:0;transition:all .3s cubic-bezier(.34,1.56,.64,1);max-width:360px;pointer-events:none;}
+.toast.show{transform:translateY(0);opacity:1;pointer-events:auto;}
 .toast.ok{border-left:3px solid var(--green);}
 .toast.warn{border-left:3px solid var(--yel);}
 .toast.err{border-left:3px solid var(--red);}
 .toast.info{border-left:3px solid var(--teal);}
-@media (min-width:769px){
-  .toast{left:auto;right:18px;max-width:360px;bottom:-200px;}
-  .toast.show{bottom:24px;}
-}
 
 /* ─ LOADER ─ */
-.ldr{position:fixed;inset:0;background:rgba(0,0,0,.55);z-index:600;display:flex;align-items:center;justify-content:center;flex-direction:column;gap:12px;
-  opacity:0;visibility:hidden;pointer-events:none;transition:opacity .2s,visibility .2s;}
-.ldr.show{opacity:1;visibility:visible;pointer-events:all;}
+.ldr{display:none;position:fixed;inset:0;background:rgba(0,0,0,.55);z-index:600;align-items:center;justify-content:center;flex-direction:column;gap:12px;pointer-events:none;}
+.ldr.show{display:flex;pointer-events:all;}
 .spinner{width:36px;height:36px;border:3px solid var(--b2);border-top-color:var(--teal);border-radius:50%;animation:spin .8s linear infinite;}
 @keyframes spin{to{transform:rotate(360deg)}}
 .ldr-t{color:var(--t2);font-size:13px;}
@@ -391,7 +357,7 @@ body{font-family:'Noto Sans Thai',sans-serif;background:var(--bg);color:var(--t)
 .mob-menu-btn:hover{background:var(--s3);color:var(--teal);}
 .sb-backdrop{display:none;position:fixed;inset:0;background:rgba(0,0,0,.55);z-index:49;}
 .sb-backdrop.open{display:block;}
-.mob-bottom-nav{display:none;position:fixed;bottom:0;left:0;right:0;background:var(--s);border-top:1px solid var(--b);z-index:80;padding:0;padding-bottom:env(safe-area-inset-bottom,0px);}
+.mob-bottom-nav{display:none;position:fixed;bottom:0;left:0;right:0;background:var(--s);border-top:1px solid var(--b);z-index:60;padding:0;padding-bottom:env(safe-area-inset-bottom,0px);}
 .mob-bottom-nav ul{display:flex;list-style:none;margin:0;padding:0;}
 .mob-bottom-nav li{flex:1;display:flex;}
 .mob-bottom-nav li a{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2px;padding:7px 2px 5px;font-size:9px;font-weight:600;color:var(--t3);cursor:pointer;text-decoration:none;transition:all .15s;border-top:2px solid transparent;}
@@ -439,6 +405,8 @@ body{font-family:'Noto Sans Thai',sans-serif;background:var(--bg);color:var(--t)
   .sched-days{grid-template-columns:repeat(3,1fr);}
   .dp-overlay{align-items:flex-end;}
   .dp-modal{border-radius:16px 16px 0 0;width:100%;max-width:100%;padding:18px 16px 24px;}
+  .toast{top:68px;bottom:auto;left:12px;right:12px;max-width:none;font-size:12px;transform:translateY(-20px);}
+  .toast.show{transform:translateY(0);}
   .mob-bottom-nav{display:block;}
   #sideDocList{display:flex;flex-wrap:nowrap;overflow-x:auto;gap:5px;padding-bottom:4px;-webkit-overflow-scrolling:touch;}
   .doc-chip{white-space:nowrap;flex-shrink:0;padding:5px 10px;font-size:11px;}
@@ -1896,37 +1864,13 @@ document.querySelectorAll('.overlay').forEach(function(o){
   });
 });
 
-function showLdr(msg){
-  document.getElementById('ldrTxt').textContent=msg||'กำลังโหลด...';
-  document.getElementById('ldr').classList.add('show');
-  // Safety: LINE browser — force-remove loader หลัง 12 วินาทีเสมอ
-  clearTimeout(window._ldrSafetyTimer);
-  window._ldrSafetyTimer = setTimeout(function(){ hideLdr(); }, 12000);
-}
-function hideLdr(){
-  clearTimeout(window._ldrSafetyTimer);
-  var ldr = document.getElementById('ldr');
-  ldr.classList.remove('show');
-  // LINE browser fix: force reflow เพื่อให้ pointer-events หลุดจริงๆ
-  ldr.style.display='none';
-  setTimeout(function(){ ldr.style.display=''; }, 0);
-}
+function showLdr(msg){document.getElementById('ldrTxt').textContent=msg;document.getElementById('ldr').classList.add('show');}
+function hideLdr(){document.getElementById('ldr').classList.remove('show');}
 function toast(msg,type){
   type=type||'';
-  var t=document.getElementById('toast');
-  // reset ก่อน
-  t.className='toast '+type;
-  t.textContent=msg;
-  // trigger show (bottom animation)
-  requestAnimationFrame(function(){
-    t.classList.add('show');
-  });
-  // ซ่อนหลัง 3.6 วิ — เลื่อนกลับออกนอกหน้าจอ (bottom:-200px)
-  // LINE browser ไม่สามารถดัก touch บน element ที่อยู่นอก viewport
-  clearTimeout(window._toastTimer);
-  window._toastTimer = setTimeout(function(){
-    t.classList.remove('show');
-  }, 3600);
+  var t=document.getElementById('toast');t.textContent=msg;t.className='toast '+type;
+  requestAnimationFrame(function(){requestAnimationFrame(function(){t.classList.add('show');});});
+  setTimeout(function(){t.classList.remove('show');},3600);
 }
 
 // ── MOBILE SIDEBAR ──
@@ -1986,178 +1930,29 @@ if('serviceWorker' in navigator){
 
 // ── PWA INSTALL PROMPT ──
 var _pwaPrompt = null;
-
-function isStandalone(){
-  return window.matchMedia('(display-mode: standalone)').matches || window.navigator.standalone;
-}
-
-function getBrowserType(){
-  var ua = navigator.userAgent;
-  if(ua.indexOf('Line') > -1 || ua.indexOf('LINE') > -1) return 'line';
-  if(ua.indexOf('FBAN') > -1 || ua.indexOf('FBAV') > -1) return 'facebook';
-  if(ua.indexOf('SamsungBrowser') > -1) return 'samsung';
-  if(/iPhone|iPad|iPod/.test(ua) && !ua.indexOf('CriOS') > -1) return 'safari';
-  return 'chrome';
-}
-
 window.addEventListener('beforeinstallprompt', function(e){
   e.preventDefault();
   _pwaPrompt = e;
-  if(isStandalone()) return;
+  // แสดง banner หลัง 3 วิ ถ้ายังไม่เคย dismiss
   try{ if(localStorage.getItem('pwa_dismissed')) return; }catch(ex){}
-  setTimeout(function(){
-    document.getElementById('pwaBanner').classList.add('show');
-  }, 2000);
+  setTimeout(function(){ document.getElementById('pwaBanner').classList.add('show'); }, 3000);
 });
-
 document.getElementById('pwaInstallBtn').addEventListener('click', function(){
-  var btype = getBrowserType();
-
-  if(_pwaPrompt && btype === 'chrome'){
-    // Chrome desktop/mobile — มี native prompt
-    _pwaPrompt.prompt();
-    _pwaPrompt.userChoice.then(function(){
-      document.getElementById('pwaBanner').classList.remove('show');
-      _pwaPrompt = null;
-    });
-    return;
-  }
-
-  // ปิด banner ก่อนเสมอ
-  document.getElementById('pwaBanner').classList.remove('show');
-
-  if(btype === 'samsung'){
-    // Samsung Internet: แสดง guide บอกวิธีกด Add to Home Screen เอง
-    showSamsungGuide();
-    return;
-  }
-
-  if(btype === 'line' || btype === 'facebook'){
-    // LINE/FB: ต้องเปิดใน Chrome ก่อน
-    showLineGuide();
-    return;
-  }
-
-  // fallback — แสดง oic overlay เดิม
-  var url = window.location.href;
-  document.getElementById('oicUrl').textContent = url;
-  document.getElementById('oicOverlay').classList.add('show');
+  if(!_pwaPrompt) return;
+  _pwaPrompt.prompt();
+  _pwaPrompt.userChoice.then(function(r){
+    document.getElementById('pwaBanner').classList.remove('show');
+    _pwaPrompt = null;
+  });
 });
-
-function showLineGuide(){
-  var url = window.location.href;
-  // สร้าง overlay guide สำหรับ LINE
-  var box = document.getElementById('lineGuideOverlay');
-  if(!box){
-    box = document.createElement('div');
-    box.id = 'lineGuideOverlay';
-    box.style.cssText='position:fixed;inset:0;background:rgba(0,0,0,.7);z-index:960;display:flex;align-items:flex-end;justify-content:center;';
-    box.innerHTML =
-      '<div style="background:var(--s);border-radius:16px 16px 0 0;padding:24px 20px 32px;width:100%;max-width:480px;text-align:center;">' +
-        '<div style="font-size:28px;margin-bottom:8px;">📲</div>' +
-        '<h3 style="font-size:15px;font-weight:700;color:var(--t);margin-bottom:8px;">เปิดใน Chrome เพื่อติดตั้ง</h3>' +
-        '<p style="font-size:13px;color:var(--t2);line-height:1.6;margin-bottom:16px;">LINE browser ไม่รองรับการติดตั้ง<br>กรุณาคัดลอก URL แล้วเปิดใน <b>Chrome</b></p>' +
-        '<div id="lineGuideUrl" style="background:var(--s2);border:1px solid var(--b2);border-radius:8px;padding:10px 14px;font-size:11px;color:var(--teal);word-break:break-all;margin-bottom:16px;-webkit-user-select:all;user-select:all;">' + url + '</div>' +
-        '<button onclick="copyLineUrl()" style="background:var(--teal);color:#fff;border:none;border-radius:8px;padding:12px 24px;font-size:14px;font-weight:700;cursor:pointer;font-family:inherit;width:100%;margin-bottom:8px;">📋 คัดลอก URL</button>' +
-        '<button onclick="document.getElementById(\'lineGuideOverlay\').style.display=\'none\'" style="background:none;border:1px solid var(--b2);color:var(--t2);border-radius:8px;padding:10px 24px;font-size:13px;cursor:pointer;font-family:inherit;width:100%;">ปิด</button>' +
-      '</div>';
-    document.body.appendChild(box);
-  }
-  box.style.display = 'flex';
-}
-
-function copyLineUrl(){
-  var url = window.location.href;
-  // ใช้ execCommand เป็น primary สำหรับ LINE ที่มักบล็อก clipboard API
-  var el = document.createElement('textarea');
-  el.value = url;
-  el.style.cssText = 'position:fixed;left:-9999px;top:-9999px;opacity:0;';
-  document.body.appendChild(el);
-  el.focus(); el.select();
-  var ok = false;
-  try{ ok = document.execCommand('copy'); }catch(e){}
-  document.body.removeChild(el);
-  if(ok){
-    toast('📋 คัดลอก URL แล้ว เปิดใน Chrome ได้เลย','ok');
-  } else if(navigator.clipboard){
-    navigator.clipboard.writeText(url).then(function(){
-      toast('📋 คัดลอก URL แล้ว','ok');
-    }).catch(function(){
-      toast('⚠️ กรุณาก็อป URL ด้านบนเอง แล้วเปิดใน Chrome','warn');
-    });
-  } else {
-    toast('⚠️ กรุณาก็อป URL ด้านบนเอง แล้วเปิดใน Chrome','warn');
-  }
-}
-
-function showSamsungGuide(){
-  // Samsung Internet: แสดง step-by-step guide
-  var box = document.getElementById('samsungGuideOverlay');
-  if(!box){
-    box = document.createElement('div');
-    box.id = 'samsungGuideOverlay';
-    box.style.cssText='position:fixed;inset:0;background:rgba(0,0,0,.7);z-index:960;display:flex;align-items:flex-end;justify-content:center;';
-    box.innerHTML =
-      '<div style="background:var(--s);border-radius:16px 16px 0 0;padding:24px 20px 32px;width:100%;max-width:480px;">' +
-        '<div style="text-align:center;font-size:28px;margin-bottom:8px;">📱</div>' +
-        '<h3 style="font-size:15px;font-weight:700;color:var(--t);margin-bottom:8px;text-align:center;">เพิ่มลงหน้าจอหลัก (Samsung)</h3>' +
-        '<p style="font-size:12px;color:var(--t2);margin-bottom:14px;text-align:center;">ทำตามขั้นตอนนี้ใน Samsung Internet</p>' +
-        '<div style="background:var(--s2);border-radius:10px;padding:14px 16px;margin-bottom:16px;">' +
-          '<div style="display:flex;align-items:flex-start;gap:10px;margin-bottom:10px;">' +
-            '<span style="background:var(--teal);color:#fff;border-radius:50%;width:22px;height:22px;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:700;flex-shrink:0;">1</span>' +
-            '<span style="font-size:12px;color:var(--t);line-height:1.5;">กดปุ่ม <b>⋮ เมนู</b> ที่มุมล่างขวา (หรือบน) ของ Samsung Internet</span>' +
-          '</div>' +
-          '<div style="display:flex;align-items:flex-start;gap:10px;margin-bottom:10px;">' +
-            '<span style="background:var(--teal);color:#fff;border-radius:50%;width:22px;height:22px;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:700;flex-shrink:0;">2</span>' +
-            '<span style="font-size:12px;color:var(--t);line-height:1.5;">เลือก <b>"เพิ่มหน้านี้ลงใน"</b> หรือ <b>"Add page to"</b></span>' +
-          '</div>' +
-          '<div style="display:flex;align-items:flex-start;gap:10px;">' +
-            '<span style="background:var(--teal);color:#fff;border-radius:50%;width:22px;height:22px;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:700;flex-shrink:0;">3</span>' +
-            '<span style="font-size:12px;color:var(--t);line-height:1.5;">เลือก <b>"หน้าจอหลัก"</b> หรือ <b>"Home screen"</b> แล้วกด เพิ่ม</span>' +
-          '</div>' +
-        '</div>' +
-        '<div style="background:var(--yd);border-radius:8px;padding:10px 12px;margin-bottom:16px;font-size:11px;color:var(--yel);">⚠️ ถ้าขึ้น "ถูกบล็อกโดย Google Play" ให้ใช้วิธีนี้แทน เพราะ Samsung Internet ต้องการ Play Store ในการติดตั้ง PWA แบบ full install แต่ Add to Home Screen ทำงานได้ปกติ</div>' +
-        '<button onclick="document.getElementById(\'samsungGuideOverlay\').style.display=\'none\'" style="background:var(--teal);color:#fff;border:none;border-radius:8px;padding:12px 24px;font-size:14px;font-weight:700;cursor:pointer;font-family:inherit;width:100%;">เข้าใจแล้ว</button>' +
-      '</div>';
-    document.body.appendChild(box);
-  }
-  box.style.display = 'flex';
-}
-
-function copyOicUrl(){
-  copyLineUrl();
-}
-
 function dismissPWA(){
   document.getElementById('pwaBanner').classList.remove('show');
   try{ localStorage.setItem('pwa_dismissed','1'); }catch(e){}
 }
-
+// ซ่อน banner ถ้าติดตั้งแล้ว
 window.addEventListener('appinstalled', function(){
   document.getElementById('pwaBanner').classList.remove('show');
-  toast('✅ ติดตั้งแอพสำเร็จแล้ว!','ok');
 });
-
-// แสดง banner ถ้าเปิดจาก in-app browser และยังไม่ได้ติดตั้ง
-(function(){
-  if(isStandalone()) return;
-  try{ if(localStorage.getItem('pwa_dismissed')) return; }catch(ex){}
-  var btype = getBrowserType();
-  if(btype === 'line' || btype === 'facebook' || btype === 'samsung'){
-    // ปรับ text ของ banner ให้เหมาะกับ browser
-    var pwaText = document.querySelector('.pwa-text span');
-    if(btype === 'line' && pwaText) pwaText.textContent = 'เปิดใน Chrome เพื่อติดตั้งเป็นแอพ';
-    if(btype === 'samsung' && pwaText) pwaText.textContent = 'กดเพื่อดูวิธีเพิ่มลงหน้าจอหลัก';
-    setTimeout(function(){
-      document.getElementById('pwaBanner').classList.add('show');
-      // auto-dismiss หลัง 12 วินาที เพื่อไม่ให้บัง nav
-      setTimeout(function(){
-        var b = document.getElementById('pwaBanner');
-        if(b) b.classList.remove('show');
-      }, 12000);
-    }, 2500);
-  }
-})();
 </script>
 
 <nav class="mob-bottom-nav" id="mobBottomNav">
@@ -2188,17 +1983,6 @@ window.addEventListener('appinstalled', function(){
   </div>
   <button class="pwa-install-btn" id="pwaInstallBtn">ติดตั้ง</button>
   <button class="pwa-dismiss" onclick="dismissPWA()">✕</button>
-</div>
-
-<!-- Open in Chrome overlay -->
-<div class="oic-overlay" id="oicOverlay">
-  <div class="oic-box">
-    <h3>📲 เปิดใน Chrome เพื่อติดตั้ง</h3>
-    <p>browser นี้ไม่รองรับการติดตั้ง PWA<br>กรุณาคัดลอก URL แล้วเปิดใน <b>Chrome</b> หรือ <b>Safari</b></p>
-    <div class="oic-url" id="oicUrl" onclick="copyOicUrl()"></div>
-    <button class="oic-copy-btn" onclick="copyOicUrl()">📋 คัดลอก URL</button>
-    <button class="oic-cancel" onclick="document.getElementById('oicOverlay').classList.remove('show')">ปิด</button>
-  </div>
 </div>
 
 </body>
