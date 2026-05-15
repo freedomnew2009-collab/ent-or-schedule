@@ -224,7 +224,15 @@ body{font-family:'Noto Sans Thai',sans-serif;background:var(--bg);color:var(--t)
 .leave-tag{font-size:9px;color:var(--red);display:block;margin-top:2px;}
 .swap-tag{font-size:9px;color:var(--yel);display:block;margin-top:1px;}
 
-/* ─ SETTINGS ─ */
+/* ─ PWA INSTALL BANNER ─ */
+.pwa-banner{position:fixed;bottom:0;left:0;right:0;z-index:700;background:var(--s);border-top:2px solid var(--teal);padding:12px 16px calc(12px + env(safe-area-inset-bottom,0px));display:none;align-items:center;gap:12px;box-shadow:0 -4px 20px rgba(0,0,0,.3);}
+.pwa-banner.show{display:flex;}
+.pwa-icon{width:44px;height:44px;border-radius:10px;background:var(--td2);border:1px solid var(--teal);display:flex;align-items:center;justify-content:center;font-size:22px;flex-shrink:0;}
+.pwa-text{flex:1;}
+.pwa-text b{font-size:13px;color:var(--t);display:block;}
+.pwa-text span{font-size:11px;color:var(--t3);}
+.pwa-install-btn{background:var(--teal);color:#fff;border:none;border-radius:var(--rs);padding:8px 16px;font-size:12px;font-weight:700;cursor:pointer;white-space:nowrap;font-family:inherit;}
+.pwa-dismiss{background:none;border:none;color:var(--t3);font-size:18px;cursor:pointer;padding:4px;line-height:1;flex-shrink:0;}
 .set-pg{padding:14px 22px 22px;max-width:920px;flex:1;}
 .set-sec{background:var(--s);border:1px solid var(--b);border-radius:var(--r);padding:16px 18px;margin-bottom:14px;}
 .set-sec h3{font-size:13px;font-weight:700;margin-bottom:11px;color:var(--teal);display:flex;align-items:center;gap:6px;}
@@ -330,8 +338,8 @@ body{font-family:'Noto Sans Thai',sans-serif;background:var(--bg);color:var(--t)
 .swap-doc-info{padding:10px 12px;background:var(--s2);border-radius:var(--rs);border:1px solid var(--b);font-size:13px;font-weight:700;margin-bottom:11px;}
 
 /* ─ TOAST ─ */
-.toast{position:fixed;bottom:18px;right:18px;z-index:999;background:var(--s);border:1px solid var(--b2);padding:10px 14px;border-radius:9px;font-size:12px;font-weight:500;box-shadow:0 8px 30px rgba(0,0,0,.5);display:flex;align-items:center;gap:8px;transform:translateY(70px);opacity:0;transition:all .3s cubic-bezier(.34,1.56,.64,1);max-width:360px;}
-.toast.show{transform:translateY(0);opacity:1;}
+.toast{position:fixed;bottom:18px;right:18px;z-index:500;background:var(--s);border:1px solid var(--b2);padding:10px 14px;border-radius:9px;font-size:12px;font-weight:500;box-shadow:0 8px 30px rgba(0,0,0,.5);display:flex;align-items:center;gap:8px;transform:translateY(70px);opacity:0;transition:all .3s cubic-bezier(.34,1.56,.64,1);max-width:360px;pointer-events:none;}
+.toast.show{transform:translateY(0);opacity:1;pointer-events:auto;}
 .toast.ok{border-left:3px solid var(--green);}
 .toast.warn{border-left:3px solid var(--yel);}
 .toast.err{border-left:3px solid var(--red);}
@@ -397,7 +405,7 @@ body{font-family:'Noto Sans Thai',sans-serif;background:var(--bg);color:var(--t)
   .sched-days{grid-template-columns:repeat(3,1fr);}
   .dp-overlay{align-items:flex-end;}
   .dp-modal{border-radius:16px 16px 0 0;width:100%;max-width:100%;padding:18px 16px 24px;}
-  .toast{bottom:calc(env(safe-area-inset-bottom,0px) + 70px);left:12px;right:12px;max-width:none;font-size:12px;}
+  .toast{bottom:calc(env(safe-area-inset-bottom,0px) + 76px);left:12px;right:12px;max-width:none;font-size:12px;}
   .mob-bottom-nav{display:block;}
   #sideDocList{display:flex;flex-wrap:nowrap;overflow-x:auto;gap:5px;padding-bottom:4px;-webkit-overflow-scrolling:touch;}
   .doc-chip{white-space:nowrap;flex-shrink:0;padding:5px 10px;font-size:11px;}
@@ -1918,6 +1926,32 @@ if('serviceWorker' in navigator){
     navigator.serviceWorker.register('sw.js').catch(function(){});
   });
 }
+
+// ── PWA INSTALL PROMPT ──
+var _pwaPrompt = null;
+window.addEventListener('beforeinstallprompt', function(e){
+  e.preventDefault();
+  _pwaPrompt = e;
+  // แสดง banner หลัง 3 วิ ถ้ายังไม่เคย dismiss
+  try{ if(localStorage.getItem('pwa_dismissed')) return; }catch(ex){}
+  setTimeout(function(){ document.getElementById('pwaBanner').classList.add('show'); }, 3000);
+});
+document.getElementById('pwaInstallBtn').addEventListener('click', function(){
+  if(!_pwaPrompt) return;
+  _pwaPrompt.prompt();
+  _pwaPrompt.userChoice.then(function(r){
+    document.getElementById('pwaBanner').classList.remove('show');
+    _pwaPrompt = null;
+  });
+});
+function dismissPWA(){
+  document.getElementById('pwaBanner').classList.remove('show');
+  try{ localStorage.setItem('pwa_dismissed','1'); }catch(e){}
+}
+// ซ่อน banner ถ้าติดตั้งแล้ว
+window.addEventListener('appinstalled', function(){
+  document.getElementById('pwaBanner').classList.remove('show');
+});
 </script>
 
 <nav class="mob-bottom-nav" id="mobBottomNav">
@@ -1939,5 +1973,16 @@ if('serviceWorker' in navigator){
     </a></li>
   </ul>
 </nav>
+<!-- PWA Install Banner -->
+<div class="pwa-banner" id="pwaBanner">
+  <div class="pwa-icon">🏥</div>
+  <div class="pwa-text">
+    <b>ติดตั้ง ENT OR Schedule</b>
+    <span>เพิ่มลงหน้าจอหลัก ใช้งานเหมือนแอพ</span>
+  </div>
+  <button class="pwa-install-btn" id="pwaInstallBtn">ติดตั้ง</button>
+  <button class="pwa-dismiss" onclick="dismissPWA()">✕</button>
+</div>
+
 </body>
 </html>
