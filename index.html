@@ -355,21 +355,28 @@ body{font-family:'Noto Sans Thai',sans-serif;background:var(--bg);color:var(--t)
 
 /* ─ TOAST ─ */
 .toast{
-  position:fixed;bottom:80px;right:18px;z-index:499;
+  position:fixed;
+  /* ซ่อนโดยย้ายออกนอกหน้าจอ — วิธีเดียวที่ LINE browser ไม่ดัก touch */
+  bottom:-200px;
+  left:12px;right:12px;
+  z-index:499;
   background:var(--s);border:1px solid var(--b2);
   padding:10px 14px;border-radius:9px;font-size:12px;font-weight:500;
   box-shadow:0 8px 30px rgba(0,0,0,.5);
-  display:none;align-items:center;gap:8px;
-  max-width:360px;
-  /* ซ่อนแบบ display:none ไม่ใช่ opacity เพื่อให้ LINE browser ไม่ดัก touch */
-  opacity:0;pointer-events:none;
-  transition:opacity .3s cubic-bezier(.34,1.56,.64,1);
+  display:flex;align-items:center;gap:8px;
+  max-width:calc(100% - 24px);
+  transition:bottom .3s cubic-bezier(.34,1.56,.64,1);
+  pointer-events:none;
 }
-.toast.show{display:flex;opacity:1;pointer-events:auto;}
+.toast.show{bottom:74px;pointer-events:auto;}
 .toast.ok{border-left:3px solid var(--green);}
 .toast.warn{border-left:3px solid var(--yel);}
 .toast.err{border-left:3px solid var(--red);}
 .toast.info{border-left:3px solid var(--teal);}
+@media (min-width:769px){
+  .toast{left:auto;right:18px;max-width:360px;bottom:-200px;}
+  .toast.show{bottom:24px;}
+}
 
 /* ─ LOADER ─ */
 .ldr{position:fixed;inset:0;background:rgba(0,0,0,.55);z-index:600;display:flex;align-items:center;justify-content:center;flex-direction:column;gap:12px;
@@ -432,8 +439,6 @@ body{font-family:'Noto Sans Thai',sans-serif;background:var(--bg);color:var(--t)
   .sched-days{grid-template-columns:repeat(3,1fr);}
   .dp-overlay{align-items:flex-end;}
   .dp-modal{border-radius:16px 16px 0 0;width:100%;max-width:100%;padding:18px 16px 24px;}
-  .toast{bottom:74px;top:auto;left:12px;right:12px;max-width:none;font-size:12px;}
-  .toast.show{display:flex;}
   .mob-bottom-nav{display:block;}
   #sideDocList{display:flex;flex-wrap:nowrap;overflow-x:auto;gap:5px;padding-bottom:4px;-webkit-overflow-scrolling:touch;}
   .doc-chip{white-space:nowrap;flex-shrink:0;padding:5px 10px;font-size:11px;}
@@ -1909,24 +1914,18 @@ function hideLdr(){
 function toast(msg,type){
   type=type||'';
   var t=document.getElementById('toast');
-  // ซ่อนก่อน (display:none จริงๆ) แล้วค่อยแสดง
+  // reset ก่อน
   t.className='toast '+type;
   t.textContent=msg;
-  t.style.display='none';
-  t.classList.remove('show');
-  // รอ 1 frame แล้วแสดง
+  // trigger show (bottom animation)
   requestAnimationFrame(function(){
-    t.style.display='';
-    requestAnimationFrame(function(){
-      t.classList.add('show');
-    });
+    t.classList.add('show');
   });
-  // ซ่อนหลัง 3.6 วิ — ใช้ display:none ทันทีหลัง fade
+  // ซ่อนหลัง 3.6 วิ — เลื่อนกลับออกนอกหน้าจอ (bottom:-200px)
+  // LINE browser ไม่สามารถดัก touch บน element ที่อยู่นอก viewport
   clearTimeout(window._toastTimer);
   window._toastTimer = setTimeout(function(){
     t.classList.remove('show');
-    // รอ transition เสร็จ (0.3s) แล้ว display:none จริงๆ
-    setTimeout(function(){ t.style.display='none'; }, 350);
   }, 3600);
 }
 
