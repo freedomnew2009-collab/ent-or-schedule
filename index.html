@@ -338,8 +338,8 @@ body{font-family:'Noto Sans Thai',sans-serif;background:var(--bg);color:var(--t)
 .swap-doc-info{padding:10px 12px;background:var(--s2);border-radius:var(--rs);border:1px solid var(--b);font-size:13px;font-weight:700;margin-bottom:11px;}
 
 /* ─ TOAST ─ */
-.toast{position:fixed;top:68px;right:18px;z-index:500;background:var(--s);border:1px solid var(--b2);padding:10px 14px;border-radius:9px;font-size:12px;font-weight:500;box-shadow:0 8px 30px rgba(0,0,0,.5);display:flex;align-items:center;gap:8px;transform:translateY(-20px);opacity:0;transition:all .3s cubic-bezier(.34,1.56,.64,1);max-width:360px;pointer-events:none;}
-.toast.show{transform:translateY(0);opacity:1;pointer-events:auto;}
+.toast{position:fixed;top:68px;right:18px;z-index:55;background:var(--s);border:1px solid var(--b2);padding:10px 14px;border-radius:9px;font-size:12px;font-weight:500;box-shadow:0 8px 30px rgba(0,0,0,.5);display:none;align-items:center;gap:8px;transform:translateY(-20px);opacity:0;transition:opacity .3s cubic-bezier(.34,1.56,.64,1),transform .3s cubic-bezier(.34,1.56,.64,1);max-width:360px;pointer-events:none;}
+.toast.show{display:flex;transform:translateY(0);opacity:1;pointer-events:auto;}
 .toast.ok{border-left:3px solid var(--green);}
 .toast.warn{border-left:3px solid var(--yel);}
 .toast.err{border-left:3px solid var(--red);}
@@ -357,7 +357,7 @@ body{font-family:'Noto Sans Thai',sans-serif;background:var(--bg);color:var(--t)
 .mob-menu-btn:hover{background:var(--s3);color:var(--teal);}
 .sb-backdrop{display:none;position:fixed;inset:0;background:rgba(0,0,0,.55);z-index:49;}
 .sb-backdrop.open{display:block;}
-.mob-bottom-nav{display:none;position:fixed;bottom:0;left:0;right:0;background:var(--s);border-top:1px solid var(--b);z-index:60;padding:0;padding-bottom:env(safe-area-inset-bottom,0px);}
+.mob-bottom-nav{display:none;position:fixed;bottom:0;left:0;right:0;background:var(--s);border-top:1px solid var(--b);z-index:200;padding:0;padding-bottom:env(safe-area-inset-bottom,0px);}
 .mob-bottom-nav ul{display:flex;list-style:none;margin:0;padding:0;}
 .mob-bottom-nav li{flex:1;display:flex;}
 .mob-bottom-nav li a{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2px;padding:7px 2px 5px;font-size:9px;font-weight:600;color:var(--t3);cursor:pointer;text-decoration:none;transition:all .15s;border-top:2px solid transparent;}
@@ -405,7 +405,7 @@ body{font-family:'Noto Sans Thai',sans-serif;background:var(--bg);color:var(--t)
   .sched-days{grid-template-columns:repeat(3,1fr);}
   .dp-overlay{align-items:flex-end;}
   .dp-modal{border-radius:16px 16px 0 0;width:100%;max-width:100%;padding:18px 16px 24px;}
-  .toast{top:68px;bottom:auto;left:12px;right:12px;max-width:none;font-size:12px;transform:translateY(-20px);}
+  .toast{top:12px;bottom:auto;left:12px;right:12px;max-width:none;font-size:12px;transform:translateY(-20px);z-index:55;}
   .toast.show{transform:translateY(0);}
   .mob-bottom-nav{display:block;}
   #sideDocList{display:flex;flex-wrap:nowrap;overflow-x:auto;gap:5px;padding-bottom:4px;-webkit-overflow-scrolling:touch;}
@@ -1868,9 +1868,20 @@ function showLdr(msg){document.getElementById('ldrTxt').textContent=msg;document
 function hideLdr(){document.getElementById('ldr').classList.remove('show');}
 function toast(msg,type){
   type=type||'';
-  var t=document.getElementById('toast');t.textContent=msg;t.className='toast '+type;
-  requestAnimationFrame(function(){requestAnimationFrame(function(){t.classList.add('show');});});
-  setTimeout(function(){t.classList.remove('show');},3600);
+  var t=document.getElementById('toast');
+  // หยุด timer เก่าถ้ามี
+  if(t._hideTimer) clearTimeout(t._hideTimer);
+  if(t._displayTimer) clearTimeout(t._displayTimer);
+  t.textContent=msg;t.className='toast '+type+' show';
+  t._hideTimer=setTimeout(function(){
+    t.classList.remove('show');
+    // หลัง transition จบ ซ่อน element จริงๆ ด้วย display:none
+    t._displayTimer=setTimeout(function(){
+      if(!t.classList.contains('show'))t.style.display='none';
+    },350);
+  },3600);
+  // ล้าง display:none ที่อาจค้างอยู่
+  t.style.display='';
 }
 
 // ── MOBILE SIDEBAR ──
