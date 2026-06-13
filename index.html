@@ -3,2169 +3,681 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>ENT OR Schedule · v4 updated</title>
-<!-- PWA -->
-<link rel="manifest" href="manifest.json">
-<meta name="theme-color" content="#0F1923">
-<meta name="mobile-web-app-capable" content="yes">
-<meta name="apple-mobile-web-app-capable" content="yes">
-<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-<meta name="apple-mobile-web-app-title" content="ENT OR">
-<link rel="apple-touch-icon" href="icon-192.png">
-<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+Thai:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
+<title>TSHA · สมาคมโสตสัมผัสวิทยาและการแก้ไขการพูดแห่งประเทศไทย</title>
+<meta name="description" content="สมาคมโสตสัมผัสวิทยาและการแก้ไขการพูดแห่งประเทศไทย — Thai Speech-Language & Hearing Association">
+<link rel="icon" href="logo.jpg">
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+Thai:wght@300;400;500;600;700&display=swap" rel="stylesheet">
 <style>
-:root {
-  --bg:#0F1923; --s:#16232F; --s2:#1E2F3D; --s3:#243646;
-  --b:rgba(255,255,255,.08); --b2:rgba(255,255,255,.14);
-  --teal:#00BFD8; --td:rgba(0,191,216,.15); --td2:rgba(0,191,216,.07);
-  --gold:#F5A623; --gd:rgba(245,166,35,.15);
-  --green:#2ECC71; --gnd:rgba(46,204,113,.12);
-  --red:#E74C3C; --rd:rgba(231,76,60,.14);
-  --yel:#F39C12; --yd:rgba(243,156,18,.14);
-  --pur:#9B59B6; --pd:rgba(155,89,182,.14);
-  --t:#E8F0F7; --t2:#8FA8BE; --t3:#4F6B82;
-  --r:12px; --rs:8px;
+:root{
+  --pink:#D81B7A; --pink-d:#B01563; --pink-soft:#FCE7F1;
+  --blue:#3A56A8; --blue-d:#2C4287; --blue-soft:#E8EDF8;
+  --ink:#1F2733; --muted:#6B7686; --line:#E7EAEF;
+  --bg:#FFFFFF; --soft:#F7F8FA;
+  --r:14px; --rs:10px;
+  --shadow:0 1px 3px rgba(20,30,50,.06),0 8px 24px rgba(20,30,50,.05);
 }
-html.light {
-  --bg:#F0F4F8; --s:#FFFFFF; --s2:#EBF0F5; --s3:#DDE4EC;
-  --b:rgba(0,0,0,.08); --b2:rgba(0,0,0,.14);
-  --teal:#0099B8; --td:rgba(0,153,184,.13); --td2:rgba(0,153,184,.07);
-  --gold:#D4880A; --gd:rgba(212,136,10,.13);
-  --green:#1A9E52; --gnd:rgba(26,158,82,.11);
-  --red:#C0392B; --rd:rgba(192,57,43,.12);
-  --yel:#C47B00; --yd:rgba(196,123,0,.13);
-  --pur:#7D3C98; --pd:rgba(125,60,152,.12);
-  --t:#1A2A38; --t2:#4A6275; --t3:#8FA8BE;
-}
-.theme-btn{background:var(--s2);border:1px solid var(--b);color:var(--t2);width:34px;height:34px;border-radius:var(--rs);cursor:pointer;font-size:16px;display:flex;align-items:center;justify-content:center;transition:all .2s;flex-shrink:0;}
-.theme-btn:hover{background:var(--s3);color:var(--teal);border-color:var(--teal);}
-html.light .overlay{background:rgba(0,0,0,.45);}
-html.light .ldr{background:rgba(255,255,255,.65);}
-html.light .modal{box-shadow:0 12px 48px rgba(0,0,0,.18);}
-html.light .toast{box-shadow:0 4px 20px rgba(0,0,0,.15);}
-html.light .dp-d.sel{color:#fff;}
-html.light .sidebar{box-shadow:2px 0 12px rgba(0,0,0,.08);}
-html.light .ac:hover{box-shadow:0 4px 18px rgba(0,0,0,.1);}
-html.light .day-col{box-shadow:0 2px 8px rgba(0,0,0,.06);}
-html.light .stat-card{box-shadow:0 2px 8px rgba(0,0,0,.05);}
-html.light .set-sec{box-shadow:0 2px 8px rgba(0,0,0,.05);}
-html.light .spinner{border-color:var(--b2);border-top-color:var(--teal);}
-html.light .sb-backdrop{background:rgba(0,0,0,.35);}
-html.light .mob-bottom-nav{box-shadow:0 -2px 12px rgba(0,0,0,.08);}
-html.light body{color:var(--t);}
 *{box-sizing:border-box;margin:0;padding:0;}
-/* ป้องกัน text selection บนมือถือสำหรับ element ที่กดได้ */
-.nav-item,.doc-chip,.ac,.btn-add,.wbtn,.bs,.bss,.bsr,.ab,.mcl,.cnbtn,.dp-nav-btn,.dp-d,.cal-day,.add-day-btn,.theme-btn,.mob-bottom-nav li a,.cfc,.slb,.dsr-d{
-  -webkit-user-select:none;
-  user-select:none;
-  -webkit-tap-highlight-color:transparent;
-  touch-action:manipulation;
-}
-body{font-family:'Noto Sans Thai',sans-serif;background:var(--bg);color:var(--t);min-height:100vh;display:flex;-webkit-overflow-scrolling:touch;}
+html{scroll-behavior:smooth;}
+body{font-family:'Noto Sans Thai',sans-serif;color:var(--ink);background:var(--bg);line-height:1.6;-webkit-font-smoothing:antialiased;}
+a{color:inherit;text-decoration:none;}
+img{max-width:100%;display:block;}
+.wrap{max-width:1120px;margin:0 auto;padding:0 22px;}
 
-/* ─ SIDEBAR ─ */
-.sidebar{width:220px;min-height:100vh;background:var(--s);border-right:1px solid var(--b);display:flex;flex-direction:column;position:fixed;top:0;left:0;z-index:50;overflow-y:auto;}
-.sb-logo{padding:18px 16px 14px;border-bottom:1px solid var(--b);}
-.sb-logo .ico{font-size:22px;margin-bottom:3px;}
-.sb-logo h2{font-size:13px;font-weight:700;color:var(--teal);}
-.sb-logo p{font-size:10px;color:var(--t3);margin-top:1px;}
-.nav-sec{padding:10px 7px 4px;}
-.nav-lbl{font-size:9px;font-weight:700;color:var(--t3);letter-spacing:1.5px;text-transform:uppercase;padding:0 8px;margin-bottom:4px;}
-.nav-item{display:flex;align-items:center;gap:8px;padding:8px 10px;border-radius:var(--rs);cursor:pointer;font-size:12px;font-weight:500;color:var(--t2);transition:all .15s;margin-bottom:1px;}
-.nav-item:hover{background:var(--s2);color:var(--t);}
-.nav-item.active{background:var(--td);color:var(--teal);}
-.nav-item .ni{font-size:13px;width:16px;text-align:center;}
-.sb-docs{padding:9px 7px;border-top:1px solid var(--b);margin-top:auto;}
-.sb-dlbl{font-size:9px;font-weight:700;color:var(--t3);letter-spacing:1.5px;text-transform:uppercase;padding:0 8px;margin-bottom:4px;}
-.doc-chip{display:flex;align-items:center;gap:6px;padding:6px 9px;border-radius:var(--rs);cursor:pointer;font-size:11px;font-weight:500;color:var(--t2);transition:all .15s;margin-bottom:2px;}
-.doc-chip:hover{background:var(--s2);}
-.d-dot{width:7px;height:7px;border-radius:50%;flex-shrink:0;}
-
-/* ─ CONTENT ─ */
-.content{margin-left:220px;flex:1;display:flex;flex-direction:column;}
-.topbar{background:var(--s);border-bottom:1px solid var(--b);padding:11px 22px;display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;z-index:40;}
-.pg-title{font-size:15px;font-weight:700;}
-.top-r{display:flex;align-items:center;gap:8px;}
-.sync-badge{display:flex;align-items:center;gap:5px;font-size:11px;padding:4px 10px;border-radius:20px;border:1px solid var(--b);color:var(--t3);background:var(--s2);}
-.s-dot{width:6px;height:6px;border-radius:50%;background:var(--t3);}
-.sync-badge.synced .s-dot{background:var(--green);box-shadow:0 0 5px var(--green);}
-.sync-badge.syncing .s-dot{background:var(--gold);animation:pulse 1s infinite;}
-.sync-badge.error .s-dot{background:var(--red);}
-@keyframes pulse{0%,100%{opacity:1}50%{opacity:.3}}
-.wk-nav{display:flex;align-items:center;gap:6px;background:var(--s2);border-radius:var(--rs);padding:4px 10px;border:1px solid var(--b);}
-.wk-nav span{font-size:12px;font-weight:500;min-width:96px;text-align:center;}
-.wbtn{background:none;border:none;color:var(--t2);width:22px;height:22px;cursor:pointer;border-radius:4px;font-size:13px;display:flex;align-items:center;justify-content:center;transition:all .15s;}
-.wbtn:hover{background:var(--s3);color:var(--teal);}
-.btn-add{background:var(--teal);color:var(--bg);border:none;cursor:pointer;padding:7px 14px;border-radius:var(--rs);font-family:inherit;font-size:12px;font-weight:700;display:flex;align-items:center;gap:5px;transition:all .2s;}
-.btn-add:hover{background:#00d6f0;transform:translateY(-1px);}
-
-/* ─ STATS ─ */
-.stats-row{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;padding:14px 22px 0;}
-.stat-card{background:var(--s);border:1px solid var(--b);border-radius:var(--r);padding:12px 14px;display:flex;align-items:center;gap:10px;}
-.stat-icon{width:36px;height:36px;border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:16px;}
-.si-t{background:var(--td)}.si-c{background:var(--gnd)}.si-p{background:var(--yd)}.si-x{background:var(--rd)}
-.sn{font-size:20px;font-weight:700;line-height:1;font-family:'JetBrains Mono',monospace;}
-.sn.t{color:var(--teal)}.sn.c{color:var(--green)}.sn.p{color:var(--yel)}.sn.x{color:var(--red)}
-.sl{font-size:10px;color:var(--t3);margin-top:2px;}
+/* ─ HEADER ─ */
+header{position:sticky;top:0;z-index:50;background:rgba(255,255,255,.92);backdrop-filter:blur(10px);border-bottom:1px solid var(--line);}
+.nav{display:flex;align-items:center;gap:14px;height:68px;}
+.brand{display:flex;align-items:center;gap:11px;cursor:pointer;}
+.brand img{width:42px;height:42px;border-radius:50%;}
+.brand-t b{font-size:15px;font-weight:700;letter-spacing:.5px;display:block;line-height:1.15;}
+.brand-t span{font-size:10px;color:var(--muted);letter-spacing:1.5px;text-transform:uppercase;}
+.menu{display:flex;align-items:center;gap:2px;margin-left:auto;}
+.menu a{padding:8px 13px;font-size:13.5px;font-weight:500;color:var(--muted);border-radius:8px;transition:.15s;cursor:pointer;}
+.menu a:hover{color:var(--ink);background:var(--soft);}
+.menu a.on{color:var(--pink);background:var(--pink-soft);}
+.btn{display:inline-flex;align-items:center;gap:7px;padding:9px 18px;border-radius:30px;font-size:13.5px;font-weight:600;cursor:pointer;border:none;font-family:inherit;transition:.18s;white-space:nowrap;}
+.btn-p{background:var(--pink);color:#fff;}
+.btn-p:hover{background:var(--pink-d);}
+.btn-o{background:#fff;color:var(--blue);border:1.5px solid var(--blue-soft);}
+.btn-o:hover{border-color:var(--blue);}
+.btn-b{background:var(--blue);color:#fff;}
+.btn-b:hover{background:var(--blue-d);}
+.btn-g{background:var(--soft);color:var(--ink);border:1px solid var(--line);}
+.btn-g:hover{background:#eef0f3;}
+.burger{display:none;background:none;border:none;font-size:22px;cursor:pointer;color:var(--ink);margin-left:auto;}
 
 /* ─ PAGES ─ */
-.page{display:none;flex:1;flex-direction:column;}
-.page.active{display:flex;}
+.page{display:none;animation:fade .35s ease;}
+.page.on{display:block;}
+@keyframes fade{from{opacity:0;transform:translateY(8px);}to{opacity:1;transform:none;}}
+section{padding:56px 0;}
+.eyebrow{font-size:12px;font-weight:700;letter-spacing:2px;text-transform:uppercase;color:var(--pink);margin-bottom:10px;}
+h1{font-size:40px;font-weight:700;line-height:1.18;letter-spacing:-.5px;}
+h2{font-size:27px;font-weight:700;letter-spacing:-.3px;}
+h3{font-size:17px;font-weight:600;}
+.lead{font-size:16px;color:var(--muted);max-width:620px;}
+.center{text-align:center;}
+.center .lead{margin:0 auto;}
 
-/* ─ SCHEDULE ─ */
-.sg{display:grid;grid-template-columns:1fr 1fr;gap:16px;padding:14px 22px 22px;flex:1;}
-.day-col{background:var(--s);border:1px solid var(--b);border-radius:var(--r);overflow:hidden;display:flex;flex-direction:column;}
-.day-hd{padding:12px 14px;border-bottom:1px solid var(--b);display:flex;align-items:center;justify-content:space-between;background:var(--s2);}
-.day-hd-l{display:flex;align-items:center;gap:9px;}
-.day-badge{width:40px;height:40px;border-radius:8px;display:flex;flex-direction:column;align-items:center;justify-content:center;background:var(--td);border:1px solid rgba(0,191,216,.2);}
-.dnum{font-size:16px;font-weight:700;color:var(--teal);line-height:1;font-family:'JetBrains Mono',monospace;}
-.dshort{font-size:8px;color:var(--teal);opacity:.7;}
-.day-name{font-size:14px;font-weight:700;}
-.day-dlbl{font-size:10px;color:var(--t3);margin-top:1px;}
-.day-cnt{font-size:11px;font-weight:600;padding:3px 9px;border-radius:20px;background:var(--td2);color:var(--teal);border:1px solid rgba(0,191,216,.18);}
-.day-body{flex:1;padding:11px;overflow-y:auto;max-height:460px;}
+/* ─ HERO ─ */
+.hero{background:
+   radial-gradient(900px 400px at 12% -10%,var(--pink-soft),transparent 60%),
+   radial-gradient(800px 420px at 95% 0%,var(--blue-soft),transparent 55%);
+   padding:78px 0 64px;}
+.hero-grid{display:grid;grid-template-columns:1.15fr .85fr;gap:48px;align-items:center;}
+.hero .lead{margin:18px 0 26px;font-size:17px;}
+.hero-cta{display:flex;gap:12px;flex-wrap:wrap;}
+.hero-art{position:relative;display:flex;justify-content:center;}
+.hero-art .disc{width:300px;height:300px;border-radius:50%;background:#fff;box-shadow:var(--shadow);display:flex;align-items:center;justify-content:center;border:1px solid var(--line);}
+.hero-art .disc img{width:230px;height:230px;border-radius:50%;}
+.hero-art .blob{position:absolute;border-radius:50%;filter:blur(2px);opacity:.5;}
+.b1{width:90px;height:90px;background:var(--pink-soft);top:-8px;right:30px;}
+.b2{width:60px;height:60px;background:var(--blue-soft);bottom:6px;left:24px;}
+.pill-row{display:flex;gap:9px;flex-wrap:wrap;margin-bottom:22px;}
+.pill{font-size:12px;font-weight:600;padding:5px 13px;border-radius:30px;background:#fff;border:1px solid var(--line);color:var(--muted);}
 
-/* ─ APT CARD ─ */
-.ac{background:var(--s2);border:1px solid var(--b);border-radius:var(--rs);padding:10px 12px;margin-bottom:6px;cursor:pointer;transition:all .18s;border-left:3px solid var(--teal);}
-.ac:hover{background:var(--s3);transform:translateY(-1px);box-shadow:0 4px 24px rgba(0,0,0,.4);}
-.ac.s-confirm{border-left-color:var(--green);}
-.ac.s-wait,.ac.s-pending{border-left-color:var(--yel);}
-.ac.s-cancel{border-left-color:var(--red);opacity:.55;}
-.ac-r1{display:flex;align-items:center;justify-content:space-between;margin-bottom:3px;}
-.a-hn{font-size:10px;color:var(--t3);font-family:'JetBrains Mono',monospace;}
-.a-time{font-size:11px;font-weight:600;color:var(--teal);font-family:'JetBrains Mono',monospace;}
-.a-name{font-size:13px;font-weight:700;margin-bottom:2px;}
-.a-op{font-size:11px;color:var(--t2);margin-bottom:4px;}
-.ac-r3{display:flex;align-items:center;flex-wrap:wrap;gap:5px;}
-.a-doc{font-size:11px;color:var(--t3);display:flex;align-items:center;gap:4px;flex:1;}
-.spill{font-size:10px;font-weight:700;padding:2px 7px;border-radius:20px;}
-.sp-c{background:var(--gnd);color:var(--green);border:1px solid rgba(46,204,113,.3);}
-.sp-w{background:var(--yd);color:var(--yel);border:1px solid rgba(243,156,18,.3);}
-.sp-wt{background:var(--td2);color:var(--teal);border:1px solid rgba(0,191,216,.2);}
-.sp-x{background:var(--rd);color:var(--red);border:1px solid rgba(231,76,60,.3);}
-.swap-bdg{font-size:9px;font-weight:700;padding:2px 7px;border-radius:20px;background:var(--yd);color:var(--yel);border:1px solid rgba(243,156,18,.45);}
-.a-note-r{font-size:10px;color:var(--red);background:var(--rd);border-radius:4px;padding:3px 7px;margin-top:4px;}
-.a-tel{font-size:10px;color:var(--t2);margin-top:2px;}
-.a-anes{font-size:10px;color:#9B59B6;margin-top:1px;}
-.a-doc2{font-size:10px;color:var(--teal);margin-top:1px;font-weight:600;}
-.a-note-y{font-size:10px;color:var(--yel);background:var(--yd);border-radius:4px;padding:3px 7px;margin-top:3px;border:1px solid rgba(243,156,18,.3);}
-.ac-actions{display:none;gap:4px;margin-top:8px;padding-top:8px;border-top:1px solid var(--b);}
-.ac.exp .ac-actions{display:flex;flex-wrap:wrap;}
-.ab{flex:1;min-width:60px;padding:6px 4px;border-radius:6px;border:1px solid var(--b2);background:transparent;font-family:inherit;font-size:10px;font-weight:600;cursor:pointer;color:var(--t2);transition:all .15s;text-align:center;}
-.ab:hover{background:var(--s3);color:var(--t);}
-.ab.g{color:var(--green);border-color:rgba(46,204,113,.35);}
-.ab.g:hover{background:var(--gnd);}
-.ab.o{color:var(--gold);border-color:rgba(245,166,35,.35);}
-.ab.o:hover{background:var(--gd);}
-.ab.y{color:var(--yel);border-color:rgba(243,156,18,.35);}
-.ab.y:hover{background:var(--yd);}
-.ab.r{color:var(--red);border-color:rgba(231,76,60,.35);}
-.ab.r:hover{background:var(--rd);}
-.add-day-btn{width:100%;padding:8px;border:1.5px dashed var(--b2);background:none;border-radius:var(--rs);color:var(--t3);font-family:inherit;font-size:11px;cursor:pointer;transition:all .2s;display:flex;align-items:center;justify-content:center;gap:5px;margin-top:2px;}
-.add-day-btn:hover{border-color:var(--teal);color:var(--teal);background:var(--td2);}
-.empty-day{text-align:center;padding:32px 14px;color:var(--t3);font-size:12px;}
+/* ─ STAT STRIP ─ */
+.stat-strip{display:grid;grid-template-columns:repeat(4,1fr);gap:14px;margin-top:40px;}
+.stat{background:#fff;border:1px solid var(--line);border-radius:var(--r);padding:18px;text-align:center;}
+.stat b{display:block;font-size:30px;font-weight:700;color:var(--blue);line-height:1;}
+.stat span{font-size:12.5px;color:var(--muted);}
 
-/* ─ VALIDATION ALERT ─ */
-.val-alert{display:none;border-radius:var(--rs);font-size:12px;margin-bottom:10px;overflow:hidden;}
-.val-alert.show{display:block;}
-.val-alert-body{display:flex;align-items:flex-start;gap:9px;padding:10px 12px;}
-.val-alert.err-a .val-alert-body{background:var(--rd);border:1px solid rgba(231,76,60,.32);border-bottom:none;color:var(--red);}
-.val-alert.warn-a .val-alert-body{background:var(--yd);border:1px solid rgba(243,156,18,.32);border-bottom:none;color:var(--yel);}
-.val-alert.err-a.no-act .val-alert-body,
-.val-alert.warn-a.no-act .val-alert-body{border-bottom:1px solid transparent;border-radius:var(--rs);}
-.vi{font-size:15px;flex-shrink:0;margin-top:1px;}
-.val-action{padding:7px 12px 9px;display:flex;align-items:center;gap:8px;flex-wrap:wrap;}
-.val-alert.err-a .val-action{background:rgba(231,76,60,.06);border:1px solid rgba(231,76,60,.22);border-top:none;border-radius:0 0 var(--rs) var(--rs);}
-.val-alert.err-a.no-act .val-action{display:none!important;}
-.val-action-lbl{font-size:11px;color:var(--t3);flex:1;}
-.btn-ov{background:none;border:1.5px solid rgba(243,156,18,.6);color:var(--gold);border-radius:6px;padding:5px 12px;font-family:inherit;font-size:11px;font-weight:700;cursor:pointer;display:flex;align-items:center;gap:5px;transition:all .15s;white-space:nowrap;}
-.btn-ov:hover{background:var(--gd);border-color:var(--gold);}
-.btn-ov.active{background:var(--gd);border-color:var(--gold);}
-.ov-form{padding:10px 12px;border:1px solid rgba(243,156,18,.22);border-top:none;border-radius:0 0 var(--rs) var(--rs);background:rgba(243,156,18,.05);display:none;}
-.ov-form.show{display:block;}
-.ov-row{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:8px;}
-.ov-lbl{font-size:10px;font-weight:600;color:var(--t3);margin-bottom:3px;display:block;}
+/* ─ FEATURE CARDS ─ */
+.grid{display:grid;gap:18px;}
+.g3{grid-template-columns:repeat(3,1fr);}
+.g2{grid-template-columns:repeat(2,1fr);}
+.g4{grid-template-columns:repeat(4,1fr);}
+.card{background:#fff;border:1px solid var(--line);border-radius:var(--r);padding:22px;transition:.2s;}
+.card:hover{box-shadow:var(--shadow);transform:translateY(-2px);}
+.ic{width:44px;height:44px;border-radius:11px;display:flex;align-items:center;justify-content:center;font-size:20px;margin-bottom:14px;background:var(--pink-soft);}
+.ic.blue{background:var(--blue-soft);}
+.card h3{margin-bottom:6px;}
+.card p{font-size:13.5px;color:var(--muted);}
 
-/* ─ CALENDAR ─ */
-.cal-pg{padding:14px 22px 22px;flex:1;}
-.cal-hdr{display:flex;align-items:center;justify-content:space-between;margin-bottom:10px;flex-wrap:wrap;gap:10px;}
-.cal-mnav{display:flex;align-items:center;gap:8px;}
-.cal-mt{font-size:18px;font-weight:700;min-width:175px;}
-.cnbtn{background:var(--s2);border:1px solid var(--b);color:var(--t2);width:30px;height:30px;border-radius:var(--rs);cursor:pointer;font-size:14px;display:flex;align-items:center;justify-content:center;transition:all .15s;}
-.cnbtn:hover{background:var(--s3);color:var(--teal);border-color:var(--teal);}
-.cal-fbar{display:flex;align-items:center;gap:6px;flex-wrap:wrap;}
-.cfc{padding:5px 12px;border-radius:20px;font-size:11px;font-weight:600;cursor:pointer;border:1px solid var(--b);background:var(--s2);color:var(--t2);transition:all .15s;display:flex;align-items:center;gap:5px;}
-.cfc:hover{border-color:var(--teal);color:var(--teal);}
-.cfc.active{background:var(--td);color:var(--teal);border-color:rgba(0,191,216,.4);}
-#calSummary{display:flex;gap:10px;margin-bottom:12px;flex-wrap:wrap;}
-.cal-wrap{background:var(--s);border:1px solid var(--b);border-radius:var(--r);overflow:hidden;}
-.cal-wds{display:grid;grid-template-columns:repeat(7,1fr);border-bottom:1px solid var(--b);}
-.cal-wd{padding:8px;text-align:center;font-size:11px;font-weight:700;color:var(--t3);letter-spacing:.5px;text-transform:uppercase;}
-.cal-wd.hi{color:var(--teal);}
-.cal-dg{display:grid;grid-template-columns:repeat(7,1fr);}
-.cal-day{min-height:88px;padding:7px 6px;border-right:1px solid var(--b);border-bottom:1px solid var(--b);transition:background .15s;}
-.cal-day.clk{cursor:pointer;}
-.cal-day.clk:hover{background:var(--s2);}
-.cal-day.other{opacity:.25;}
-.cal-day.today-c{background:var(--td2);}
-.cal-day.today-c .cdn{color:var(--teal);font-weight:700;}
-.cal-day.or-day .cdn-w{background:var(--td);border-radius:5px;padding:2px 5px;display:inline-flex;align-items:center;gap:3px;}
-.cal-day.or-day .cdn{color:var(--teal);}
-.cal-day.has-leave{background:rgba(231,76,60,.05);}
-.cdn-w{margin-bottom:3px;}
-.cdn{font-size:12px;font-weight:600;font-family:'JetBrains Mono',monospace;}
-.or-tag{font-size:8px;color:var(--teal);opacity:.7;font-weight:700;}
-.cal-cnt{font-size:11px;font-weight:700;padding:2px 6px;border-radius:4px;display:inline-block;background:var(--td);color:var(--teal);margin-bottom:2px;}
-.cal-dots{display:flex;flex-wrap:wrap;gap:2px;margin-top:2px;}
-.cdot{width:6px;height:6px;border-radius:2px;}
-.cal-case-list{margin-top:4px;}
-.cal-case-item{font-size:10px;color:var(--t2);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;padding:1px 0;}
-.cal-case-more{font-size:10px;color:var(--t3);margin-top:2px;}
-.leave-tag{font-size:9px;color:var(--red);display:block;margin-top:2px;}
-.swap-tag{font-size:9px;color:var(--yel);display:block;margin-top:1px;}
+/* ─ SECTION HEAD ─ */
+.shead{display:flex;align-items:flex-end;justify-content:space-between;margin-bottom:30px;gap:20px;flex-wrap:wrap;}
+.shead .lead{margin-top:8px;}
+.soft{background:var(--soft);}
 
-/* ─ PWA INSTALL BANNER ─ */
-.pwa-banner{position:fixed;bottom:0;left:0;right:0;z-index:700;background:var(--s);border-top:2px solid var(--teal);padding:12px 16px calc(12px + env(safe-area-inset-bottom,0px));display:none;align-items:center;gap:12px;box-shadow:0 -4px 20px rgba(0,0,0,.3);}
-.pwa-banner.show{display:flex;}
-.pwa-icon{width:44px;height:44px;border-radius:10px;background:var(--td2);border:1px solid var(--teal);display:flex;align-items:center;justify-content:center;font-size:22px;flex-shrink:0;}
-.pwa-text{flex:1;}
-.pwa-text b{font-size:13px;color:var(--t);display:block;}
-.pwa-text span{font-size:11px;color:var(--t3);}
-.pwa-install-btn{background:var(--teal);color:#fff;border:none;border-radius:var(--rs);padding:8px 16px;font-size:12px;font-weight:700;cursor:pointer;white-space:nowrap;font-family:inherit;}
-.pwa-dismiss{background:none;border:none;color:var(--t3);font-size:18px;cursor:pointer;padding:4px;line-height:1;flex-shrink:0;}
-.set-pg{padding:14px 22px 22px;max-width:920px;flex:1;}
-.set-sec{background:var(--s);border:1px solid var(--b);border-radius:var(--r);padding:16px 18px;margin-bottom:14px;}
-.set-sec h3{font-size:13px;font-weight:700;margin-bottom:11px;color:var(--teal);display:flex;align-items:center;gap:6px;}
-.set-sub{font-size:11px;color:var(--t3);margin:-4px 0 9px;}
-.fg{margin-bottom:11px;}
-.fl{font-size:11px;font-weight:600;color:var(--t2);margin-bottom:4px;display:block;}
-.fl span{color:var(--red);}
-.fi,.fs,.fta{width:100%;padding:8px 11px;background:var(--s2);border:1px solid var(--b);border-radius:var(--rs);color:var(--t);font-family:inherit;font-size:12px;outline:none;transition:all .15s;}
-.fi:focus,.fs:focus,.fta:focus{border-color:var(--teal);box-shadow:0 0 0 3px var(--td2);}
-.fs option{background:var(--s2);}
-.fta{resize:vertical;min-height:60px;}
-.fr{display:grid;grid-template-columns:1fr 1fr;gap:10px;}
-.bs{background:var(--teal);color:var(--bg);border:none;cursor:pointer;padding:8px 14px;border-radius:var(--rs);font-family:inherit;font-size:12px;font-weight:700;transition:all .2s;}
-.bs:hover{background:#00d6f0;}
-.bss{background:var(--s2);color:var(--t2);border:1px solid var(--b);cursor:pointer;padding:8px 12px;border-radius:var(--rs);font-family:inherit;font-size:12px;font-weight:600;transition:all .15s;}
-.bss:hover{border-color:var(--teal);color:var(--teal);}
-.bsr{background:none;border:1px solid rgba(231,76,60,.4);color:var(--red);cursor:pointer;padding:4px 9px;border-radius:5px;font-family:inherit;font-size:11px;font-weight:600;transition:all .15s;}
-.bsr:hover{background:var(--rd);}
-.div{height:1px;background:var(--b);margin:11px 0;}
-.dsr{background:var(--s2);border:1px solid var(--b);border-radius:var(--rs);padding:10px 12px;margin-bottom:8px;}
-.dsr-h{display:flex;align-items:center;gap:7px;margin-bottom:8px;}
-.dsr-c{width:10px;height:10px;border-radius:2px;flex-shrink:0;}
-.dsr-n{font-size:13px;font-weight:700;flex:1;}
-.dsr-d{background:none;border:1px solid var(--b);color:var(--t3);padding:2px 8px;border-radius:4px;font-size:11px;cursor:pointer;transition:all .15s;}
-.dsr-d:hover{border-color:var(--red);color:var(--red);}
-.sched-days{display:grid;grid-template-columns:repeat(6,1fr);gap:4px;}
-.sdc{text-align:center;}
-.sdl{font-size:9px;font-weight:700;color:var(--t3);letter-spacing:.4px;text-transform:uppercase;margin-bottom:3px;}
-.sdl.or{color:var(--teal);}
-.slb{display:block;width:100%;margin-bottom:2px;padding:3px 2px;border-radius:4px;border:1px solid var(--b);background:none;color:var(--t3);font-family:inherit;font-size:9px;cursor:pointer;transition:all .15s;}
-.slb:hover{border-color:var(--td);color:var(--teal);}
-.slb.on{background:var(--td);color:var(--teal);border-color:rgba(0,191,216,.4);font-weight:700;}
-.dtbl{width:100%;border-collapse:collapse;font-size:12px;}
-.dtbl th{padding:8px 10px;text-align:left;color:var(--t3);font-weight:600;border-bottom:1px solid var(--b);font-size:11px;}
-.dtbl td{padding:8px 10px;border-bottom:1px solid rgba(255,255,255,.04);vertical-align:middle;}
-.dtbl tr:hover td{background:rgba(255,255,255,.02);}
-.op-item{display:flex;align-items:center;gap:7px;padding:6px 9px;background:var(--s2);border-radius:5px;border:1px solid var(--b);margin-bottom:4px;}
-.op-item span{flex:1;font-size:12px;}
-.ls-a{font-size:10px;font-weight:700;padding:2px 7px;border-radius:20px;background:var(--gnd);color:var(--green);border:1px solid rgba(46,204,113,.3);}
-.ls-p{font-size:10px;font-weight:700;padding:2px 7px;border-radius:20px;background:var(--yd);color:var(--yel);border:1px solid rgba(243,156,18,.3);}
-.ot-sw{font-size:10px;font-weight:700;padding:2px 7px;border-radius:20px;background:var(--yd);color:var(--yel);border:1px solid rgba(243,156,18,.3);}
-.ot-ad{font-size:10px;font-weight:700;padding:2px 7px;border-radius:20px;background:var(--pd);color:var(--pur);border:1px solid rgba(155,89,182,.3);}
-.ot-rp{font-size:10px;font-weight:700;padding:2px 7px;border-radius:20px;background:var(--td);color:var(--teal);border:1px solid rgba(0,191,216,.25);}
-.script-box{background:var(--bg);border:1px solid var(--b);border-radius:var(--rs);padding:12px;font-size:11px;color:var(--t2);font-family:'JetBrains Mono',monospace;line-height:1.65;overflow-x:auto;max-height:360px;overflow-y:auto;white-space:pre;}
+/* ─ LIST CARDS (news/articles) ─ */
+.tile{background:#fff;border:1px solid var(--line);border-radius:var(--r);overflow:hidden;transition:.2s;cursor:pointer;}
+.tile:hover{box-shadow:var(--shadow);transform:translateY(-2px);}
+.tile .thumb{height:150px;background:linear-gradient(135deg,var(--blue-soft),var(--pink-soft));display:flex;align-items:center;justify-content:center;font-size:34px;}
+.tile .body{padding:16px 18px;}
+.tag{display:inline-block;font-size:11px;font-weight:700;letter-spacing:.5px;text-transform:uppercase;color:var(--pink);margin-bottom:7px;}
+.tag.blue{color:var(--blue);}
+.tile h3{font-size:15px;line-height:1.4;margin-bottom:6px;}
+.tile .meta{font-size:12px;color:var(--muted);}
 
-/* ─ DATE PICKER OVERLAY ─ */
-.dp-overlay{display:none;position:fixed;inset:0;z-index:500;background:rgba(0,0,0,.6);backdrop-filter:blur(4px);align-items:center;justify-content:center;}
-.dp-overlay.open{display:flex;}
-.dp-modal{background:var(--s);border:1px solid var(--b2);border-radius:16px;padding:20px;width:360px;max-width:95vw;box-shadow:0 20px 60px rgba(0,0,0,.65);animation:fup .2s ease;}
-@keyframes fup{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:translateY(0)}}
-.dp-modal-hd{display:flex;align-items:center;justify-content:space-between;margin-bottom:12px;}
-.dp-modal-title{font-size:14px;font-weight:700;}
-.dp-mcl{background:var(--s2);border:1px solid var(--b);color:var(--t2);width:26px;height:26px;border-radius:6px;cursor:pointer;font-size:13px;display:flex;align-items:center;justify-content:center;transition:all .15s;}
-.dp-mcl:hover{background:var(--s3);color:var(--t);}
-.dp-nav-row{display:flex;align-items:center;justify-content:space-between;margin-bottom:10px;}
-.dp-nav-btn{background:var(--s2);border:1px solid var(--b);color:var(--t2);width:28px;height:28px;border-radius:var(--rs);cursor:pointer;font-size:13px;display:flex;align-items:center;justify-content:center;transition:all .15s;}
-.dp-nav-btn:hover{border-color:var(--teal);color:var(--teal);}
-.dp-month-label{font-size:14px;font-weight:700;color:var(--teal);}
-.dp-legend{display:flex;gap:10px;margin-bottom:8px;flex-wrap:wrap;}
-.dp-lgnd-item{display:flex;align-items:center;gap:4px;font-size:10px;color:var(--t3);}
-.dp-lgnd-dot{width:8px;height:8px;border-radius:2px;}
-.dp-cal-grid{display:grid;grid-template-columns:repeat(7,1fr);gap:3px;}
-.dp-wd{text-align:center;font-size:10px;font-weight:700;color:var(--t3);padding:4px 0;text-transform:uppercase;}
-.dp-wd.hi{color:var(--teal);}
-.dp-d{text-align:center;padding:8px 3px;border-radius:7px;cursor:pointer;font-size:12px;font-weight:500;color:var(--t2);transition:all .12s;border:1px solid transparent;position:relative;}
-.dp-d:hover:not(.other){background:var(--td);color:var(--teal);}
-.dp-d.other{color:var(--t3);opacity:.35;cursor:default;pointer-events:none;}
-.dp-d.sel{background:var(--teal);color:var(--bg);font-weight:700;}
-.dp-d.td-mark:not(.sel){border-color:rgba(0,191,216,.5);color:var(--teal);}
-.dp-d.orm:not(.sel):not(.leave-d):not(.swap-d){background:var(--td2);}
-.dp-d.leave-d:not(.sel){background:var(--rd);color:var(--red);}
-.dp-d.leave-d:hover:not(.sel){background:rgba(231,76,60,.25);}
-.dp-d.swap-d:not(.sel):not(.leave-d){background:var(--yd);}
-.dp-trigger{width:100%;padding:9px 11px;background:var(--s2);border:1px solid var(--b);border-radius:var(--rs);color:var(--t);font-family:inherit;font-size:13px;cursor:pointer;transition:all .15s;display:flex;align-items:center;justify-content:space-between;text-align:left;}
-.dp-trigger:hover,.dp-trigger.has-val{border-color:var(--teal);}
-.dp-trigger.placeholder{color:var(--t3);}
+/* ─ ABOUT TABS ─ */
+.tabs{display:flex;gap:6px;border-bottom:1px solid var(--line);margin-bottom:28px;flex-wrap:wrap;}
+.tabs button{background:none;border:none;font-family:inherit;font-size:14px;font-weight:600;color:var(--muted);padding:11px 16px;cursor:pointer;border-bottom:2.5px solid transparent;margin-bottom:-1px;transition:.15s;}
+.tabs button.on{color:var(--pink);border-color:var(--pink);}
+.tabpane{display:none;}.tabpane.on{display:block;animation:fade .3s;}
+.team{display:grid;grid-template-columns:repeat(4,1fr);gap:18px;}
+.member{text-align:center;}
+.member .av{width:84px;height:84px;border-radius:50%;margin:0 auto 12px;background:linear-gradient(135deg,var(--pink),var(--blue));display:flex;align-items:center;justify-content:center;color:#fff;font-size:26px;font-weight:700;}
+.member b{display:block;font-size:14px;}
+.member span{font-size:12px;color:var(--muted);}
 
-/* ─ TIME 24h ─ */
-.time-wrap{display:flex;align-items:center;gap:6px;}
-.time-inp{width:80px;padding:9px 11px;background:var(--s2);border:1px solid var(--b);border-radius:var(--rs);color:var(--t);font-family:'JetBrains Mono',monospace;font-size:14px;outline:none;transition:all .15s;text-align:center;}
-.time-inp:focus{border-color:var(--teal);box-shadow:0 0 0 3px var(--td2);}
-.time-sep{font-size:11px;color:var(--t3);}
+/* ─ CONFERENCE ─ */
+.conf-banner{background:linear-gradient(120deg,var(--blue-d),var(--pink-d));border-radius:var(--r);padding:42px;color:#fff;display:grid;grid-template-columns:1.3fr .7fr;gap:30px;align-items:center;}
+.conf-banner h2{color:#fff;}
+.conf-banner .lead{color:rgba(255,255,255,.85);}
+.conf-meta{display:flex;flex-direction:column;gap:12px;}
+.conf-meta .row{display:flex;align-items:center;gap:11px;font-size:14px;}
+.conf-meta .row span{width:30px;height:30px;background:rgba(255,255,255,.18);border-radius:8px;display:flex;align-items:center;justify-content:center;}
+.price-row{display:grid;grid-template-columns:repeat(2,1fr);gap:16px;margin-top:24px;}
+.price{border:1px solid var(--line);border-radius:var(--r);padding:22px;text-align:center;}
+.price.feat{border-color:var(--pink);box-shadow:0 0 0 3px var(--pink-soft);}
+.price .lvl{font-size:13px;font-weight:700;color:var(--muted);}
+.price .amt{font-size:30px;font-weight:700;color:var(--blue);margin:6px 0;}
+.price .amt small{font-size:14px;color:var(--muted);font-weight:500;}
+.price ul{list-style:none;font-size:13px;color:var(--muted);text-align:left;margin:14px 0 18px;}
+.price li{padding:5px 0 5px 22px;position:relative;}
+.price li:before{content:"✓";position:absolute;left:0;color:var(--pink);font-weight:700;}
+
+/* ─ SERVICE UNITS ─ */
+.unit{display:flex;gap:14px;align-items:flex-start;padding:18px;border:1px solid var(--line);border-radius:var(--r);background:#fff;}
+.unit .pin{width:40px;height:40px;border-radius:10px;background:var(--blue-soft);display:flex;align-items:center;justify-content:center;flex-shrink:0;}
+.unit b{font-size:14.5px;}
+.unit p{font-size:12.5px;color:var(--muted);}
+.unit .prov{font-size:11px;font-weight:600;color:var(--pink);}
+
+/* ─ CONTACT ─ */
+.contact-grid{display:grid;grid-template-columns:1fr 1fr;gap:32px;}
+.field{margin-bottom:14px;}
+.field label{display:block;font-size:13px;font-weight:600;margin-bottom:5px;}
+.field input,.field textarea,.field select{width:100%;padding:11px 13px;border:1px solid var(--line);border-radius:var(--rs);font-family:inherit;font-size:14px;background:#fff;color:var(--ink);transition:.15s;}
+.field input:focus,.field textarea:focus,.field select:focus{outline:none;border-color:var(--blue);box-shadow:0 0 0 3px var(--blue-soft);}
+.info-line{display:flex;gap:12px;align-items:center;padding:14px 0;border-bottom:1px solid var(--line);}
+.info-line .ic{margin:0;width:40px;height:40px;font-size:17px;}
+.info-line b{font-size:14px;display:block;}
+.info-line span{font-size:13px;color:var(--muted);}
 
 /* ─ MODAL ─ */
-.overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,.72);z-index:200;align-items:center;justify-content:center;backdrop-filter:blur(5px);}
-.overlay.open{display:flex;}
-.modal{background:var(--s);border:1px solid var(--b2);border-radius:16px;padding:22px 24px;width:560px;max-width:96vw;max-height:92vh;overflow-y:auto;box-shadow:0 20px 60px rgba(0,0,0,.65);animation:fup .2s ease;}
-.modal.sm{width:460px;}
-.mhd{display:flex;align-items:center;justify-content:space-between;margin-bottom:14px;}
-.mtl{font-size:15px;font-weight:700;}
-.mcl{background:var(--s2);border:1px solid var(--b);color:var(--t2);width:27px;height:27px;border-radius:6px;cursor:pointer;font-size:14px;display:flex;align-items:center;justify-content:center;transition:all .15s;}
-.mcl:hover{background:var(--s3);color:var(--t);}
-.mft{display:flex;gap:7px;justify-content:flex-end;margin-top:14px;}
+.overlay{position:fixed;inset:0;background:rgba(20,28,42,.45);backdrop-filter:blur(3px);z-index:100;display:none;align-items:center;justify-content:center;padding:20px;}
+.overlay.on{display:flex;animation:fade .2s;}
+.modal{background:#fff;border-radius:18px;width:100%;max-width:420px;padding:30px;box-shadow:0 24px 70px rgba(0,0,0,.25);max-height:90vh;overflow-y:auto;}
+.modal-x{float:right;background:none;border:none;font-size:22px;cursor:pointer;color:var(--muted);line-height:1;}
+.modal h2{font-size:21px;margin-bottom:4px;}
+.modal .sub{font-size:13.5px;color:var(--muted);margin-bottom:22px;}
+.seg{display:flex;background:var(--soft);border-radius:10px;padding:4px;margin-bottom:22px;}
+.seg button{flex:1;background:none;border:none;font-family:inherit;font-size:13.5px;font-weight:600;padding:9px;border-radius:7px;cursor:pointer;color:var(--muted);transition:.15s;}
+.seg button.on{background:#fff;color:var(--pink);box-shadow:0 1px 3px rgba(0,0,0,.08);}
+.modal .btn{width:100%;justify-content:center;margin-top:6px;}
+.muted-link{font-size:12.5px;color:var(--muted);text-align:center;margin-top:16px;}
+.muted-link a{color:var(--pink);font-weight:600;cursor:pointer;}
+.note{font-size:12px;color:var(--muted);background:var(--soft);border-radius:8px;padding:10px 12px;margin-top:12px;}
 
-/* ─ RS CALENDAR ─ */
-.rs-cal-wrap{background:var(--s2);border:1px solid var(--b);border-radius:var(--rs);padding:12px;}
-.rs-cal-nav{display:flex;align-items:center;justify-content:space-between;margin-bottom:8px;}
-.rs-cal-label{font-size:13px;font-weight:700;color:var(--teal);}
-.rs-sel-display{margin-top:8px;padding:8px 10px;background:var(--td2);border:1px solid rgba(0,191,216,.2);border-radius:6px;font-size:12px;color:var(--teal);text-align:center;min-height:32px;display:flex;align-items:center;justify-content:center;}
-.rs-sel-display.empty{color:var(--t3);}
+/* ─ DASHBOARD (member/admin/reviewer demo) ─ */
+.dash{display:grid;grid-template-columns:230px 1fr;gap:0;min-height:560px;border:1px solid var(--line);border-radius:var(--r);overflow:hidden;margin:30px 0;}
+.dash-side{background:var(--soft);border-right:1px solid var(--line);padding:18px 12px;}
+.dash-side .who{display:flex;align-items:center;gap:10px;padding:8px 10px 16px;border-bottom:1px solid var(--line);margin-bottom:12px;}
+.dash-side .who .av{width:38px;height:38px;border-radius:50%;background:linear-gradient(135deg,var(--pink),var(--blue));color:#fff;display:flex;align-items:center;justify-content:center;font-weight:700;font-size:15px;}
+.dash-side .who b{font-size:13px;display:block;}.dash-side .who span{font-size:11px;color:var(--muted);}
+.dash-side .di{display:flex;align-items:center;gap:9px;padding:9px 11px;border-radius:8px;font-size:13px;font-weight:500;color:var(--muted);cursor:pointer;margin-bottom:2px;transition:.15s;}
+.dash-side .di:hover{background:#fff;color:var(--ink);}
+.dash-side .di.on{background:var(--pink-soft);color:var(--pink);font-weight:600;}
+.dash-main{padding:24px;overflow-x:auto;}
+.dash-main h3{margin-bottom:4px;}
+.dash-main .hint{font-size:13px;color:var(--muted);margin-bottom:20px;}
+.kpis{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin-bottom:22px;}
+.kpi{background:#fff;border:1px solid var(--line);border-radius:var(--rs);padding:15px;}
+.kpi b{font-size:24px;font-weight:700;color:var(--blue);display:block;line-height:1;}
+.kpi span{font-size:12px;color:var(--muted);}
+table{width:100%;border-collapse:collapse;font-size:13px;}
+th{text-align:left;font-size:11px;text-transform:uppercase;letter-spacing:.5px;color:var(--muted);padding:10px 12px;border-bottom:1px solid var(--line);font-weight:700;}
+td{padding:11px 12px;border-bottom:1px solid var(--line);}
+tr:hover td{background:var(--soft);}
+.badge{font-size:11px;font-weight:700;padding:3px 9px;border-radius:20px;}
+.bg-on{background:#E4F7EC;color:#1A9E52;}
+.bg-off{background:#FBE9E7;color:#C0392B;}
+.bg-wait{background:#FEF3E0;color:#C47B00;}
+.bg-blue{background:var(--blue-soft);color:var(--blue);}
+.dash-tabnote{font-size:12px;color:var(--muted);background:var(--blue-soft);border-radius:8px;padding:10px 13px;margin-bottom:18px;}
 
-/* ─ SWAP MODAL ─ */
-.swap-doc-info{padding:10px 12px;background:var(--s2);border-radius:var(--rs);border:1px solid var(--b);font-size:13px;font-weight:700;margin-bottom:11px;}
+/* ─ FOOTER ─ */
+footer{background:#11192A;color:#9FB0C8;padding:48px 0 26px;margin-top:20px;}
+.foot-grid{display:grid;grid-template-columns:1.5fr 1fr 1fr 1fr;gap:30px;margin-bottom:32px;}
+footer .brand-t b{color:#fff;}
+footer h4{color:#fff;font-size:13px;margin-bottom:14px;letter-spacing:.5px;}
+footer a,footer p{display:block;font-size:13px;color:#9FB0C8;padding:4px 0;cursor:pointer;}
+footer a:hover{color:#fff;}
+.foot-bottom{border-top:1px solid rgba(255,255,255,.1);padding-top:20px;font-size:12px;display:flex;justify-content:space-between;flex-wrap:wrap;gap:10px;}
+.demo-flag{position:fixed;bottom:16px;right:16px;z-index:60;background:var(--ink);color:#fff;font-size:11.5px;font-weight:600;padding:8px 14px;border-radius:30px;box-shadow:var(--shadow);letter-spacing:.5px;}
 
-/* ─ TOAST ─ */
-.toast{position:fixed;top:68px;right:18px;z-index:55;background:var(--s);border:1px solid var(--b2);padding:10px 14px;border-radius:9px;font-size:12px;font-weight:500;box-shadow:0 8px 30px rgba(0,0,0,.5);display:none;align-items:center;gap:8px;transform:translateY(-20px);opacity:0;transition:opacity .3s cubic-bezier(.34,1.56,.64,1),transform .3s cubic-bezier(.34,1.56,.64,1);max-width:360px;pointer-events:none;}
-.toast.show{display:flex;transform:translateY(0);opacity:1;pointer-events:auto;}
-.toast.ok{border-left:3px solid var(--green);}
-.toast.warn{border-left:3px solid var(--yel);}
-.toast.err{border-left:3px solid var(--red);}
-.toast.info{border-left:3px solid var(--teal);}
-
-/* ─ LOADER ─ */
-.ldr{display:none;position:fixed;inset:0;background:rgba(0,0,0,.55);z-index:600;align-items:center;justify-content:center;flex-direction:column;gap:12px;pointer-events:none;}
-.ldr.show{display:flex;pointer-events:all;}
-.spinner{width:36px;height:36px;border:3px solid var(--b2);border-top-color:var(--teal);border-radius:50%;animation:spin .8s linear infinite;}
-@keyframes spin{to{transform:rotate(360deg)}}
-.ldr-t{color:var(--t2);font-size:13px;}
-
-/* ─ MOBILE ─ */
-.mob-menu-btn{display:none;background:var(--s2);border:1px solid var(--b);color:var(--t2);width:36px;height:36px;border-radius:var(--rs);cursor:pointer;font-size:18px;align-items:center;justify-content:center;flex-shrink:0;transition:all .15s;}
-.mob-menu-btn:hover{background:var(--s3);color:var(--teal);}
-.sb-backdrop{display:none;position:fixed;inset:0;background:rgba(0,0,0,.55);z-index:49;}
-.sb-backdrop.open{display:block;}
-.mob-bottom-nav{display:none;position:fixed;bottom:0;left:0;right:0;background:var(--s);border-top:1px solid var(--b);z-index:200;padding:0;padding-bottom:env(safe-area-inset-bottom,0px);}
-.mob-bottom-nav ul{display:flex;list-style:none;margin:0;padding:0;}
-.mob-bottom-nav li{flex:1;display:flex;}
-.mob-bottom-nav li a{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2px;padding:7px 2px 5px;font-size:9px;font-weight:600;color:var(--t3);cursor:pointer;text-decoration:none;transition:all .15s;border-top:2px solid transparent;}
-.mob-bottom-nav li a .mni{font-size:18px;line-height:1;}
-.mob-bottom-nav li a.active{color:var(--teal);border-top-color:var(--teal);}
-
-@media (max-width: 768px){
-  .sidebar{transform:translateX(-100%);transition:transform .25s ease;z-index:51;box-shadow:4px 0 24px rgba(0,0,0,.5);}
-  .sidebar.mob-open{transform:translateX(0);}
-  .content{margin-left:0;}
-  .topbar{padding:9px 12px;gap:8px;flex-wrap:wrap;}
-  .pg-title{font-size:14px;flex:1;min-width:0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
-  .top-r{gap:5px;flex-wrap:nowrap;}
-  .sync-badge{font-size:10px;padding:3px 7px;}
-  .sync-badge span{display:none;}
-  .wk-nav span{font-size:11px;min-width:72px;}
-  .btn-add{padding:7px 10px;font-size:11px;}
-  .btn-add span{display:none;}
-  .mob-menu-btn{display:flex;}
-  .stats-row{grid-template-columns:1fr 1fr;padding:10px 12px 0;gap:7px;}
-  .stat-card{padding:10px 10px;}
-  .stat-icon{width:30px;height:30px;font-size:14px;}
-  .sn{font-size:16px;}
-  .sl{font-size:9px;}
-  .sg{grid-template-columns:1fr;padding:10px 10px 80px;gap:10px;}
-  .cal-pg{padding:10px 10px 80px;}
-  .set-pg{padding:10px 10px 80px;}
-  .ac{padding:9px 10px;}
-  .a-name{font-size:12px;}
-  .a-op{font-size:10px;}
-  .overlay{align-items:flex-end;}
-  .modal{border-radius:16px 16px 0 0;width:100%;max-width:100%;max-height:88vh;padding:18px 16px 24px;animation:slide-up .25s ease;}
-  @keyframes slide-up{from{transform:translateY(60px);opacity:0}to{transform:translateY(0);opacity:1}}
-  .modal.sm{width:100%;max-width:100%;}
-  .fr{grid-template-columns:1fr;}
-  .ov-row{grid-template-columns:1fr;}
-  .mft{gap:8px;}
-  .mft .bs,.mft .bss{flex:1;text-align:center;}
-  .cal-pg{padding:10px 10px 80px;}
-  .cal-mt{font-size:15px;min-width:130px;}
-  .cal-day{min-height:62px;padding:5px 4px;}
-  .cdn{font-size:11px;}
-  .cal-cnt{font-size:10px;padding:1px 4px;}
-  .cal-case-item{font-size:9px;}
-  .sched-days{grid-template-columns:repeat(3,1fr);}
-  .dp-overlay{align-items:flex-end;}
-  .dp-modal{border-radius:16px 16px 0 0;width:100%;max-width:100%;padding:18px 16px 24px;}
-  .toast{top:12px;bottom:auto;left:12px;right:12px;max-width:none;font-size:12px;transform:translateY(-20px);z-index:55;}
-  .toast.show{transform:translateY(0);}
-  .mob-bottom-nav{display:block;}
-  #sideDocList{display:flex;flex-wrap:nowrap;overflow-x:auto;gap:5px;padding-bottom:4px;-webkit-overflow-scrolling:touch;}
-  .doc-chip{white-space:nowrap;flex-shrink:0;padding:5px 10px;font-size:11px;}
+/* ─ RESPONSIVE ─ */
+@media(max-width:880px){
+  .menu{display:none;position:absolute;top:68px;left:0;right:0;background:#fff;flex-direction:column;border-bottom:1px solid var(--line);padding:10px 14px;gap:2px;box-shadow:var(--shadow);}
+  .menu.open{display:flex;}
+  .menu a{padding:11px 13px;}
+  .burger{display:block;}
+  .nav .btn{display:none;}
+  .hero-grid{grid-template-columns:1fr;text-align:center;}
+  .hero .lead{margin-left:auto;margin-right:auto;}
+  .hero-cta,.pill-row{justify-content:center;}
+  .hero-art{order:-1;}
+  .conf-banner{grid-template-columns:1fr;}
+  .contact-grid{grid-template-columns:1fr;}
+  .dash{grid-template-columns:1fr;}
+  .dash-side{display:flex;flex-wrap:wrap;gap:6px;border-right:none;border-bottom:1px solid var(--line);}
+  .dash-side .who{width:100%;}
+  h1{font-size:31px;}
 }
-@media (max-width: 400px){
-  .stats-row{grid-template-columns:1fr 1fr;gap:5px;padding:8px 8px 0;}
-  .stat-card{padding:8px 8px;}
-  .sn{font-size:14px;}
-  .cal-day{min-height:52px;padding:4px 3px;}
-  .cdn{font-size:10px;}
+@media(max-width:680px){
+  .g3,.g4,.g2,.team,.stat-strip,.kpis,.price-row{grid-template-columns:1fr 1fr;}
+}
+@media(max-width:460px){
+  .g3,.g4,.g2,.team,.stat-strip,.kpis,.price-row{grid-template-columns:1fr;}
+  h1{font-size:27px;}h2{font-size:22px;}
 }
 </style>
 </head>
 <body>
 
-<div class="sb-backdrop" id="sbBackdrop" onclick="closeSidebar()"></div>
-
-<aside class="sidebar">
-  <div class="sb-logo">
-    <div class="ico">🏥</div>
-    <h2>ENT OR Schedule</h2>
-    <p>แผนก หู คอ จมูก · v4f</p>
-  </div>
-  <div class="nav-sec">
-    <div class="nav-lbl">เมนูหลัก</div>
-    <div class="nav-item active" data-page="schedule" onclick="showPage('schedule')"><span class="ni">📋</span>ตารางนัดผ่าตัด</div>
-    <div class="nav-item" data-page="calendar" onclick="showPage('calendar')"><span class="ni">📅</span>ปฏิทินรายเดือน</div>
-    <div class="nav-lbl" style="margin-top:10px;">จัดการ</div>
-    <div class="nav-item" data-page="leave" onclick="showPage('leave')"><span class="ni">🏖️</span>วันลาแพทย์</div>
-    <div class="nav-item" data-page="swap" onclick="showPage('swap')"><span class="ni">🔁</span>สลับวันผ่าตัด</div>
-    <div class="nav-item" data-page="settings" onclick="showPage('settings')"><span class="ni">⚙️</span>ตั้งค่า</div>
-  </div>
-  <div class="sb-docs">
-    <div class="sb-dlbl">กรองแพทย์</div>
-    <div id="sideDocList"></div>
-  </div>
-</aside>
-
-<div class="content">
-  <div class="topbar">
-    <button class="mob-menu-btn" id="mobMenuBtn" onclick="toggleSidebar()">☰</button>
-    <div class="pg-title" id="pgTitle">ตารางนัดผ่าตัด</div>
-    <div class="top-r">
-      <div class="sync-badge" id="syncBadge"><div class="s-dot"></div><span id="syncTxt">ไม่ได้เชื่อมต่อ</span></div>
-      <div class="wk-nav" id="wkNav"><button class="wbtn" onclick="changeWeek(-1)">‹</button><span id="wkLabel">สัปดาห์นี้</span><button class="wbtn" onclick="changeWeek(1)">›</button></div>
-      <button class="theme-btn" id="themeBtn" onclick="toggleTheme()" title="สลับธีม">🌙</button>
-      <button class="btn-add" onclick="openAdd()">＋ <span>เพิ่มนัดผ่าตัด</span></button>
+<!-- ─── HEADER ─── -->
+<header>
+  <div class="wrap nav">
+    <div class="brand" onclick="go('home')">
+      <img src="logo.jpg" alt="TSHA">
+      <div class="brand-t"><b>TSHA</b><span>สมาคมโสตสัมผัสฯ</span></div>
     </div>
+    <nav class="menu" id="menu">
+      <a onclick="go('home')" data-nav="home" class="on">หน้าหลัก</a>
+      <a onclick="go('about')" data-nav="about">เกี่ยวกับเรา</a>
+      <a onclick="go('articles')" data-nav="articles">บทความน่ารู้</a>
+      <a onclick="go('news')" data-nav="news">ข่าวสาร</a>
+      <a onclick="go('conf')" data-nav="conf">ประชุมวิชาการ</a>
+      <a onclick="go('research')" data-nav="research">งานวิจัย</a>
+      <a onclick="go('units')" data-nav="units">หน่วยบริการ</a>
+      <a onclick="go('contact')" data-nav="contact">ติดต่อเรา</a>
+    </nav>
+    <button class="btn btn-p" onclick="openLogin()">เข้าสู่ระบบสมาชิก</button>
+    <button class="burger" onclick="document.getElementById('menu').classList.toggle('open')">☰</button>
   </div>
+</header>
 
-  <div class="stats-row" id="statsRow">
-    <div class="stat-card"><div class="stat-icon si-t">🗓️</div><div><div class="sn t" id="stT">0</div><div class="sl">นัดสัปดาห์นี้</div></div></div>
-    <div class="stat-card"><div class="stat-icon si-c">✅</div><div><div class="sn c" id="stC">0</div><div class="sl">ยืนยันแล้ว</div></div></div>
-    <div class="stat-card"><div class="stat-icon si-p">⏳</div><div><div class="sn p" id="stP">0</div><div class="sl">รอยืนยัน</div></div></div>
-    <div class="stat-card"><div class="stat-icon si-x">❌</div><div><div class="sn x" id="stX">0</div><div class="sl">ยกเลิก</div></div></div>
-  </div>
-
-  <div class="page active" id="page-schedule">
-    <div class="sg">
-      <div class="day-col">
-        <div class="day-hd">
-          <div class="day-hd-l">
-            <div class="day-badge"><div class="dnum" id="monN">–</div><div class="dshort">MON</div></div>
-            <div><div class="day-name">วันจันทร์</div><div class="day-dlbl" id="monD">–</div></div>
-          </div>
-          <div class="day-cnt" id="monCnt">0 ราย</div>
+<!-- ════════ HOME ════════ -->
+<div class="page on" id="page-home">
+  <div class="hero">
+    <div class="wrap hero-grid">
+      <div>
+        <div class="pill-row">
+          <span class="pill">🎧 โสตสัมผัสวิทยา</span>
+          <span class="pill">🗣️ การแก้ไขการพูด</span>
         </div>
-        <div class="day-body" id="monBody"></div>
-        <div style="padding:0 11px 11px"><button class="add-day-btn" onclick="openAdd('mon')">＋ เพิ่มนัดวันจันทร์</button></div>
+        <h1>สมาคมโสตสัมผัสวิทยาและ<br>การแก้ไขการพูดแห่งประเทศไทย</h1>
+        <p class="lead">ศูนย์รวมความรู้ ข่าวสาร และเครือข่ายวิชาชีพสำหรับนักแก้ไขการได้ยินและนักแก้ไขการพูด พร้อมระบบสมาชิกและการประชุมวิชาการประจำปี</p>
+        <div class="hero-cta">
+          <button class="btn btn-p" onclick="openLogin('register')">สมัครสมาชิก</button>
+          <button class="btn btn-o" onclick="go('conf')">ลงทะเบียนประชุมวิชาการ</button>
+        </div>
       </div>
-      <div class="day-col">
-        <div class="day-hd">
-          <div class="day-hd-l">
-            <div class="day-badge"><div class="dnum" id="wedN">–</div><div class="dshort">WED</div></div>
-            <div><div class="day-name">วันพุธ</div><div class="day-dlbl" id="wedD">–</div></div>
-          </div>
-          <div class="day-cnt" id="wedCnt">0 ราย</div>
-        </div>
-        <div class="day-body" id="wedBody"></div>
-        <div style="padding:0 11px 11px"><button class="add-day-btn" onclick="openAdd('wed')">＋ เพิ่มนัดวันพุธ</button></div>
+      <div class="hero-art">
+        <div class="blob b1"></div><div class="blob b2"></div>
+        <div class="disc"><img src="logo.jpg" alt="TSHA Logo"></div>
       </div>
     </div>
   </div>
 
-  <div class="page" id="page-calendar">
-    <div class="cal-pg">
-      <div class="cal-hdr">
-        <div class="cal-mnav"><button class="cnbtn" onclick="calNav(-1)">‹</button><div class="cal-mt" id="calTitle">–</div><button class="cnbtn" onclick="calNav(1)">›</button></div>
-        <div class="cal-fbar" id="calFbar"></div>
-      </div>
-      <div id="calSummary"></div>
-      <div class="cal-wrap">
-        <div class="cal-wds">
-          <div class="cal-wd">อา</div><div class="cal-wd hi">จ</div><div class="cal-wd">อ</div>
-          <div class="cal-wd hi">พ</div><div class="cal-wd">พฤ</div><div class="cal-wd">ศ</div><div class="cal-wd">ส</div>
-        </div>
-        <div class="cal-dg" id="calGrid"></div>
-      </div>
-      <div style="display:flex;gap:12px;margin-top:8px;flex-wrap:wrap;">
-        <span style="font-size:10px;color:var(--t3);display:flex;align-items:center;gap:4px;"><span style="width:8px;height:8px;background:var(--td);border-radius:2px;display:inline-block;"></span>วัน OR</span>
-        <span style="font-size:10px;color:var(--t3);display:flex;align-items:center;gap:4px;"><span style="width:8px;height:8px;background:var(--rd);border-radius:2px;display:inline-block;"></span>วันลาแพทย์</span>
-        <span style="font-size:10px;color:var(--t3);display:flex;align-items:center;gap:4px;"><span style="width:8px;height:8px;background:var(--yd);border-radius:2px;display:inline-block;"></span>สลับเวร</span>
-      </div>
+  <div class="wrap">
+    <div class="stat-strip">
+      <div class="stat"><b>1,250+</b><span>สมาชิกทั่วประเทศ</span></div>
+      <div class="stat"><b>32</b><span>ปีของสมาคม</span></div>
+      <div class="stat"><b>78</b><span>หน่วยบริการ</span></div>
+      <div class="stat"><b>24</b><span>การประชุมวิชาการ</span></div>
     </div>
   </div>
 
-  <div class="page" id="page-leave">
-    <div class="set-pg">
-      <div class="set-sec">
-        <h3>🏖️ บันทึกวันลาแพทย์ใหม่</h3>
-        <div class="fr">
-          <div class="fg"><label class="fl">แพทย์ <span>*</span></label><select class="fs" id="lvDoc"></select></div>
-          <div class="fg"><label class="fl">สถานะ</label><select class="fs" id="lvStat"><option value="Approved">Approved – อนุมัติแล้ว</option><option value="Pending">Pending – รออนุมัติ</option></select></div>
-        </div>
-        <div class="fr">
-          <div class="fg"><label class="fl">วันเริ่มต้น <span>*</span></label><input class="fi" type="date" id="lvStart"></div>
-          <div class="fg"><label class="fl">วันสิ้นสุด <span>*</span></label><input class="fi" type="date" id="lvEnd"></div>
-        </div>
-        <div class="fg"><label class="fl">เหตุผล</label><input class="fi" id="lvReason" placeholder="เช่น ลาพักผ่อน, ไปอบรม..."></div>
-        <button class="bs" onclick="saveLeave()">💾 บันทึกวันลา</button>
-      </div>
-      <div class="set-sec">
-        <h3>📋 รายการวันลาทั้งหมด</h3>
-        <table class="dtbl"><thead><tr><th>แพทย์</th><th>ช่วงวัน</th><th>เหตุผล</th><th>สถานะ</th><th></th></tr></thead>
-        <tbody id="leaveTbody"></tbody></table>
-      </div>
+  <section class="wrap">
+    <div class="center" style="margin-bottom:34px">
+      <div class="eyebrow">บริการของสมาคม</div>
+      <h2>ทุกอย่างในที่เดียว</h2>
+      <p class="lead">ระบบครบวงจรสำหรับสมาชิกและการบริหารงานสมาคม</p>
     </div>
-  </div>
+    <div class="grid g3">
+      <div class="card"><div class="ic">👤</div><h3>ระบบสมาชิก</h3><p>สมัคร ต่ออายุ อัปโหลดใบประกอบวิชาชีพ และจัดการข้อมูลส่วนตัวได้ตลอด 24 ชม.</p></div>
+      <div class="card"><div class="ic blue">📚</div><h3>บทความน่ารู้</h3><p>คลังความรู้สำหรับนักแก้ไขการได้ยินและการพูด อัปเดตสม่ำเสมอ</p></div>
+      <div class="card"><div class="ic">🎓</div><h3>ประชุมวิชาการ</h3><p>ลงทะเบียนงานประชุมประจำปี เก็บ CEU และส่งผลงานนำเสนอออนไลน์</p></div>
+      <div class="card"><div class="ic blue">📝</div><h3>วารสารและงานวิจัย</h3><p>รวบรวมวารสารและงานวิจัยทางวิชาการของสมาคม</p></div>
+      <div class="card"><div class="ic">📍</div><h3>หน่วยบริการ</h3><p>ค้นหาสถานที่หน่วยบริการทั่วประเทศ พร้อมพิกัดและรายละเอียด</p></div>
+      <div class="card"><div class="ic blue">🧾</div><h3>การเงินโปร่งใส</h3><p>ตรวจสอบการชำระเงิน ออกใบเสร็จอัตโนมัติ และดูสรุปการเงินรายปี</p></div>
+    </div>
+  </section>
 
-  <div class="page" id="page-swap">
-    <div class="set-pg">
-      <div class="set-sec">
-        <h3>🔁 บันทึกการสลับ / เพิ่มวันผ่าตัด (Override)</h3>
-        <p class="set-sub">กรณีแพทย์ผ่าตัดนอกตารางปกติ เช่น สลับเวรกัน, ผ่าตัดเพิ่ม, แทนแพทย์</p>
-        <div class="fr">
-          <div class="fg"><label class="fl">แพทย์ <span>*</span></label><select class="fs" id="swDoc"></select></div>
-          <div class="fg"><label class="fl">ประเภท</label><select class="fs" id="swType"><option value="Swap">🔁 Swap – สลับเวร</option><option value="Additional">➕ Additional – ผ่าตัดเพิ่ม</option><option value="Replacement">↔️ Replacement – แทนแพทย์</option></select></div>
-        </div>
-        <div class="fr">
-          <div class="fg"><label class="fl">วันที่ <span>*</span></label><input class="fi" type="date" id="swDate"></div>
-          <div class="fg"><label class="fl">หมายเหตุ</label><input class="fi" id="swNote" placeholder="เช่น สลับเวรกับ นพ. สมชาย"></div>
-        </div>
-        <button class="bs" onclick="saveSwap()">💾 บันทึก Override</button>
+  <section class="soft">
+    <div class="wrap">
+      <div class="shead">
+        <div><div class="eyebrow">อัปเดตล่าสุด</div><h2>ข่าวสารและกิจกรรม</h2></div>
+        <button class="btn btn-g" onclick="go('news')">ดูทั้งหมด →</button>
       </div>
-      <div class="set-sec">
-        <h3>📋 รายการ Override ทั้งหมด</h3>
-        <table class="dtbl"><thead><tr><th>แพทย์</th><th>วันที่</th><th>ประเภท</th><th>หมายเหตุ</th><th></th></tr></thead>
-        <tbody id="swapTbody"></tbody></table>
+      <div class="grid g3">
+        <div class="tile" onclick="go('news')"><div class="thumb">📢</div><div class="body"><span class="tag">ประกาศ</span><h3>เปิดรับสมัครสมาชิกใหม่ ประจำปี 2569</h3><p class="meta">10 มิ.ย. 2569</p></div></div>
+        <div class="tile" onclick="go('conf')"><div class="thumb">🎓</div><div class="body"><span class="tag blue">กิจกรรม</span><h3>ประชุมวิชาการประจำปี ครั้งที่ 25</h3><p class="meta">2 มิ.ย. 2569</p></div></div>
+        <div class="tile" onclick="go('articles')"><div class="thumb">🔬</div><div class="body"><span class="tag">บทความ</span><h3>เทคโนโลยีเครื่องช่วยฟังยุคใหม่</h3><p class="meta">28 พ.ค. 2569</p></div></div>
       </div>
     </div>
-  </div>
+  </section>
 
-  <div class="page" id="page-settings">
-    <div class="set-pg">
-      <div class="set-sec">
-        <h3>🔗 เชื่อมต่อ Google Sheets</h3>
-        <p class="set-sub">Deploy Google Apps Script เป็น Web App (Execute as: Me, Access: Anyone)</p>
-        <div class="fg"><label class="fl">Apps Script Web App URL</label><input class="fi" id="cfgUrl" placeholder="https://script.google.com/macros/s/…/exec"></div>
-        <div class="fr">
-          <div class="fg"><label class="fl">Sheet Name</label><input class="fi" id="cfgSheet" value="ENT_Schedule"></div>
-          <div class="fg"><label class="fl">Spreadsheet ID</label><input class="fi" id="cfgSpId" placeholder="ดูจาก URL ของ Google Sheets"></div>
-        </div>
-        <div style="display:flex;gap:7px;flex-wrap:wrap;">
-          <button class="bs" onclick="saveSheetCfg()">💾 บันทึก Config</button>
-          <button class="bss" onclick="testConn()">🔌 ทดสอบ</button>
-          <button class="bss" onclick="pullSheet()">↓ โหลดจาก Sheet</button>
-          <button class="bss" onclick="pushAll()">↑ อัพโหลดทั้งหมด</button>
-        </div>
-        <div id="corsHelp" style="display:none;margin-top:12px;padding:12px 14px;background:rgba(231,76,60,.1);border:1px solid rgba(231,76,60,.35);border-radius:var(--rs);font-size:12px;line-height:1.7;">
-          <div style="font-weight:700;color:var(--red);margin-bottom:6px;">⚠️ Failed to fetch — วิธีแก้</div>
-          <div style="color:var(--t2);">
-            <b>1. ตรวจสอบ URL:</b> ต้องเป็น <code style="background:var(--s3);padding:1px 5px;border-radius:3px;">https://script.google.com/macros/s/…/exec</code><br>
-            <b>2. Deploy ใหม่:</b> Apps Script → Deploy → <b>New deployment</b><br>
-            &nbsp;&nbsp;&nbsp;Type: <b>Web app</b> · Execute as: <b>Me</b> · Who has access: <b>Anyone</b><br>
-            <b>3. ทดสอบ:</b> เพิ่ม <code style="background:var(--s3);padding:1px 5px;border-radius:3px;">?action=ping</code> ต่อท้าย URL แล้วเปิดใน browser
-          </div>
-          <button onclick="document.getElementById('corsHelp').style.display='none'" style="margin-top:8px;background:none;border:1px solid var(--b2);color:var(--t3);border-radius:5px;padding:3px 10px;cursor:pointer;font-size:11px;">ปิด</button>
-        </div>
-        <div class="div"></div>
-        <details><summary style="cursor:pointer;font-size:12px;color:var(--teal);font-weight:600;outline:none;">📜 ดู Google Apps Script ตัวอย่าง</summary>
-          <div style="margin-top:8px;"><div class="script-box" id="scriptBox"></div></div></details>
+  <section class="wrap">
+    <div class="conf-banner">
+      <div>
+        <div class="eyebrow" style="color:#fff;opacity:.8">การประชุมวิชาการประจำปี</div>
+        <h2>TSHA Annual Conference 2026</h2>
+        <p class="lead">เปิดลงทะเบียนแล้ววันนี้ — พบกับวิทยากรชั้นนำ เก็บหน่วย CEU และร่วมนำเสนอผลงานวิชาการ</p>
+        <button class="btn btn-p" style="margin-top:18px" onclick="go('conf')">ลงทะเบียนเลย</button>
       </div>
-      <div class="set-sec">
-        <h3>👨‍⚕️ แพทย์และตารางผ่าตัด</h3>
-        <p class="set-sub">* = วัน OR (จันทร์, พุธ)</p>
-        <div id="docList"></div>
-        <div class="div"></div>
-        <div style="display:flex;gap:7px;align-items:flex-end;">
-          <div class="fg" style="flex:1;margin:0"><label class="fl">เพิ่มแพทย์ใหม่</label><input class="fi" id="newDocName" placeholder="ชื่อ-นามสกุล ตำแหน่ง"></div>
-          <button class="bs" onclick="addDoc()" style="height:39px;">＋ เพิ่ม</button>
-        </div>
-        <div class="div"></div>
-        <button class="bs" onclick="saveSettings()" style="width:100%">💾 บันทึกข้อมูลแพทย์และวันผ่าตัดลง Sheet</button>
-      </div>
-      <div class="set-sec">
-        <h3>🔪 ประเภทการผ่าตัด</h3>
-        <div id="opList"></div>
-        <div style="display:flex;gap:7px;margin-top:8px;align-items:center;">
-          <input class="fi" id="newOp" placeholder="ชื่อประเภทการผ่าตัด...">
-          <button class="bs" onclick="addOp()" style="white-space:nowrap;height:39px;">＋ เพิ่ม</button>
-        </div>
-        <div class="div"></div>
-        <button class="bs" onclick="saveSettings()" style="width:100%">💾 บันทึกประเภทผ่าตัดลง Sheet</button>
+      <div class="conf-meta">
+        <div class="row"><span>📅</span> 14–15 สิงหาคม 2569</div>
+        <div class="row"><span>📍</span> โรงแรมเซ็นทารา กรุงเทพฯ</div>
+        <div class="row"><span>🎖️</span> เก็บได้ 12 หน่วย CEU</div>
       </div>
     </div>
-  </div>
+  </section>
 </div>
 
-<div class="dp-overlay" id="dpOverlay" onclick="if(event.target===this)closeDPOverlay()">
-  <div class="dp-modal">
-    <div class="dp-modal-hd">
-      <div class="dp-modal-title">เลือกวันที่ผ่าตัด</div>
-      <button class="dp-mcl" onclick="closeDPOverlay()">✕</button>
+<!-- ════════ ABOUT ════════ -->
+<div class="page" id="page-about">
+  <section class="wrap">
+    <div class="eyebrow">เกี่ยวกับเรา</div>
+    <h1>รู้จักสมาคม TSHA</h1>
+    <div class="tabs" style="margin-top:28px">
+      <button class="on" onclick="tab(this,'t-history')">ประวัติความเป็นมา</button>
+      <button onclick="tab(this,'t-vision')">วิสัยทัศน์ พันธกิจ</button>
+      <button onclick="tab(this,'t-team')">คณะทำงานของสมาคม</button>
     </div>
-    <div class="dp-nav-row">
-      <button class="dp-nav-btn" onclick="dpNav(-1)">‹</button>
-      <div class="dp-month-label" id="dpMonthLabel">–</div>
-      <button class="dp-nav-btn" onclick="dpNav(1)">›</button>
+    <div class="tabpane on" id="t-history">
+      <p class="lead" style="max-width:760px">สมาคมโสตสัมผัสวิทยาและการแก้ไขการพูดแห่งประเทศไทย (Thai Speech-Language &amp; Hearing Association) ก่อตั้งขึ้นเพื่อพัฒนาวิชาชีพและส่งเสริมมาตรฐานการดูแลผู้ที่มีความบกพร่องทางการได้ยินและการสื่อสาร</p>
+      <div class="grid g3" style="margin-top:26px">
+        <div class="card"><div class="ic">📜</div><h3>จุดเริ่มต้น</h3><p>รวมตัวของนักวิชาชีพด้านโสตสัมผัสวิทยาและการแก้ไขการพูด เพื่อสร้างเครือข่ายและพัฒนามาตรฐานวิชาชีพ</p></div>
+        <div class="card"><div class="ic blue">🌱</div><h3>การเติบโต</h3><p>ขยายเครือข่ายสมาชิกครอบคลุมทั่วประเทศ พร้อมจัดประชุมวิชาการต่อเนื่องทุกปี</p></div>
+        <div class="card"><div class="ic">🤝</div><h3>ปัจจุบัน</h3><p>เป็นศูนย์กลางวิชาชีพที่เชื่อมโยงสมาชิก หน่วยบริการ และองค์ความรู้เข้าด้วยกัน</p></div>
+      </div>
     </div>
-    <div class="dp-legend" id="dpLegend"></div>
-    <div class="dp-cal-grid" id="dpGrid"></div>
-  </div>
+    <div class="tabpane" id="t-vision">
+      <div class="grid g2">
+        <div class="card" style="border-left:3px solid var(--pink)"><h3>วิสัยทัศน์</h3><p style="margin-top:8px">เป็นองค์กรวิชาชีพชั้นนำด้านโสตสัมผัสวิทยาและการแก้ไขการพูดของประเทศไทย ที่ได้รับการยอมรับในระดับสากล</p></div>
+        <div class="card" style="border-left:3px solid var(--blue)"><h3>พันธกิจ</h3><ul style="margin-top:8px;font-size:14px;color:var(--muted);padding-left:18px"><li>พัฒนามาตรฐานและจริยธรรมวิชาชีพ</li><li>ส่งเสริมการศึกษาและงานวิจัย</li><li>สร้างเครือข่ายความร่วมมือ</li><li>เผยแพร่ความรู้สู่สังคม</li></ul></div>
+      </div>
+    </div>
+    <div class="tabpane" id="t-team">
+      <div class="team">
+        <div class="member"><div class="av">นา</div><b>นพ. นายก สมาคม</b><span>นายกสมาคม</span></div>
+        <div class="member"><div class="av">อุ</div><b>ดร. อุปนายก</b><span>อุปนายก</span></div>
+        <div class="member"><div class="av">ลข</div><b>คุณ เลขานุการ</b><span>เลขาธิการ</span></div>
+        <div class="member"><div class="av">หร</div><b>คุณ เหรัญญิก</b><span>เหรัญญิก</span></div>
+        <div class="member"><div class="av">วช</div><b>ผศ. ฝ่ายวิชาการ</b><span>ประธานฝ่ายวิชาการ</span></div>
+        <div class="member"><div class="av">ปช</div><b>คุณ ฝ่ายประชาสัมพันธ์</b><span>ฝ่ายประชาสัมพันธ์</span></div>
+        <div class="member"><div class="av">ทบ</div><b>คุณ นายทะเบียน</b><span>นายทะเบียน</span></div>
+        <div class="member"><div class="av">กก</div><b>คุณ กรรมการกลาง</b><span>กรรมการ</span></div>
+      </div>
+    </div>
+  </section>
 </div>
 
-<div class="overlay" id="addModal">
+<!-- ════════ ARTICLES ════════ -->
+<div class="page" id="page-articles">
+  <section class="wrap">
+    <div class="eyebrow">บทความน่ารู้</div>
+    <h1>คลังความรู้วิชาชีพ</h1>
+    <p class="lead" style="margin-top:10px">แหล่งรวบรวมความรู้สำหรับนักแก้ไขการได้ยินและนักแก้ไขการพูด</p>
+    <div class="grid g3" style="margin-top:30px">
+      <div class="tile"><div class="thumb">🎧</div><div class="body"><span class="tag">โสตสัมผัส</span><h3>เข้าใจการตรวจการได้ยินเบื้องต้น</h3><p class="meta">อ่าน 5 นาที</p></div></div>
+      <div class="tile"><div class="thumb">🗣️</div><div class="body"><span class="tag blue">การพูด</span><h3>เทคนิคฝึกพูดสำหรับเด็กเล็ก</h3><p class="meta">อ่าน 7 นาที</p></div></div>
+      <div class="tile"><div class="thumb">👂</div><div class="body"><span class="tag">เครื่องช่วยฟัง</span><h3>การเลือกเครื่องช่วยฟังให้เหมาะสม</h3><p class="meta">อ่าน 6 นาที</p></div></div>
+      <div class="tile"><div class="thumb">🧠</div><div class="body"><span class="tag blue">พัฒนาการ</span><h3>พัฒนาการทางภาษาในวัยเด็ก</h3><p class="meta">อ่าน 8 นาที</p></div></div>
+      <div class="tile"><div class="thumb">🔬</div><div class="body"><span class="tag">งานวิจัย</span><h3>นวัตกรรมการฟื้นฟูการได้ยิน</h3><p class="meta">อ่าน 10 นาที</p></div></div>
+      <div class="tile"><div class="thumb">💬</div><div class="body"><span class="tag blue">การสื่อสาร</span><h3>การสื่อสารกับผู้สูงอายุที่มีปัญหาการได้ยิน</h3><p class="meta">อ่าน 5 นาที</p></div></div>
+    </div>
+  </section>
+</div>
+
+<!-- ════════ NEWS ════════ -->
+<div class="page" id="page-news">
+  <section class="wrap">
+    <div class="eyebrow">ข่าวสารและกิจกรรม</div>
+    <h1>อัปเดตจากสมาคม</h1>
+    <div class="grid g3" style="margin-top:30px">
+      <div class="tile"><div class="thumb">📢</div><div class="body"><span class="tag">ประกาศ</span><h3>เปิดรับสมัครสมาชิกใหม่ ประจำปี 2569</h3><p class="meta">10 มิ.ย. 2569</p></div></div>
+      <div class="tile"><div class="thumb">🎓</div><div class="body"><span class="tag blue">กิจกรรม</span><h3>ประชุมวิชาการประจำปี ครั้งที่ 25</h3><p class="meta">2 มิ.ย. 2569</p></div></div>
+      <div class="tile"><div class="thumb">🏆</div><div class="body"><span class="tag">รางวัล</span><h3>มอบรางวัลผลงานวิจัยดีเด่นประจำปี</h3><p class="meta">20 พ.ค. 2569</p></div></div>
+      <div class="tile"><div class="thumb">📋</div><div class="body"><span class="tag blue">อบรม</span><h3>เวิร์กช็อปการตรวจการได้ยินขั้นสูง</h3><p class="meta">15 พ.ค. 2569</p></div></div>
+      <div class="tile"><div class="thumb">🤝</div><div class="body"><span class="tag">ความร่วมมือ</span><h3>ลงนาม MOU กับมหาวิทยาลัยพันธมิตร</h3><p class="meta">8 พ.ค. 2569</p></div></div>
+      <div class="tile"><div class="thumb">📅</div><div class="body"><span class="tag blue">กิจกรรม</span><h3>วันสื่อสารโลก กิจกรรมเพื่อสังคม</h3><p class="meta">1 พ.ค. 2569</p></div></div>
+    </div>
+  </section>
+</div>
+
+<!-- ════════ CONFERENCE ════════ -->
+<div class="page" id="page-conf">
+  <section class="wrap">
+    <div class="conf-banner" style="margin-bottom:34px">
+      <div>
+        <div class="eyebrow" style="color:#fff;opacity:.8">การประชุมวิชาการประจำปี ครั้งที่ 25</div>
+        <h2>TSHA Annual Conference 2026</h2>
+        <p class="lead">“นวัตกรรมการดูแลการได้ยินและการสื่อสารในยุคดิจิทัล”</p>
+      </div>
+      <div class="conf-meta">
+        <div class="row"><span>📅</span> 14–15 สิงหาคม 2569</div>
+        <div class="row"><span>📍</span> โรงแรมเซ็นทารา กรุงเทพฯ</div>
+        <div class="row"><span>🎖️</span> 12 หน่วย CEU</div>
+        <div class="row"><span>👥</span> รับจำนวนจำกัด 400 ที่นั่ง</div>
+      </div>
+    </div>
+
+    <div class="center"><div class="eyebrow">อัตราค่าลงทะเบียน</div><h2>เลือกประเภทผู้เข้าร่วม</h2></div>
+    <div class="price-row" style="max-width:760px;margin:26px auto 0">
+      <div class="price feat">
+        <div class="lvl">สมาชิกสมาคม</div>
+        <div class="amt">฿1,500 <small>Early Bird</small></div>
+        <ul><li>เข้าร่วมได้ทั้ง 2 วัน</li><li>เก็บ CEU 12 หน่วย</li><li>เอกสารและอาหารกลางวัน</li><li>สิทธิ์ส่งผลงานนำเสนอ</li></ul>
+        <button class="btn btn-p" style="width:100%" onclick="openLogin()">ลงทะเบียน</button>
+      </div>
+      <div class="price">
+        <div class="lvl">บุคคลทั่วไป</div>
+        <div class="amt">฿2,500 <small>Regular</small></div>
+        <ul><li>เข้าร่วมได้ทั้ง 2 วัน</li><li>เก็บ CEU 12 หน่วย</li><li>เอกสารและอาหารกลางวัน</li><li>ใบประกาศนียบัตร</li></ul>
+        <button class="btn btn-o" style="width:100%" onclick="openLogin('register')">ลงทะเบียน</button>
+      </div>
+    </div>
+    <p class="note center" style="max-width:560px;margin:22px auto 0">💡 ผู้เข้าร่วมสามารถอัปโหลดหลักฐานการโอนเงิน และดาวน์โหลดใบเสร็จได้หลังได้รับการอนุมัติจากระบบ</p>
+  </section>
+</div>
+
+<!-- ════════ RESEARCH ════════ -->
+<div class="page" id="page-research">
+  <section class="wrap">
+    <div class="eyebrow">วิชาการและงานวิจัย</div>
+    <h1>วารสารและงานวิจัย</h1>
+    <p class="lead" style="margin-top:10px">รวบรวมวารสารวิชาการและผลงานวิจัยของสมาคม</p>
+    <div class="grid g2" style="margin-top:30px">
+      <div class="card" style="display:flex;gap:16px;align-items:flex-start"><div class="ic blue" style="margin:0">📕</div><div><span class="tag blue">วารสาร</span><h3>วารสาร TSHA ปีที่ 24 ฉบับที่ 2</h3><p>รวมบทความวิจัยด้านโสตสัมผัสวิทยาและการแก้ไขการพูด</p></div></div>
+      <div class="card" style="display:flex;gap:16px;align-items:flex-start"><div class="ic" style="margin:0">📗</div><div><span class="tag">งานวิจัย</span><h3>ผลของการฟื้นฟูการได้ยินในผู้สูงอายุ</h3><p>การศึกษาเชิงทดลองในกลุ่มผู้สูงอายุไทย</p></div></div>
+      <div class="card" style="display:flex;gap:16px;align-items:flex-start"><div class="ic blue" style="margin:0">📘</div><div><span class="tag blue">วารสาร</span><h3>วารสาร TSHA ปีที่ 24 ฉบับที่ 1</h3><p>บทความปริทัศน์และกรณีศึกษาทางคลินิก</p></div></div>
+      <div class="card" style="display:flex;gap:16px;align-items:flex-start"><div class="ic" style="margin:0">📙</div><div><span class="tag">งานวิจัย</span><h3>การพัฒนาแบบประเมินการพูดภาษาไทย</h3><p>เครื่องมือมาตรฐานสำหรับการประเมินทางคลินิก</p></div></div>
+    </div>
+  </section>
+</div>
+
+<!-- ════════ SERVICE UNITS ════════ -->
+<div class="page" id="page-units">
+  <section class="wrap">
+    <div class="eyebrow">หน่วยบริการ</div>
+    <h1>ค้นหาหน่วยบริการ</h1>
+    <p class="lead" style="margin-top:10px">ข้อมูลสถานที่หน่วยบริการทั่วประเทศ พร้อมพิกัดและรายละเอียดการติดต่อ</p>
+    <div class="field" style="max-width:380px;margin:24px 0 30px">
+      <input type="text" placeholder="🔍 ค้นหาตามจังหวัดหรือชื่อหน่วยบริการ">
+    </div>
+    <div class="grid g2">
+      <div class="unit"><div class="pin">📍</div><div><span class="prov">กรุงเทพมหานคร</span><b>ศูนย์การได้ยิน โรงพยาบาลรามาธิบดี</b><p>270 ถ.พระรามที่ 6 เขตราชเทวี · โทร 02-201-xxxx</p></div></div>
+      <div class="unit"><div class="pin">📍</div><div><span class="prov">เชียงใหม่</span><b>หน่วยแก้ไขการพูด รพ.มหาราชนครเชียงใหม่</b><p>110 ถ.อินทวโรรส อ.เมือง · โทร 053-93-xxxx</p></div></div>
+      <div class="unit"><div class="pin">📍</div><div><span class="prov">ขอนแก่น</span><b>ศูนย์โสตสัมผัส รพ.ศรีนครินทร์</b><p>123 ถ.มิตรภาพ อ.เมือง · โทร 043-36-xxxx</p></div></div>
+      <div class="unit"><div class="pin">📍</div><div><span class="prov">สงขลา</span><b>หน่วยการได้ยิน รพ.สงขลานครินทร์</b><p>15 ถ.กาญจนวนิช อ.หาดใหญ่ · โทร 074-45-xxxx</p></div></div>
+      <div class="unit"><div class="pin">📍</div><div><span class="prov">ชลบุรี</span><b>คลินิกแก้ไขการพูด รพ.ชลบุรี</b><p>69 ถ.สุขุมวิท อ.เมือง · โทร 038-93-xxxx</p></div></div>
+      <div class="unit"><div class="pin">📍</div><div><span class="prov">นครราชสีมา</span><b>ศูนย์การได้ยิน รพ.มหาราชนครราชสีมา</b><p>49 ถ.ช้างเผือก อ.เมือง · โทร 044-23-xxxx</p></div></div>
+    </div>
+  </section>
+</div>
+
+<!-- ════════ CONTACT ════════ -->
+<div class="page" id="page-contact">
+  <section class="wrap">
+    <div class="eyebrow">ติดต่อเรา</div>
+    <h1>เราพร้อมช่วยเหลือคุณ</h1>
+    <div class="contact-grid" style="margin-top:30px">
+      <div>
+        <div class="info-line"><div class="ic">📍</div><div><b>ที่ตั้งสำนักงาน</b><span>เลขที่ 000 อาคารสมาคมฯ ถนน... เขต... กรุงเทพฯ 10xxx</span></div></div>
+        <div class="info-line"><div class="ic blue">✉️</div><div><b>อีเมล</b><span>info@tsha.or.th</span></div></div>
+        <div class="info-line"><div class="ic">📞</div><div><b>โทรศัพท์</b><span>02-xxx-xxxx</span></div></div>
+        <div class="info-line"><div class="ic blue">🌐</div><div><b>โซเชียลมีเดีย</b><span>Facebook · Line Official · YouTube</span></div></div>
+      </div>
+      <div class="card">
+        <h3 style="margin-bottom:16px">ส่งข้อความถึงเรา</h3>
+        <div class="field"><label>ชื่อ-นามสกุล</label><input type="text" placeholder="ชื่อของคุณ"></div>
+        <div class="field"><label>อีเมล</label><input type="email" placeholder="you@email.com"></div>
+        <div class="field"><label>ข้อความ</label><textarea rows="4" placeholder="พิมพ์ข้อความ..."></textarea></div>
+        <button class="btn btn-p" style="width:100%" onclick="toast('ส่งข้อความเรียบร้อย (เดโม)')">ส่งข้อความ</button>
+      </div>
+    </div>
+  </section>
+</div>
+
+<!-- ════════ MEMBER DASHBOARD (demo) ════════ -->
+<div class="page" id="page-member">
+  <section class="wrap">
+    <div class="eyebrow">พื้นที่สมาชิก</div>
+    <h1>แดชบอร์ดสมาชิก</h1>
+    <div class="dash">
+      <aside class="dash-side">
+        <div class="who"><div class="av">สม</div><div><b>คุณ สมาชิก ทดสอบ</b><span>สมาชิกสามัญ</span></div></div>
+        <div class="di on">🏠 ภาพรวม</div>
+        <div class="di">👤 ข้อมูลส่วนตัว</div>
+        <div class="di">🪪 ใบประกอบวิชาชีพ</div>
+        <div class="di">🎓 ประวัติการประชุม</div>
+        <div class="di">🧾 การชำระเงิน / ใบเสร็จ</div>
+        <div class="di">📤 ส่งผลงานนำเสนอ</div>
+      </aside>
+      <div class="dash-main">
+        <h3>สวัสดี, คุณสมาชิก 👋</h3>
+        <p class="hint">ภาพรวมสถานะการเป็นสมาชิกและกิจกรรมของคุณ</p>
+        <div class="kpis">
+          <div class="kpi"><b>Active</b><span>สถานะสมาชิก</span></div>
+          <div class="kpi"><b>สามัญ</b><span>ประเภทสมาชิก</span></div>
+          <div class="kpi"><b>31 ธ.ค. 69</b><span>วันครบกำหนด</span></div>
+          <div class="kpi"><b>5</b><span>ประชุมที่เข้าร่วม</span></div>
+        </div>
+        <div class="dash-tabnote">🔔 สมาชิกของคุณจะหมดอายุใน 201 วัน — ระบบจะแจ้งเตือนอัตโนมัติก่อนหมดอายุ 30 วัน</div>
+        <h3 style="margin-bottom:12px">ประวัติการเข้าร่วมประชุมวิชาการ</h3>
+        <table>
+          <tr><th>ปี</th><th>การประชุม</th><th>CEU</th><th>สถานะ</th></tr>
+          <tr><td>2569</td><td>ครั้งที่ 25 — ยุคดิจิทัล</td><td>12</td><td><span class="badge bg-on">ลงทะเบียนแล้ว</span></td></tr>
+          <tr><td>2568</td><td>ครั้งที่ 24 — Hearing Care</td><td>10</td><td><span class="badge bg-on">เข้าร่วมแล้ว</span></td></tr>
+          <tr><td>2567</td><td>ครั้งที่ 23 — Communication</td><td>10</td><td><span class="badge bg-on">เข้าร่วมแล้ว</span></td></tr>
+        </table>
+      </div>
+    </div>
+    <p class="note">💡 นี่คือหน้าจอตัวอย่าง (เดโม) ของระบบสมาชิก — ครอบคลุมการแก้ไขข้อมูล อัปโหลดใบประกอบวิชาชีพ ต่ออายุสมาชิก ดาวน์โหลดใบเสร็จ และส่งผลงานนำเสนอ</p>
+  </section>
+</div>
+
+<!-- ════════ ADMIN (demo) ════════ -->
+<div class="page" id="page-admin">
+  <section class="wrap">
+    <div class="eyebrow">ระบบหลังบ้าน</div>
+    <h1>Admin Panel</h1>
+    <div class="dash">
+      <aside class="dash-side">
+        <div class="who"><div class="av">AD</div><div><b>ผู้ดูแลระบบ</b><span>Administrator</span></div></div>
+        <div class="di on">📊 ภาพรวม</div>
+        <div class="di">👥 จัดการสมาชิก</div>
+        <div class="di">💰 ระบบการเงิน</div>
+        <div class="di">🎓 ประชุมวิชาการ</div>
+        <div class="di">📄 จัดการเนื้อหา</div>
+        <div class="di">⚖️ กรรมการพิจารณา</div>
+        <div class="di">🔐 สิทธิ์ผู้ใช้งาน</div>
+      </aside>
+      <div class="dash-main">
+        <h3>ภาพรวมระบบ</h3>
+        <p class="hint">สรุปข้อมูลสำคัญและรายการที่ต้องดำเนินการ</p>
+        <div class="kpis">
+          <div class="kpi"><b>1,250</b><span>สมาชิกทั้งหมด</span></div>
+          <div class="kpi"><b>18</b><span>รออนุมัติสมัคร</span></div>
+          <div class="kpi"><b>฿2.4M</b><span>รายรับปีนี้</span></div>
+          <div class="kpi"><b>342</b><span>ลงทะเบียนประชุม</span></div>
+        </div>
+        <div class="dash-tabnote">⏳ มีรายการรอตรวจสอบ: 18 ใบสมัครสมาชิก · 24 หลักฐานการโอนเงิน · 7 ผลงานนำเสนอ</div>
+        <h3 style="margin-bottom:12px">รายการสมัครสมาชิกล่าสุด</h3>
+        <table>
+          <tr><th>ชื่อ</th><th>ประเภท</th><th>จังหวัด</th><th>ชำระเงิน</th><th>สถานะ</th></tr>
+          <tr><td>ก. ทดสอบหนึ่ง</td><td>สามัญ</td><td>กรุงเทพฯ</td><td><span class="badge bg-on">โอนแล้ว</span></td><td><span class="badge bg-wait">รออนุมัติ</span></td></tr>
+          <tr><td>ข. ทดสอบสอง</td><td>วิสามัญ</td><td>เชียงใหม่</td><td><span class="badge bg-on">โอนแล้ว</span></td><td><span class="badge bg-wait">รออนุมัติ</span></td></tr>
+          <tr><td>ค. ทดสอบสาม</td><td>ตลอดชีพ</td><td>ขอนแก่น</td><td><span class="badge bg-off">รอตรวจสอบ</span></td><td><span class="badge bg-wait">รออนุมัติ</span></td></tr>
+        </table>
+      </div>
+    </div>
+    <p class="note">💡 หน้าจอตัวอย่าง (เดโม) ของระบบหลังบ้าน — จัดการเนื้อหา สมาชิก การเงิน การประชุม ระบบส่งผลงาน และสิทธิ์ตามบทบาท (Role-Based Access Control)</p>
+  </section>
+</div>
+
+<!-- ════════ REVIEWER (demo) ════════ -->
+<div class="page" id="page-reviewer">
+  <section class="wrap">
+    <div class="eyebrow">ระบบกรรมการ</div>
+    <h1>กรรมการพิจารณาผลงาน</h1>
+    <div class="dash">
+      <aside class="dash-side">
+        <div class="who"><div class="av">กก</div><div><b>กรรมการ ผู้ทรงคุณวุฒิ</b><span>Reviewer</span></div></div>
+        <div class="di on">📥 รอการพิจารณา</div>
+        <div class="di">✅ พิจารณาแล้ว</div>
+        <div class="di">📜 ประวัติการพิจารณา</div>
+      </aside>
+      <div class="dash-main">
+        <h3>ผลงานที่ได้รับมอบหมาย</h3>
+        <p class="hint">รายการผลงานนำเสนอที่รอการพิจารณาให้คะแนน</p>
+        <div class="kpis" style="grid-template-columns:repeat(3,1fr)">
+          <div class="kpi"><b>4</b><span>รอพิจารณา</span></div>
+          <div class="kpi"><b>12</b><span>พิจารณาแล้ว</span></div>
+          <div class="kpi"><b>8.4</b><span>คะแนนเฉลี่ย</span></div>
+        </div>
+        <table>
+          <tr><th>รหัส</th><th>ชื่อบทความ</th><th>ประเภท</th><th>สถานะ</th><th></th></tr>
+          <tr><td>AB-041</td><td>การฟื้นฟูการได้ยินด้วย AI</td><td>Oral</td><td><span class="badge bg-wait">รอพิจารณา</span></td><td><button class="btn btn-p" style="padding:5px 12px;font-size:12px">พิจารณา</button></td></tr>
+          <tr><td>AB-038</td><td>แบบประเมินการพูดภาษาไทย</td><td>Poster</td><td><span class="badge bg-wait">รอพิจารณา</span></td><td><button class="btn btn-p" style="padding:5px 12px;font-size:12px">พิจารณา</button></td></tr>
+          <tr><td>AB-022</td><td>เครื่องช่วยฟังในผู้สูงอายุ</td><td>Oral</td><td><span class="badge bg-on">ให้คะแนนแล้ว</span></td><td><button class="btn btn-g" style="padding:5px 12px;font-size:12px">แก้ไข</button></td></tr>
+        </table>
+      </div>
+    </div>
+    <p class="note">💡 หน้าจอตัวอย่าง (เดโม) — กรรมการล็อกอินผ่านลิงก์ในอีเมล ดูผลงานที่มอบหมาย ให้คะแนน และบันทึกผลการพิจารณา (Accept / Accept with Change / Reject)</p>
+  </section>
+</div>
+
+<!-- ─── FOOTER ─── -->
+<footer>
+  <div class="wrap">
+    <div class="foot-grid">
+      <div>
+        <div class="brand" style="margin-bottom:12px"><img src="logo.jpg" style="width:40px;height:40px;border-radius:50%"><div class="brand-t"><b>TSHA</b><span style="color:#9FB0C8">Thai Speech-Language &amp; Hearing</span></div></div>
+        <p>สมาคมโสตสัมผัสวิทยาและการแก้ไขการพูดแห่งประเทศไทย ศูนย์รวมวิชาชีพและองค์ความรู้</p>
+      </div>
+      <div><h4>เกี่ยวกับ</h4><a onclick="go('about')">ประวัติสมาคม</a><a onclick="go('about')">วิสัยทัศน์</a><a onclick="go('about')">คณะทำงาน</a></div>
+      <div><h4>บริการ</h4><a onclick="go('articles')">บทความน่ารู้</a><a onclick="go('conf')">ประชุมวิชาการ</a><a onclick="go('research')">งานวิจัย</a><a onclick="go('units')">หน่วยบริการ</a></div>
+      <div><h4>สำหรับทีมงาน</h4><a onclick="go('admin')">ระบบหลังบ้าน</a><a onclick="go('reviewer')">กรรมการพิจารณา</a><a onclick="go('contact')">ติดต่อเรา</a></div>
+    </div>
+    <div class="foot-bottom">
+      <span>© 2569 TSHA — Thai Speech-Language &amp; Hearing Association</span>
+      <span>เว็บไซต์ตัวอย่าง (Demo) · Responsive Design</span>
+    </div>
+  </div>
+</footer>
+
+<div class="demo-flag">● DEMO</div>
+
+<!-- ─── LOGIN MODAL ─── -->
+<div class="overlay" id="loginModal">
   <div class="modal">
-    <div class="mhd"><div class="mtl" id="addTl">📅 เพิ่มนัดผ่าตัด</div><button class="mcl" onclick="closeModal('addModal')">✕</button></div>
-
-    <div class="val-alert" id="valBox">
-      <div class="val-alert-body">
-        <span class="vi" id="valIcon">⚠️</span>
-        <div id="valMsg" style="flex:1;line-height:1.5;">–</div>
-      </div>
-      <div class="val-action" id="valAction" style="display:none;">
-        <span class="val-action-lbl">แพทย์จะมาตรวจนอกตาราง? กด Override เพื่อบันทึกพิเศษ</span>
-        <button class="btn-ov" id="btnOv" onclick="toggleOvForm()" type="button">🔁 สลับวันตรวจ (Override)</button>
-      </div>
-      <div class="ov-form" id="ovForm">
-        <div class="ov-row">
-          <div>
-            <label class="ov-lbl">ประเภท Override <span style="color:var(--red)">*</span></label>
-            <select class="fs" id="ovType" style="font-size:11px;padding:6px 9px;">
-              <option value="Swap">🔁 Swap – สลับเวร</option>
-              <option value="Additional">➕ Additional – ผ่าตัดเพิ่ม</option>
-              <option value="Replacement">↔️ Replacement – แทนแพทย์</option>
-            </select>
-          </div>
-          <div>
-            <label class="ov-lbl">หมายเหตุ</label>
-            <input class="fi" id="ovNote" placeholder="เช่น สลับเวรกับ นพ. ..." style="font-size:11px;padding:6px 9px;">
-          </div>
-        </div>
-        <div style="display:flex;align-items:center;gap:8px;">
-          <button class="bs" onclick="confirmOv()" type="button" style="font-size:11px;padding:6px 13px;">✅ ยืนยัน Override และบันทึกนัด</button>
-          <button class="bss" onclick="cancelOv()" type="button" style="font-size:11px;padding:6px 10px;">ยกเลิก</button>
-        </div>
-      </div>
+    <button class="modal-x" onclick="closeLogin()">×</button>
+    <h2 id="loginTitle">เข้าสู่ระบบ</h2>
+    <p class="sub">ระบบสมาชิก TSHA</p>
+    <div class="seg">
+      <button class="on" id="segLogin" onclick="segLogin()">เข้าสู่ระบบ</button>
+      <button id="segReg" onclick="segReg()">สมัครสมาชิก</button>
     </div>
-
-    <div class="fr">
-      <div class="fg"><label class="fl">HN <span>*</span></label><input class="fi" id="fHN" placeholder="เช่น 12345678" maxlength="12"></div>
-      <div class="fg">
-        <label class="fl">วันที่ผ่าตัด <span>*</span></label>
-        <button class="dp-trigger placeholder" id="dpTrigger" onclick="openDPOverlay()" type="button">
-          <span id="dpTriggerTxt">เลือกวันที่...</span><span>📅</span>
-        </button>
-        <input type="hidden" id="fDate">
-      </div>
+    <div id="loginForm">
+      <div class="field"><label>อีเมล</label><input type="email" placeholder="you@email.com"></div>
+      <div class="field"><label>รหัสผ่าน</label><input type="password" placeholder="••••••••"></div>
+      <button class="btn btn-p" onclick="go('member');closeLogin()">เข้าสู่ระบบ</button>
+      <div class="note">เข้าสู่ระบบในฐานะ: <a onclick="go('member');closeLogin()" style="color:var(--pink);cursor:pointer;font-weight:600">สมาชิก</a> · <a onclick="go('admin');closeLogin()" style="color:var(--blue);cursor:pointer;font-weight:600">แอดมิน</a> · <a onclick="go('reviewer');closeLogin()" style="color:var(--ink);cursor:pointer;font-weight:600">กรรมการ</a></div>
     </div>
-    <div class="fg"><label class="fl">ชื่อ-นามสกุล ผู้ป่วย <span>*</span></label><input class="fi" id="fName" placeholder="ชื่อ นามสกุล"></div>
-    <div class="fr">
-      <div class="fg">
-        <label class="fl">เวลาเริ่ม (24 ชม.) <span>*</span></label>
-        <div class="time-wrap"><input class="time-inp" id="fTs" type="text" placeholder="08:00" maxlength="5" oninput="fmtTimeInp(this)"><span class="time-sep">hh:mm</span></div>
-      </div>
-      <div class="fg">
-        <label class="fl">เวลาสิ้นสุด (ประมาณ)</label>
-        <div class="time-wrap"><input class="time-inp" id="fTe" type="text" placeholder="09:00" maxlength="5" oninput="fmtTimeInp(this)"><span class="time-sep">hh:mm</span></div>
-      </div>
+    <div id="regForm" style="display:none">
+      <div class="field"><label>ชื่อ-นามสกุล</label><input type="text" placeholder="ชื่อจริง นามสกุล"></div>
+      <div class="field"><label>อีเมล</label><input type="email" placeholder="you@email.com"></div>
+      <div class="field"><label>ประเภทสมาชิก</label><select><option>วิสามัญ</option><option>สามัญ</option><option>ตลอดชีพ</option></select></div>
+      <div class="field"><label>ใบประกอบวิชาชีพ</label><input type="file"></div>
+      <button class="btn btn-p" onclick="toast('ส่งใบสมัครเรียบร้อย — รอการอนุมัติ (เดโม)');closeLogin()">ส่งใบสมัคร</button>
     </div>
-    <div class="fg">
-      <label class="fl">ประเภทการผ่าตัด <span>*</span></label>
-      <select class="fs" id="fOp" onchange="toggleOpCustom(this.value)"></select>
-      <input class="fi" id="fOpCustom" placeholder="พิมพ์ประเภทการผ่าตัด..." style="display:none;margin-top:6px;">
-    </div>
-    <div class="fg"><label class="fl">แพทย์ผ่าตัด <span>*</span></label><select class="fs" id="fDoc" onchange="runVal()"></select></div>
-    <div class="fg"><label class="fl">แพทย์ผ่าตัดคนที่ 2 (ถ้ามี)</label><select class="fs" id="fDoc2"><option value="">– ไม่มี –</option></select></div>
-    <div class="fg"><label class="fl">วิธีระงับความรู้สึก</label><select class="fs" id="fAnes"><option value="">– ไม่ระบุ –</option><option value="GA">GA (ดมยาสลบ)</option><option value="LA">LA (ยาชาเฉพาะที่)</option><option value="NLA">NLA (ยาสลบร่วมยาชา)</option><option value="Sedation">Sedation (ยาระงับประสาท)</option><option value="Spinal">Spinal Block</option></select></div>
-    <div class="fr">
-      <div class="fg"><label class="fl">เบอร์ติดต่อ 1</label><input class="fi" id="fTel1" placeholder="08x-xxx-xxxx" maxlength="15" type="tel"></div>
-      <div class="fg"><label class="fl">เบอร์ติดต่อ 2 (ถ้ามี)</label><input class="fi" id="fTel2" placeholder="08x-xxx-xxxx" maxlength="15" type="tel"></div>
-    </div>
-    <div class="fg"><label class="fl">สถานะ</label><select class="fs" id="fStatus"><option value="wait">รอยืนยัน</option><option value="confirm">ยืนยันแล้ว</option><option value="cancel">ยกเลิก</option></select></div>
-    <div class="fg"><label class="fl">หมายเหตุ / ข้อควรระวัง</label><textarea class="fta" id="fNote" placeholder="เช่น แพ้ยา, โรคประจำตัว..."></textarea></div>
-    <div class="mft"><button class="bss" onclick="closeModal('addModal')">ยกเลิก</button><button class="bs" id="btnSave" onclick="saveApt()">💾 บันทึกนัด</button></div>
   </div>
 </div>
-
-<div class="overlay" id="rsModal">
-  <div class="modal sm">
-    <div class="mhd"><div class="mtl">🔄 เลื่อนนัดผ่าตัด</div><button class="mcl" onclick="closeModal('rsModal')">✕</button></div>
-    <div class="fg"><label class="fl">ผู้ป่วย</label><div id="rsPt" style="padding:8px 11px;background:var(--s2);border-radius:7px;font-size:13px;font-weight:700;border:1px solid var(--b)">–</div></div>
-
-    <div class="fg">
-      <label class="fl">เลือกวันใหม่ <span style="color:var(--red)">*</span></label>
-      <div class="rs-cal-wrap">
-        <div class="rs-cal-nav">
-          <button class="dp-nav-btn" onclick="rsCalNav(-1)" type="button">‹</button>
-          <div class="rs-cal-label" id="rsCalLabel">–</div>
-          <button class="dp-nav-btn" onclick="rsCalNav(1)" type="button">›</button>
-        </div>
-        <div class="dp-cal-grid" id="rsCalGrid" style="gap:2px;"></div>
-        <div class="rs-sel-display empty" id="rsSelDisplay">📅 ยังไม่ได้เลือกวันที่</div>
-      </div>
-    </div>
-
-    <div class="fg"><label class="fl">เวลาใหม่ (24 ชม.)</label><div class="time-wrap"><input class="time-inp" id="rsTs" type="text" placeholder="08:00" maxlength="5" oninput="fmtTimeInp(this)"><span class="time-sep">hh:mm</span></div></div>
-    <div class="fg"><label class="fl">เหตุผลการเลื่อน</label><select class="fs" id="rsReason"><option>ผู้ป่วยขอเลื่อนเอง</option><option>ห้องผ่าตัดไม่ว่าง</option><option>แพทย์ติดภารกิจ</option><option>ผู้ป่วยป่วย / ไม่พร้อม</option><option>อื่น ๆ</option></select></div>
-    <div class="mft"><button class="bss" onclick="closeModal('rsModal')">ยกเลิก</button><button class="bs" onclick="confirmRS()">✅ ยืนยันการเลื่อนนัด</button></div>
-    <div id="rsOvSection" style="display:none;margin-top:10px;padding:12px;background:var(--rd);border:1px solid rgba(231,76,60,.35);border-radius:var(--rs);">
-  <div style="font-size:12px;font-weight:700;color:var(--red);margin-bottom:8px;">
-    ⚠️ <span id="rsOvMsg"></span>
-  </div>
-  <div class="fr" style="margin-bottom:8px;">
-    <div>
-      <label class="fl">ประเภท Override</label>
-      <select class="fs" id="rsOvType" style="font-size:11px;">
-        <option value="Swap">🔁 Swap – สลับเวร</option>
-        <option value="Additional">➕ Additional – ผ่าตัดเพิ่ม</option>
-        <option value="Replacement">↔️ Replacement – แทนแพทย์</option>
-      </select>
-    </div>
-    <div>
-      <label class="fl">หมายเหตุ</label>
-      <input class="fi" id="rsOvNote" placeholder="เช่น สลับกับ นพ.สมชาย" style="font-size:11px;">
-    </div>
-  </div>
-  <button class="bs" onclick="confirmRSWithOv()" style="width:100%;background:var(--gold);color:var(--bg);">
-    🔁 Override และเลื่อนนัดเลย
-  </button>
-</div>
-  </div>
-</div>
-
-<div class="overlay" id="qSwapModal">
-  <div class="modal sm">
-    <div class="mhd"><div class="mtl">🔁 บันทึกการสลับวันผ่าตัด</div><button class="mcl" onclick="closeModal('qSwapModal')">✕</button></div>
-    <p style="font-size:12px;color:var(--t2);margin-bottom:12px;">บันทึก Override เพื่อระบุว่าแพทย์ผ่าตัดนอกตารางปกติ</p>
-    <div class="fg"><label class="fl">แพทย์</label><div class="swap-doc-info" id="qSwapDocName">–</div></div>
-    <div class="fg"><label class="fl">วันที่ผ่าตัด (จากนัดปัจจุบัน)</label><div class="swap-doc-info" id="qSwapDate">–</div></div>
-    <div class="fg"><label class="fl">ประเภท Override</label>
-      <select class="fs" id="qSwapType"><option value="Swap">🔁 Swap – สลับเวรกับแพทย์ท่านอื่น</option><option value="Additional">➕ Additional – ผ่าตัดนอกตารางเพิ่มเติม</option><option value="Replacement">↔️ Replacement – แทนแพทย์ท่านอื่น</option></select></div>
-    <div class="fg"><label class="fl">หมายเหตุ</label><input class="fi" id="qSwapNote" placeholder="เช่น สลับเวรกับ พญ. วรัญญา เนื่องจาก..."></div>
-    <div class="mft"><button class="bss" onclick="closeModal('qSwapModal')">ยกเลิก</button><button class="bs" onclick="confirmQSwap()">✅ บันทึก Override</button></div>
-  </div>
-</div>
-
-<div class="ldr" id="ldr"><div class="spinner"></div><div class="ldr-t" id="ldrTxt">กำลังโหลด...</div></div>
-<div class="toast" id="toast"></div>
 
 <script>
-// ── CONSTANTS ──
-const MTH=['มกราคม','กุมภาพันธ์','มีนาคม','เมษายน','พฤษภาคม','มิถุนายน','กรกฎาคม','สิงหาคม','กันยายน','ตุลาคม','พฤศจิกายน','ธันวาคม'];
-const MS=['ม.ค.','ก.พ.','มี.ค.','เม.ย.','พ.ค.','มิ.ย.','ก.ค.','ส.ค.','ก.ย.','ต.ค.','พ.ย.','ธ.ค.'];
-const DTH=['อาทิตย์','จันทร์','อังคาร','พุธ','พฤหัสบดี','ศุกร์','เสาร์'];
-const WTH=['อา','จ','อ','พ','พฤ','ศ','ส'];
-const DCOL=['#00BFD8','#F5A623','#2ECC71','#E74C3C','#9B59B6','#1ABC9C','#E67E22','#3498DB'];
-const OR=[1,3];
-
-// ── STATE ──
-var apts=[];
-var docs=[
-  {name:'พญ. ลดาทิพย์ ทองธเนศ', color:DCOL[0],sched:{1:[],2:[],3:[],4:[],5:[],6:[]}},
-  {name:'พญ. จิรัชญา อุกะโชค',  color:DCOL[1],sched:{1:[],2:[],3:[],4:[],5:[],6:[]}},
-];
-var ops=['Tonsillectomy (ตัดต่อมทอนซิล)','Septoplasty (ผ่าตัดผนังกั้นจมูก)','Tympanoplasty (ผ่าตัดเยื่อแก้วหู)','FESS (ผ่าตัดโพรงจมูก Endoscopic)','Myringotomy + Tube (ใส่ท่อหู)','Mastoidectomy (ผ่าตัดกระดูกหลังหู)','Adenoidectomy (ตัดต่อมอะดีนอยด์)','Direct Laryngoscopy (ส่องกล่องเสียง)','อื่น ๆ (ระบุในหมายเหตุ)'];
-var leaves=[];
-var swaps=[];
-var lastPullTime = 0;
-var PULL_COOLDOWN = 5 * 60 * 1000; // 5 นาที
-
-// ★ กำหนดการตั้งค่า Hardcoded สำหรับ Auto-Sync
-var sheetCfg={
-  url: 'https://script.google.com/macros/s/AKfycbweQIQj0GbscFla0SZvklfm38mMkSiJqzlpFNe3z19va-UUgJ_O0zE6lXdG9O8dx7kt/exec',
-  sheet: 'ENT_Schedule',
-  spId: '1KWH-9JobfctIp-prqGSlZIJ4xOuP4Yb6QVA0spTE8sk'
-};
-
-var weekOff=0,calYr=new Date().getFullYear(),calMo=new Date().getMonth();
-var docFil='all',calFil='all';
-var editId=null,rsId=null,rsDate=null,qSwapAptId=null;
-var dpYr=new Date().getFullYear(),dpMo=new Date().getMonth(),dpSel=null;
-var curPg='schedule',valBlocked=false;
-
-// ── RESCHEDULE CALENDAR STATE ──
-var rsCalYr=new Date().getFullYear(),rsCalMo=new Date().getMonth();
-
-// ── HELPERS ──
-var pad=function(n){return String(n).padStart(2,'0');};
-var iso=function(d){var yr=d.getFullYear(),mo=String(d.getMonth()+1).padStart(2,'0'),dy=String(d.getDate()).padStart(2,'0');return yr+'-'+mo+'-'+dy;};
-
-function normalizeDate(v){
-  if(!v&&v!==0)return '';
-  if(v instanceof Date){if(isNaN(v.getTime()))return '';return iso(v);}
-  var s=String(v).trim();
-  if(!s||s==='undefined'||s==='null')return '';
-  if(/^\d{4}-\d{2}-\d{2}/.test(s))return s.slice(0,10);
-  var slash=s.match(/^(\d{1,2})\/(\d{1,2})\/(\d{4})/);
-  if(slash)return slash[3]+'-'+slash[2].padStart(2,'0')+'-'+slash[1].padStart(2,'0');
-  if(/^\d+$/.test(s)){var d=new Date(+s);return isNaN(d)?'':iso(d);}
-  return s.slice(0,10);
-}
-
-function normalizeTel(v){
-  if(!v&&v!==0)return '';
-  var s=String(v).trim();
-  if(!s||s==='undefined'||s==='null')return '';
-  if(/^\d{9,10}$/.test(s)&&s.charAt(0)!=='0')return '0'+s;
-  return s;
-}
-
-function normalizeTime(v) {
-  if (!v) return '';
-  var s = String(v).trim();
-  // ถ้า Google Sheets ส่งกลับมาเป็นรูปแบบวันที่ 1899-12-30...
-  if (s.includes('1899-12-30') || s.includes('1899-12-31') || s.includes('T')) {
-    var d = new Date(s);
-    if (!isNaN(d)) {
-      return String(d.getHours()).padStart(2, '0') + ':' + String(d.getMinutes()).padStart(2, '0');
-    }
-  }
-  // ถ้ามาเป็น 08:00 ปกติ
-  return s.substring(0, 5); 
-}
-
-var parseD=function(s){if(!s)return new Date(NaN);var ns=normalizeDate(s);if(!ns)return new Date(NaN);var parts=ns.split('-');var dt=new Date(+parts[0],+parts[1]-1,+parts[2]);dt.setHours(0,0,0,0);return dt;};
-var fmtShort=function(d){return d.getDate()+' '+MS[d.getMonth()]+' '+(d.getFullYear()+543);};
-var fmtFull=function(s){var d=parseD(s);if(isNaN(d))return String(s);return d.getDate()+' '+MS[d.getMonth()]+' '+(d.getFullYear()+543)+' ('+DTH[d.getDay()]+')';};
-var shortN=function(n){if(!n)return '–';var p=String(n).split(' ');return p.length>=2?p[0]+' '+p[1]:n;};
-var hexDim=function(h){return h+'22';};
-
-// ── TIME FORMAT ──
-function fmtTimeInp(el){var v=el.value.replace(/[^0-9]/g,'');if(v.length>=3)v=v.slice(0,2)+':'+v.slice(2,4);el.value=v;}
-function validateTime(s){if(!s)return false;var m=s.match(/^(\d{1,2}):(\d{2})$/);if(!m)return false;var h=+m[1],mn=+m[2];return h>=0&&h<=23&&mn>=0&&mn<=59;}
-
-// ── INIT ──
-(function init(){
-  loadCfg(); // นำค่าที่ Hardcode ไปใส่ใน Input สำหรับโชว์ใน Settings
-  buildScript();
-  renderSide();renderAll();renderCal();
-  renderDocSettings();renderOpList();
-  renderLeaveSelects();renderSwapSelects();
-  renderLeaveTable();renderSwapTable();
-  
-  // ★ โหลดข้อมูลแบบ Auto-sync ทันทีที่เปิดเว็บ
-  if(sheetCfg.url){
-    pullSheet();
-  }
-  
-  window._autoSyncTimer=setInterval(function(){
-    if(sheetCfg.url&&document.visibilityState!=='hidden')pullSheet('silent');
-  },300000);
-})();
-
-// ── PAGE NAV ──
-function showPage(pg){
-  curPg=pg;
-  document.querySelectorAll('.page').forEach(function(p){p.classList.remove('active');});
-  document.querySelectorAll('.nav-item').forEach(function(n){n.classList.remove('active');});
-  document.getElementById('page-'+pg).classList.add('active');
-  document.querySelector('.nav-item[data-page="'+pg+'"]').classList.add('active');
-  var titles={schedule:'ตารางนัดผ่าตัด',calendar:'ปฏิทินรายเดือน',leave:'วันลาแพทย์',swap:'สลับวันผ่าตัด (Override)',settings:'ตั้งค่าระบบ'};
-  document.getElementById('pgTitle').textContent=titles[pg]||pg;
-  document.getElementById('statsRow').style.display=pg==='schedule'?'grid':'none';
-  document.getElementById('wkNav').style.display=pg==='schedule'?'flex':'none';
-  document.querySelectorAll('.mob-bottom-nav a').forEach(function(a){
-    a.classList.toggle('active',a.dataset.page===pg);
-  });
-  if(pg==='calendar'){renderCalFbar();renderCal();}
-  if(pg==='settings'){renderDocSettings();renderOpList();}
-  if(pg==='leave'){renderLeaveSelects();renderLeaveTable();}
-  if(pg==='swap'){renderSwapSelects();renderSwapTable();}
-  closeSidebar();
-}
-
-// ── WEEK ──
-function getMonWed(off){off=off||0;var t=new Date();t.setHours(0,0,0,0);var dow=t.getDay(),mon=new Date(t);mon.setDate(t.getDate()-(dow===0?6:dow-1)+off*7);var wed=new Date(mon);wed.setDate(mon.getDate()+2);return{mon:mon,wed:wed};}
-function changeWeek(d){weekOff+=d;renderAll();}
-
-// ── SCHEDULE RENDER ──
-function renderAll(){
-  var wk=getMonWed(weekOff);var mon=wk.mon,wed=wk.wed;
-  document.getElementById('monN').textContent=mon.getDate();
-  document.getElementById('wedN').textContent=wed.getDate();
-  document.getElementById('monD').textContent=fmtShort(mon);
-  document.getElementById('wedD').textContent=fmtShort(wed);
-  var wl=weekOff===0?'สัปดาห์นี้':weekOff===-1?'สัปดาห์ที่แล้ว':weekOff===1?'สัปดาห์หน้า':weekOff>1?'+'+weekOff+' สัปดาห์':weekOff+' สัปดาห์';
-  document.getElementById('wkLabel').textContent=wl;
-  var md=iso(mon),wd=iso(wed);
-  renderDay('monBody','monCnt',md);renderDay('wedBody','wedCnt',wd);updateStats(md,wd);
-}
-
-function renderDay(bid,cid,date){
-  var body=document.getElementById(bid),cntEl=document.getElementById(cid);
-  var list=apts.filter(function(a){return a.date&&a.date===date;});
-  if(docFil!=='all')list=list.filter(function(a){
-    var f=parseInt(docFil);
-    return a.di===f||(a.di2!=null&&a.di2===f);
-  });
-  list.sort(function(a,b){return (a.ts||'').localeCompare(b.ts||'');});
-  cntEl.textContent=list.length+' ราย';
-  body.innerHTML=list.length?list.map(cardHTML).join(''):'<div class="empty-day">📋 ยังไม่มีนัดในวันนี้</div>';
-}
-
-function cardHTML(a){
-  var doc=docs[a.di];
-  var docName=(doc&&doc.name&&doc.name!=='–')?doc.name:(a.doctorName||'–');
-  var docColor=(doc&&doc.color)?doc.color:'#ccc';
-  var sm={confirm:'sp-c',wait:'sp-wt',pending:'sp-w',cancel:'sp-x'};
-  var sl={confirm:'ยืนยันแล้ว',wait:'รอยืนยัน',pending:'รอยืนยัน',cancel:'ยกเลิก'};
-  var sw=swaps.find(function(s){return s.di===a.di&&s.date&&a.date&&s.date===a.date;});
-  return '<div class="ac s-'+a.status+'" id="card-'+a.id+'" onclick="toggleCard('+a.id+')">'
-    +'<div class="ac-r1"><div class="a-hn">HN: '+a.hn+'</div><div class="a-time">'+a.ts+(a.te?'–'+a.te:'')+'</div></div>'
-    +'<div class="a-name">'+a.name+'</div>'
-    +((a.tel1||a.tel2)?'<div class="a-tel">📞 '+[a.tel1,a.tel2].filter(Boolean).join(' / ')+'</div>':'')
-    +'<div class="a-op">🔪 '+a.op+'</div>'
-    +(a.anesthesia?'<div class="a-anes">💉 '+a.anesthesia+'</div>':'')
-    +(a.doctor2Name?'<div class="a-doc2">👨‍⚕️ ร่วม: '+a.doctor2Name+'</div>':'')
-    +'<div class="ac-r3">'
-    +'<div class="a-doc"><div class="d-dot" style="background:'+docColor+'"></div>'+docName+'</div>'
-    +'<div class="spill '+(sm[a.status]||'sp-wt')+'">'+(sl[a.status]||a.status)+'</div>'
-    +(sw?'<span class="swap-bdg">⚠ สลับวันผ่าตัด</span>':'')
-    +'</div>'
-    +(a.note?'<div class="a-note-r">⚠️ '+a.note+'</div>':'')
-    +(sw?'<div class="a-note-y">⚠ หมายเหตุ: แพทย์ท่านนี้มีการสลับวันผ่าตัด'+(sw.note?' · '+sw.note:'')+'</div>':'')
-    +'<div class="ac-actions">'
-    +(a.status!=='confirm'?'<button class="ab g" onclick="qs(event,'+a.id+',\'confirm\')">✅ ยืนยัน</button>':'')
-    +'<button class="ab o" onclick="openRS(event,'+a.id+')">🔄 เลื่อนนัด</button>'
-    +'<button class="ab y" onclick="openQSwap(event,'+a.id+')">🔁 บันทึกสลับเวร</button>'
-    +'<button class="ab" onclick="openEdit(event,'+a.id+')">✏️ แก้ไข</button>'
-    +(a.status!=='cancel'?'<button class="ab r" onclick="qs(event,'+a.id+',\'cancel\')">❌ ยกเลิก</button>':'')
-    +'</div></div>';
-}
-
-function toggleCard(id){var c=document.getElementById('card-'+id);if(c)c.classList.toggle('exp');}
-function qs(e,id,st){e.stopPropagation();var a=apts.find(function(x){return x.id===id;});if(a){a.status=st;renderAll();pushRow(a);toast(st==='confirm'?'✅ ยืนยันแล้ว':'❌ ยกเลิกแล้ว',st==='confirm'?'ok':'err');}}
-
-function updateStats(md,wd){
-  var wk=apts.filter(function(a){return a.date&&(a.date===md||a.date===wd);});
-  if(docFil!=='all')wk=wk.filter(function(a){
-    var f=parseInt(docFil);
-    return a.di===f||(a.di2!=null&&a.di2===f);
-  });
-  document.getElementById('stT').textContent=wk.length;
-  document.getElementById('stC').textContent=wk.filter(function(a){return a.status==='confirm';}).length;
-  document.getElementById('stP').textContent=wk.filter(function(a){return a.status==='wait'||a.status==='pending';}).length;
-  document.getElementById('stX').textContent=wk.filter(function(a){return a.status==='cancel';}).length;
-}
-
-// ── VALIDATION ──
-function validateDocDate(diStr,dateStr){
-  if(diStr===''||!dateStr)return{ok:true,type:'ok'};
-  var diN=parseInt(diStr),doc=docs[diN];
-  if(!doc||isNaN(diN))return{ok:true,type:'ok'};
-  var d=parseD(dateStr),dow=d.getDay();
-  var lv=leaves.find(function(l){return l.di===diN&&l.status==='Approved'&&l.start&&l.end&&dateStr>=l.start&&dateStr<=l.end;});
-  if(lv){
-    var rangeStr=lv.start===lv.end?fmtShort(parseD(lv.start)):fmtShort(parseD(lv.start))+' – '+fmtShort(parseD(lv.end));
-    return{ok:false,type:'leave',allowOv:false,msg:'🏖 '+shortN(doc.name)+' อยู่ในช่วงวันลา · '+rangeStr+(lv.reason?' ('+lv.reason+')':'')+' — กรุณาเลือกวันอื่น'};
-  }
-  var sw=swaps.find(function(s){return s.di===diN&&s.date&&s.date===dateStr;});
-  if(sw)return{ok:true,type:'swap',allowOv:false,msg:'ℹ️ '+shortN(doc.name)+' มีการสลับวันผ่าตัด ('+sw.type+')'+(sw.note?' · '+sw.note:'')+' — บันทึกได้'};
-  var sched=doc.sched[dow]||[];
-  if(sched.length===0)return{ok:false,type:'no-sched',allowOv:true,msg:shortN(doc.name)+' ไม่มีตารางผ่าตัดในวัน'+DTH[dow]+'นี้ — หากแพทย์จะมาจริง กด Override ด้านล่าง'};
-  return{ok:true,type:'ok'};
-}
-
-function runVal(){
-  var di=document.getElementById('fDoc').value;
-  var dateStr=document.getElementById('fDate').value;
-  if(!di||!dateStr){clearVal();return;}
-  applyVal(validateDocDate(di,dateStr));
-}
-
-function applyVal(r){
-  var box=document.getElementById('valBox');
-  var msg=document.getElementById('valMsg');
-  var icon=document.getElementById('valIcon');
-  var btn=document.getElementById('btnSave');
-  var action=document.getElementById('valAction');
-  var ovForm=document.getElementById('ovForm');
-  var btnOv=document.getElementById('btnOv');
-  box.classList.remove('show','err-a','warn-a','no-act');
-  action.style.display='none';
-  ovForm.classList.remove('show');
-  btnOv.classList.remove('active');
-  if(r.type==='ok'){valBlocked=false;btn.disabled=false;btn.style.opacity='1';return;}
-  box.classList.add('show');
-  msg.textContent=r.msg;
-  if(!r.ok){
-    box.classList.add('err-a');
-    valBlocked=true;btn.disabled=true;btn.style.opacity='.4';
-    if(r.allowOv){action.style.display='flex';}
-    else{box.classList.add('no-act');}
-  } else {
-    box.classList.add('warn-a','no-act');
-    icon.textContent='⚠️';
-    valBlocked=false;btn.disabled=false;btn.style.opacity='1';
-  }
-}
-
-function clearVal(){
-  var box=document.getElementById('valBox');
-  box.classList.remove('show','err-a','warn-a','no-act');
-  var action=document.getElementById('valAction');if(action)action.style.display='none';
-  var ovForm=document.getElementById('ovForm');if(ovForm)ovForm.classList.remove('show');
-  var btnOv=document.getElementById('btnOv');if(btnOv)btnOv.classList.remove('active');
-  valBlocked=false;
-  var btn=document.getElementById('btnSave');btn.disabled=false;btn.style.opacity='1';
-}
-
-function toggleOvForm(){
-  var form=document.getElementById('ovForm'),btnOv=document.getElementById('btnOv');
-  if(form.classList.contains('show')){
-    form.classList.remove('show');btnOv.classList.remove('active');
-    valBlocked=true;document.getElementById('btnSave').disabled=true;document.getElementById('btnSave').style.opacity='.4';
-  } else {form.classList.add('show');btnOv.classList.add('active');}
-}
-
-function confirmOv(){
-  var di=parseInt(document.getElementById('fDoc').value);
-  var dateStr=document.getElementById('fDate').value;
-  var type=document.getElementById('ovType').value;
-  var note=document.getElementById('ovNote').value.trim();
-  if(!dateStr||isNaN(di)){toast('⚠️ ยังไม่ได้เลือกแพทย์หรือวันที่','warn');return;}
-  var exists=swaps.find(function(s){return s.di===di&&s.date===dateStr;});
-  if(exists){exists.type=type;exists.note=note;}
-  else{var newId=Math.max.apply(null,[0].concat(swaps.map(function(s){return s.id;})))+1;swaps.push({id:newId,di:di,date:dateStr,type:type,note:note});}
-  renderSwapTable();renderCal();
-  valBlocked=false;
-  var btn=document.getElementById('btnSave');btn.disabled=false;btn.style.opacity='1';
-  var box=document.getElementById('valBox');
-  box.classList.remove('err-a','no-act');box.classList.add('warn-a','no-act');
-  document.getElementById('valIcon').textContent='✅';
-  document.getElementById('valMsg').textContent='Override บันทึกแล้ว · '+(docs[di]||{name:'–'}).name+' จะมาผ่าตัดในวันนี้ ('+type+')';
-  document.getElementById('valAction').style.display='none';
-  document.getElementById('ovForm').classList.remove('show');
-  document.getElementById('btnOv').classList.remove('active');
-  toast('✅ Override "'+type+'" บันทึกแล้ว','ok');
-}
-
-function cancelOv(){
-  document.getElementById('ovForm').classList.remove('show');
-  document.getElementById('btnOv').classList.remove('active');
-}
-
-// ── SIDEBAR ──
-function renderSide(){
-  var list=document.getElementById('sideDocList');list.innerHTML='';
-  function mkChip(lbl,color,isAct,fn){
-    var el=document.createElement('div');el.className='doc-chip';
-    if(isAct){el.style.background=hexDim(color);el.style.color=color;}
-    el.innerHTML='<div class="d-dot" style="background:'+color+'"></div>'+lbl;
-    el.onclick=fn;return el;
-  }
-  list.appendChild(mkChip('แพทย์ทุกท่าน','#00BFD8',docFil==='all',function(){setDocFil('all');}));
-  docs.forEach(function(d,i){list.appendChild(mkChip(shortN(d.name),d.color,docFil==i,function(){setDocFil(i);}));});
-  renderCalFbar();
-}
-function setDocFil(v){docFil=v;renderSide();renderAll();}
-
-// ── CALENDAR ──
-function renderCalFbar(){
-  var bar=document.getElementById('calFbar');bar.innerHTML='';
-  function mkCfc(lbl,color,isAct,fn,isDot){
-    var el=document.createElement('div');el.className='cfc'+(isAct?' active':'');
-    if(isAct&&color){el.style.borderColor=color;el.style.color=color;el.style.background=hexDim(color);}
-    el.innerHTML=isDot?'<div class="d-dot" style="background:'+color+';width:8px;height:8px;"></div>'+lbl:lbl;
-    el.onclick=fn;return el;
-  }
-  bar.appendChild(mkCfc('ทั้งหมด',null,calFil==='all',function(){setCalFil('all');}));
-  docs.forEach(function(d,i){bar.appendChild(mkCfc(shortN(d.name),d.color,calFil==i,function(){setCalFil(i);},true));});
-}
-function setCalFil(v){calFil=v;renderCalFbar();renderCal();}
-
-function renderCal(){
-  document.getElementById('calTitle').textContent=MTH[calMo]+' '+(calYr+543);
-  var grid=document.getElementById('calGrid');grid.innerHTML='';
-  var first=new Date(calYr,calMo,1),sdow=first.getDay(),dim=new Date(calYr,calMo+1,0).getDate();
-  var today=new Date();today.setHours(0,0,0,0);
-  var cells=[],total=0,confirm=0,wait=0;
-  for(var i=0;i<sdow;i++)cells.push({d:new Date(calYr,calMo,1-sdow+i),other:true});
-  for(var d=1;d<=dim;d++)cells.push({d:new Date(calYr,calMo,d),other:false});
-  while(cells.length%7!==0)cells.push({d:new Date(calYr,calMo+1,cells.length-sdow-dim+1),other:true});
-
-  cells.forEach(function(cell){
-    var d=cell.d,other=cell.other;
-    var isoStr=iso(d);
-    var list=apts.filter(function(a){return a.date&&a.date===isoStr&&a.status!=='cancel';});
-    if(calFil!=='all')list=list.filter(function(a){
-      var f=parseInt(calFil);
-      return a.di===f||(a.di2!=null&&a.di2===f);
-    });
-    if(!other){total+=list.length;confirm+=list.filter(function(a){return a.status==='confirm';}).length;wait+=list.filter(function(a){return a.status==='wait'||a.status==='pending';}).length;}
-    var isOR=OR.includes(d.getDay()),isToday=d.getTime()===today.getTime(),hasCases=list.length>0;
-    var dayLv=!other?leaves.filter(function(l){return l.status==='Approved'&&isoStr>=l.start&&isoStr<=l.end;}):[];
-    var daySw=!other?swaps.filter(function(s){return s.date===isoStr;}):[];
-    var el=document.createElement('div');
-    
-    // ★ แก้ไขให้ทุกวัน (ที่ไม่ใช่วันของเดือนอื่น) มีคลาส clk เพื่อให้คลิกได้
-    el.className='cal-day'+(other?' other':'')+(isToday?' today-c':'')+(isOR&&!other?' or-day':'')+(!other?' clk':'')+(dayLv.length?' has-leave':'');
-    
-    var docCountHTML=(function(){
-      if(!hasCases)return '';
-      var countMap={};
-      list.forEach(function(a){countMap[a.di]=(countMap[a.di]||0)+1;});
-      if(calFil!=='all'){var n=list.length;return '<div style="margin-top:3px;font-size:10px;font-weight:700;color:var(--teal)">'+n+' เคส</div>';}
-      return '<div style="margin-top:3px;display:flex;flex-direction:column;gap:2px;">'+
-        Object.entries(countMap).map(function(entry){
-          var di=entry[0],cnt=entry[1];
-          var doc=docs[parseInt(di)]||{name:'–',color:'#ccc'};
-          return '<div style="display:flex;align-items:center;gap:3px;font-size:9px;line-height:1.3;">'
-            +'<div style="width:5px;height:5px;border-radius:50%;background:'+doc.color+';flex-shrink:0;"></div>'
-            +'<span style="color:var(--t2);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:70px;">'+shortN(doc.name)+'</span>'
-            +'<span style="color:var(--teal);font-weight:700;margin-left:auto;">'+cnt+'</span>'
-            +'</div>';
-        }).join('')+'</div>';
-    })();
-    el.innerHTML=
-      '<div class="cdn-w"><span class="cdn">'+d.getDate()+'</span>'+(isOR&&!other?'<span class="or-tag">OR</span>':'')+'</div>'
-      +(hasCases?'<div class="cal-cnt">'+list.length+' ราย</div>':'')
-      +docCountHTML
-      +dayLv.map(function(l){return '<span class="leave-tag">🏖 '+shortN((docs[l.di]||{name:'–'}).name)+'</span>';}).join('')
-      +daySw.map(function(s){return '<span class="swap-tag">🔁 '+shortN((docs[s.di]||{name:'–'}).name)+'</span>';}).join('');
-    
-    // ★ แก้ไขให้กดวันที่เพื่อย้ายสัปดาห์ได้ "ทุกวัน" ในปฏิทิน
-    if(!other)el.onclick=(function(s){return function(){jumpTo(s);};})(isoStr);
-    
-    grid.appendChild(el);
-  });
-
-  var label=calFil==='all'?'ทุกท่าน':(docs[calFil]?shortN(docs[calFil].name):'–');
-  document.getElementById('calSummary').innerHTML=
-    '<div class="stat-card" style="padding:9px 13px;gap:8px;"><div class="stat-icon si-t" style="width:30px;height:30px;font-size:13px;">📊</div><div><div class="sn t" style="font-size:16px;">'+total+'</div><div class="sl">รวมทั้งเดือน ('+label+')</div></div></div>'
-    +'<div class="stat-card" style="padding:9px 13px;gap:8px;"><div class="stat-icon si-c" style="width:30px;height:30px;font-size:13px;">✅</div><div><div class="sn c" style="font-size:16px;">'+confirm+'</div><div class="sl">ยืนยันแล้ว</div></div></div>'
-    +'<div class="stat-card" style="padding:9px 13px;gap:8px;"><div class="stat-icon si-p" style="width:30px;height:30px;font-size:13px;">⏳</div><div><div class="sn p" style="font-size:16px;">'+wait+'</div><div class="sl">รอยืนยัน</div></div></div>';
-}
-
-function calNav(d){calMo+=d;if(calMo<0){calMo=11;calYr--;}if(calMo>11){calMo=0;calYr++;}renderCal();}
-
-function jumpTo(isoStr){
-  var d=parseD(isoStr);
-  var today=new Date();today.setHours(0,0,0,0);
-  var todayMon=new Date(today);todayMon.setDate(today.getDate()-(today.getDay()===0?6:today.getDay()-1));
-  var targetMon=new Date(d);targetMon.setDate(d.getDate()-(d.getDay()===0?6:d.getDay()-1));
-  weekOff=Math.round((targetMon-todayMon)/(7*24*60*60*1000));
-  showPage('schedule');
-  // ★ เพิ่มการสั่งโหลดข้อมูล (renderAll) เพื่อให้หน้าตารางเปลี่ยนสัปดาห์ตามที่เลือก
-  renderAll(); 
-}
-
-// ── DATE PICKER (Add/Edit modal) ──
-function openDPOverlay(){
-  if(!dpSel){dpYr=new Date().getFullYear();dpMo=new Date().getMonth();}
-  else{var pd=parseD(dpSel);dpYr=pd.getFullYear();dpMo=pd.getMonth();}
-  renderDPGrid();openModal('dpOverlay');
-}
-function closeDPOverlay(){closeModal('dpOverlay');}
-function dpNav(d){dpMo+=d;if(dpMo<0){dpMo=11;dpYr--;}if(dpMo>11){dpMo=0;dpYr++;}renderDPGrid();}
-
-function renderDPGrid(){
-  document.getElementById('dpMonthLabel').textContent=MTH[dpMo]+' '+(dpYr+543);
-  var diN=parseInt(document.getElementById('fDoc').value);
-  var leg=document.getElementById('dpLegend');
-  leg.innerHTML='<span class="dp-lgnd-item"><span class="dp-lgnd-dot" style="background:var(--td2)"></span>วัน OR</span>'
-    +(!isNaN(diN)?'<span class="dp-lgnd-item"><span class="dp-lgnd-dot" style="background:var(--yd)"></span>สลับเวร</span><span class="dp-lgnd-item"><span class="dp-lgnd-dot" style="background:var(--rd)"></span>วันลา</span>':'');
-  var grid=document.getElementById('dpGrid');
-  var first=new Date(dpYr,dpMo,1),sdow=first.getDay(),dim=new Date(dpYr,dpMo+1,0).getDate();
-  var today=new Date();today.setHours(0,0,0,0);
-  var cells=[];
-  for(var i=0;i<sdow;i++)cells.push({d:new Date(dpYr,dpMo,1-sdow+i),other:true});
-  for(var d=1;d<=dim;d++)cells.push({d:new Date(dpYr,dpMo,d),other:false});
-  while(cells.length%7!==0)cells.push({d:new Date(dpYr,dpMo+1,cells.length-sdow-dim+1),other:true});
-  grid.innerHTML=WTH.map(function(w,i){return '<div class="dp-wd'+(OR.includes(i)?' hi':'')+'">'+w+'</div>';}).join('');
-  cells.forEach(function(cell){
-    var d=cell.d,other=cell.other;
-    var s=iso(d),isSel=dpSel===s,isT=d.getTime()===today.getTime();
-    var isOR=OR.includes(d.getDay())&&!other;
-    var isLv=!other&&!isNaN(diN)&&leaves.some(function(l){return l.di===diN&&l.status==='Approved'&&s>=l.start&&s<=l.end;});
-    var isSw=!other&&!isNaN(diN)&&swaps.some(function(sw){return sw.di===diN&&sw.date===s;});
-    var cls='dp-d';
-    if(other)cls+=' other';
-    else if(isSel)cls+=' sel';
-    else if(isLv)cls+=' leave-d';
-    else if(isSw)cls+=' swap-d';
-    else if(isOR)cls+=' orm';
-    if(isT&&!isSel)cls+=' td-mark';
-    var el=document.createElement('div');
-    el.className=cls;el.textContent=d.getDate();
-    if(!other)el.onclick=(function(ss){return function(){dpSelectDate(ss);};})(s);
-    grid.appendChild(el);
-  });
-}
-
-function dpSelectDate(s){
-  dpSel=s;document.getElementById('fDate').value=s;
-  var trigger=document.getElementById('dpTrigger'),txt=document.getElementById('dpTriggerTxt');
-  txt.textContent=fmtFull(s);trigger.classList.remove('placeholder');trigger.classList.add('has-val');
-  closeDPOverlay();runVal();
-}
-
-// ── RESCHEDULE CALENDAR ──
-function rsCalNav(d){
-  rsCalMo+=d;
-  if(rsCalMo<0){rsCalMo=11;rsCalYr--;}
-  if(rsCalMo>11){rsCalMo=0;rsCalYr++;}
-  buildRSCal();
-}
-
-function buildRSCal(){
-  var labelEl=document.getElementById('rsCalLabel');
-  var grid=document.getElementById('rsCalGrid');
-  if(!labelEl||!grid)return;
-  labelEl.textContent=MTH[rsCalMo]+' '+(rsCalYr+543);
-
-  var first=new Date(rsCalYr,rsCalMo,1),sdow=first.getDay(),dim=new Date(rsCalYr,rsCalMo+1,0).getDate();
-  var today=new Date();today.setHours(0,0,0,0);
-  var cells=[];
-  for(var i=0;i<sdow;i++)cells.push({d:new Date(rsCalYr,rsCalMo,1-sdow+i),other:true});
-  for(var d=1;d<=dim;d++)cells.push({d:new Date(rsCalYr,rsCalMo,d),other:false});
-  while(cells.length%7!==0)cells.push({d:new Date(rsCalYr,rsCalMo+1,cells.length-sdow-dim+1),other:true});
-
-  // Header row
-  grid.innerHTML=WTH.map(function(w,i){
-    return '<div class="dp-wd'+(OR.includes(i)?' hi':'')+'">'+w+'</div>';
-  }).join('');
-
-  // Get doctor index from current apt
-  var a=apts.find(function(x){return x.id===rsId;});
-  var diN=a?a.di:-1;
-
-  cells.forEach(function(cell){
-    var d=cell.d,other=cell.other;
-    var s=iso(d);
-    var isPast=!other&&d.getTime()<today.getTime();
-    var isSel=rsDate===s;
-    var isT=d.getTime()===today.getTime();
-    var isOR=OR.includes(d.getDay())&&!other;
-    var isLv=!other&&diN>=0&&leaves.some(function(l){
-      return l.di===diN&&l.status==='Approved'&&s>=l.start&&s<=l.end;
-    });
-    var isSw=!other&&diN>=0&&swaps.some(function(sw){return sw.di===diN&&sw.date===s;});
-
-    var cls='dp-d';
-    if(other)cls+=' other';
-    else if(isPast)cls+=' other'; // dim past dates
-    else if(isSel)cls+=' sel';
-    else if(isLv)cls+=' leave-d';
-    else if(isSw)cls+=' swap-d';
-    else if(isOR)cls+=' orm';
-    if(isT&&!isSel&&!other)cls+=' td-mark';
-
-    var el=document.createElement('div');
-    el.className=cls;
-    el.textContent=d.getDate();
-    if(!other&&!isPast){
-      el.onclick=(function(ss){return function(){selRSDate(ss);};})(s);
-    }
-    grid.appendChild(el);
-  });
-}
-
-function selRSDate(date){
-  rsDate=date;
-  var disp=document.getElementById('rsSelDisplay');
-  if(disp){
-    disp.classList.remove('empty');
-    disp.innerHTML='📅 <strong>'+fmtFull(date)+'</strong>';
-  }
-  buildRSCal(); // re-render to show selection highlight
-}
-
-// ── ADD / EDIT ──
-function fillSelects(){
-  document.getElementById('fOp').innerHTML=
-    '<option value="">– เลือกประเภท –</option>'
-    +ops.map(function(o){return '<option>'+o+'</option>';}).join('')
-    +'<option value="__other__">✏️ อื่นๆ (พิมพ์เอง)</option>';
-  var docOpts=docs.map(function(d,i){return '<option value="'+i+'">'+d.name+'</option>';}).join('');
-  document.getElementById('fDoc').innerHTML='<option value="">– เลือกแพทย์ –</option>'+docOpts;
-  document.getElementById('fDoc2').innerHTML='<option value="">– ไม่มี –</option>'+docOpts;
-}
-
-function toggleOpCustom(val){
-  var inp=document.getElementById('fOpCustom');
-  if(val==='__other__'){
-    inp.style.display='block';
-    inp.focus();
-  } else {
-    inp.style.display='none';
-    inp.value='';
-  }
-}
-
-function openAdd(hint){
-  editId=null;valBlocked=false;
-  document.getElementById('addTl').textContent='📅 เพิ่มนัดผ่าตัด';
-  ['fHN','fName','fNote','fTs','fTe','fTel1','fTel2'].forEach(function(id){document.getElementById(id).value='';});
-  document.getElementById('fDoc2').value='';
-  document.getElementById('fAnes').value='';
-  document.getElementById('fDate').value='';dpSel=null;
-  document.getElementById('dpTriggerTxt').textContent='เลือกวันที่...';
-  document.getElementById('dpTrigger').classList.add('placeholder');document.getElementById('dpTrigger').classList.remove('has-val');
-  document.getElementById('fStatus').value='wait';
-  clearVal();fillSelects();
-  document.getElementById('fOpCustom').style.display='none';
-  document.getElementById('fOpCustom').value='';
-  var _ov=document.getElementById('ovForm');if(_ov)_ov.classList.remove('show');
-  var _ovn=document.getElementById('ovNote');if(_ovn)_ovn.value='';
-  var _ovt=document.getElementById('ovType');if(_ovt)_ovt.value='Swap';
-  if(hint){var wk=getMonWed(weekOff);var d=hint==='mon'?wk.mon:wk.wed;dpYr=d.getFullYear();dpMo=d.getMonth();dpSelectDate(iso(d));}
-  else{dpYr=new Date().getFullYear();dpMo=new Date().getMonth();}
-  openModal('addModal');
-}
-
-function openEdit(e,id){
-  e.stopPropagation();var a=apts.find(function(x){return x.id===id;});if(!a)return;
-  editId=id;document.getElementById('addTl').textContent='✏️ แก้ไขนัดผ่าตัด';
-  fillSelects();clearVal();
-  document.getElementById('fHN').value=a.hn;document.getElementById('fName').value=a.name;
-  var pd=parseD(a.date);dpYr=pd.getFullYear();dpMo=pd.getMonth();dpSel=a.date;
-  document.getElementById('fDate').value=a.date;
-  document.getElementById('dpTriggerTxt').textContent=fmtFull(a.date);
-  document.getElementById('dpTrigger').classList.remove('placeholder');document.getElementById('dpTrigger').classList.add('has-val');
-  document.getElementById('fTs').value=a.ts||'';document.getElementById('fTe').value=a.te||'';
-  // ── OP: ถ้าค่าอยู่ใน list ตั้งปกติ ถ้าไม่อยู่ให้เลือก อื่นๆ แล้วใส่ค่าใน input
-  var opSel=document.getElementById('fOp');
-  var opCustom=document.getElementById('fOpCustom');
-  var opInList=ops.includes(a.op);
-  if(opInList||!a.op){
-    opSel.value=a.op||'';
-    opCustom.style.display='none';opCustom.value='';
-  } else {
-    opSel.value='__other__';
-    opCustom.style.display='block';opCustom.value=a.op||'';
-  }
-  document.getElementById('fDoc').value=a.di;
-  document.getElementById('fDoc2').value=a.di2!=null?a.di2:'';
-  document.getElementById('fAnes').value=a.anesthesia||'';
-  document.getElementById('fTel1').value=a.tel1||'';document.getElementById('fTel2').value=a.tel2||'';
-  document.getElementById('fStatus').value=a.status;document.getElementById('fNote').value=a.note||'';
-  runVal();openModal('addModal');
-}
-
-function saveApt(){
-  if(valBlocked){toast('🚫 ไม่สามารถบันทึกได้ กรุณาแก้ไขข้อมูลหรือกด Override ก่อน','err');return;}
-  var hn=document.getElementById('fHN').value.trim(),name=document.getElementById('fName').value.trim();
-  var date=document.getElementById('fDate').value,ts=document.getElementById('fTs').value.trim(),te=document.getElementById('fTe').value.trim();
-  var opRaw=document.getElementById('fOp').value;
-  var op=opRaw==='__other__'?document.getElementById('fOpCustom').value.trim():opRaw;
-  var di=document.getElementById('fDoc').value;
-  var di2Raw=document.getElementById('fDoc2').value;
-  var di2=di2Raw!==''?parseInt(di2Raw):null;
-  var doctor2Name=di2!=null&&docs[di2]?docs[di2].name:'';
-  var anesthesia=document.getElementById('fAnes').value;
-  var tel1=document.getElementById('fTel1').value.trim(),tel2=document.getElementById('fTel2').value.trim();
-  var status=document.getElementById('fStatus').value,note=document.getElementById('fNote').value.trim();
-  if(!hn||!name||!date||!ts||!op||di===''){toast('⚠️ กรุณากรอกข้อมูลที่จำเป็นให้ครบ','warn');return;}
-  if(!validateTime(ts)){toast('⚠️ รูปแบบเวลาเริ่มไม่ถูกต้อง (HH:MM)','warn');return;}
-  if(te&&!validateTime(te)){toast('⚠️ รูปแบบเวลาสิ้นสุดไม่ถูกต้อง (HH:MM)','warn');return;}
-  if(editId!=null){
-    var idx=apts.findIndex(function(a){return a.id===editId;});
-    apts[idx]=Object.assign({},apts[idx],{hn:hn,name:name,date:date,ts:ts,te:te,op:op,di:parseInt(di),di2:di2,doctor2Name:doctor2Name,anesthesia:anesthesia,tel1:tel1,tel2:tel2,status:status,note:note});
-    pushRow(apts[idx]);toast('✅ แก้ไขเรียบร้อย','ok');
-  }else{
-    var newId=Math.max.apply(null,[0].concat(apts.map(function(a){return a.id;})))+1;
-    var r={id:newId,hn:hn,name:name,date:date,ts:ts,te:te,op:op,di:parseInt(di),di2:di2,doctor2Name:doctor2Name,anesthesia:anesthesia,tel1:tel1,tel2:tel2,status:status,note:note};
-    apts.push(r);pushRow(r);toast('✅ เพิ่มนัดผ่าตัดเรียบร้อย','ok');
-  }
-  closeModal('addModal');renderAll();if(curPg==='calendar')renderCal();
-}
-
-// ── RESCHEDULE ──
-function openRS(e,id){
-  e.stopPropagation();
-  rsId=id;rsDate=null;
-  var a=apts.find(function(x){return x.id===id;});if(!a)return;
-  document.getElementById('rsPt').textContent=a.name+' · HN: '+a.hn;
-  document.getElementById('rsTs').value=a.ts||'';
-  document.getElementById('rsOvSection').style.display='none';
-  document.getElementById('rsOvNote').value='';
-  document.getElementById('rsOvType').value='Swap';
-  // Reset calendar display
-  var disp=document.getElementById('rsSelDisplay');
-  if(disp){disp.textContent='📅 ยังไม่ได้เลือกวันที่';disp.classList.add('empty');}
-  // Init calendar to current month
-  var today=new Date();
-  rsCalYr=today.getFullYear();rsCalMo=today.getMonth();
-  openModal('rsModal');
-  // Build calendar after modal opens
-  setTimeout(function(){buildRSCal();},60);
-}
-
-function confirmRS(){
-  if(!rsDate){toast('⚠️ กรุณาเลือกวันใหม่ในปฏิทิน','warn');return;}
-  var ts=document.getElementById('rsTs').value.trim();
-  if(!validateTime(ts)){toast('⚠️ รูปแบบเวลาไม่ถูกต้อง (HH:MM)','warn');return;}
-  var a=apts.find(function(x){return x.id===rsId;});if(!a)return;
-  var vr=validateDocDate(String(a.di),rsDate);
-  
-  // ★ ถ้าไม่ ok และยังไม่ได้ override → แสดงปุ่มให้ override ในหน้านี้เลย
-  if(!vr.ok){
-    var hasOv=swaps.some(function(s){return s.di===a.di&&s.date===rsDate;});
-    if(!hasOv){
-      // แสดง override section ในหน้า rsModal
-      document.getElementById('rsOvSection').style.display='block';
-      document.getElementById('rsOvMsg').textContent=vr.msg;
-      toast('⚠️ '+vr.msg+' — กด Override เพื่อยืนยัน','warn');
-      return;
-    }
-  }
-  if(vr.type==='swap')toast('⚠️ '+vr.msg,'warn');
-  a.date=rsDate;a.ts=ts;a.status='wait';pushRow(a);
-  toast('🔄 เลื่อนนัดสำเร็จ → '+fmtFull(rsDate)+' · สถานะ → รอยืนยัน','ok');
-  closeModal('rsModal');renderAll();if(curPg==='calendar')renderCal();
-}
-
-// ★ function ใหม่ — กด Override แล้วเลื่อนนัดเลย
-function confirmRSWithOv(){
-  var a=apts.find(function(x){return x.id===rsId;});if(!a)return;
-  var ts=document.getElementById('rsTs').value.trim();
-  var type=document.getElementById('rsOvType').value;
-  var note=document.getElementById('rsOvNote').value.trim();
-  // บันทึก override ก่อน
-  var ex=swaps.find(function(s){return s.di===a.di&&s.date===rsDate;});
-  if(ex){ex.type=type;ex.note=note;}
-  else{
-    var newId=Math.max.apply(null,[0].concat(swaps.map(function(s){return s.id;})))+1;
-    swaps.push({id:newId,di:a.di,date:rsDate,type:type,note:note});
-  }
-  // แล้วเลื่อนนัด
-  a.date=rsDate;a.ts=ts;a.status='wait';pushRow(a);
-  toast('🔄 เลื่อนนัด + Override "'+type+'" สำเร็จ → '+fmtFull(rsDate),'ok');
-  closeModal('rsModal');renderAll();renderSwapTable();if(curPg==='calendar')renderCal();
-}
-
-// ── QUICK SWAP ──
-function openQSwap(e,id){
-  e.stopPropagation();qSwapAptId=id;
-  var a=apts.find(function(x){return x.id===id;});if(!a)return;
-  var doc=docs[a.di]||{name:'–'};
-  document.getElementById('qSwapDocName').textContent=doc.name;
-  document.getElementById('qSwapDate').textContent=fmtFull(a.date)+' ('+DTH[parseD(a.date).getDay()]+')';
-  document.getElementById('qSwapNote').value='';
-  document.getElementById('qSwapType').value='Swap';
-  openModal('qSwapModal');
-}
-function confirmQSwap(){
-  var a=apts.find(function(x){return x.id===qSwapAptId;});if(!a)return;
-  var type=document.getElementById('qSwapType').value;
-  var note=document.getElementById('qSwapNote').value.trim();
-  var existing=swaps.find(function(s){return s.di===a.di&&s.date===a.date;});
-  if(existing){existing.type=type;existing.note=note;toast('✅ แก้ไข Override แล้ว','ok');}
-  else{var newId=Math.max.apply(null,[0].concat(swaps.map(function(s){return s.id;})))+1;swaps.push({id:newId,di:a.di,date:a.date,type:type,note:note});toast('✅ บันทึก Override แล้ว','ok');}
-  closeModal('qSwapModal');renderAll();renderSwapTable();if(curPg==='calendar')renderCal();
-}
-
-// ── LEAVE MANAGEMENT ──
-function renderLeaveSelects(){
-  ['lvDoc','swDoc'].forEach(function(id){
-    var el=document.getElementById(id);
-    if(el)el.innerHTML=docs.map(function(d,i){return '<option value="'+i+'">'+d.name+'</option>';}).join('');
-  });
-}
-function saveLeave(){
-  var di=parseInt(document.getElementById('lvDoc').value),start=document.getElementById('lvStart').value,end=document.getElementById('lvEnd').value;
-  var reason=document.getElementById('lvReason').value.trim(),status=document.getElementById('lvStat').value;
-  if(!start||!end){toast('⚠️ กรุณาระบุช่วงวันลา','warn');return;}
-  if(start>end){toast('⚠️ วันเริ่มต้นต้องก่อนวันสิ้นสุด','warn');return;}
-  var newId=Math.max.apply(null,[0].concat(leaves.map(function(l){return l.id;})))+1;
-  leaves.push({id:newId,di:di,start:start,end:end,reason:reason,status:status});
-  renderLeaveTable();renderCal();
-  ['lvStart','lvEnd','lvReason'].forEach(function(id){document.getElementById(id).value='';});
-  toast('✅ บันทึกวันลาแล้ว','ok');
-}
-function delLeave(id){if(!confirm('ลบรายการวันลานี้?'))return;leaves=leaves.filter(function(l){return l.id!==id;});renderLeaveTable();renderCal();toast('🗑️ ลบวันลาแล้ว','warn');}
-function renderLeaveTable(){
-  var tbody=document.getElementById('leaveTbody');if(!tbody)return;
-  tbody.innerHTML=leaves.length?leaves.map(function(l){
-    return '<tr>'
-      +'<td><div style="display:flex;align-items:center;gap:6px;"><div class="d-dot" style="background:'+(docs[l.di]||{color:'#ccc'}).color+'"></div>'+(docs[l.di]||{name:'–'}).name+'</div></td>'
-      +'<td>'+fmtShort(parseD(l.start))+' – '+fmtShort(parseD(l.end))+'</td>'
-      +'<td style="color:var(--t2)">'+(l.reason||'–')+'</td>'
-      +'<td><span class="'+(l.status==='Approved'?'ls-a':'ls-p')+'">'+l.status+'</span></td>'
-      +'<td><button class="bsr" onclick="delLeave('+l.id+')">ลบ</button></td>'
-      +'</tr>';
-  }).join(''):'<tr><td colspan="5" style="text-align:center;color:var(--t3);padding:18px">ยังไม่มีรายการวันลา</td></tr>';
-}
-
-// ── SWAP MANAGEMENT ──
-function renderSwapSelects(){var el=document.getElementById('swDoc');if(el)el.innerHTML=docs.map(function(d,i){return '<option value="'+i+'">'+d.name+'</option>';}).join('');}
-function saveSwap(){
-  var di=parseInt(document.getElementById('swDoc').value),date=document.getElementById('swDate').value;
-  var type=document.getElementById('swType').value,note=document.getElementById('swNote').value.trim();
-  if(!date){toast('⚠️ กรุณาระบุวันที่','warn');return;}
-  var ex=swaps.find(function(s){return s.di===di&&s.date===date;});
-  if(ex){ex.type=type;ex.note=note;toast('✅ แก้ไข Override แล้ว','ok');}
-  else{var newId=Math.max.apply(null,[0].concat(swaps.map(function(s){return s.id;})))+1;swaps.push({id:newId,di:di,date:date,type:type,note:note});toast('✅ บันทึก Override แล้ว','ok');}
-  renderSwapTable();renderCal();renderAll();
-  ['swDate','swNote'].forEach(function(id){document.getElementById(id).value='';});
-}
-function delSwap(id){if(!confirm('ลบรายการ Override นี้?'))return;swaps=swaps.filter(function(s){return s.id!==id;});renderSwapTable();renderCal();renderAll();toast('🗑️ ลบ Override แล้ว','warn');}
-function renderSwapTable(){
-  var tbody=document.getElementById('swapTbody');if(!tbody)return;
-  var tl={Swap:'🔁 สลับเวร',Additional:'➕ ผ่าตัดเพิ่ม',Replacement:'↔️ แทน'};
-  var tc={Swap:'ot-sw',Additional:'ot-ad',Replacement:'ot-rp'};
-  tbody.innerHTML=swaps.length?swaps.map(function(s){
-    return '<tr>'
-      +'<td><div style="display:flex;align-items:center;gap:6px;"><div class="d-dot" style="background:'+(docs[s.di]||{color:'#ccc'}).color+'"></div>'+(docs[s.di]||{name:'–'}).name+'</div></td>'
-      +'<td>'+fmtShort(parseD(s.date))+' ('+DTH[parseD(s.date).getDay()]+')</td>'
-      +'<td><span class="'+(tc[s.type]||'')+'">'+(tl[s.type]||s.type)+'</span></td>'
-      +'<td style="color:var(--t2)">'+(s.note||'–')+'</td>'
-      +'<td><button class="bsr" onclick="delSwap('+s.id+')">ลบ</button></td>'
-      +'</tr>';
-  }).join(''):'<tr><td colspan="5" style="text-align:center;color:var(--t3);padding:18px">ยังไม่มีรายการ Override</td></tr>';
-}
-
-// ── SETTINGS: DOCTORS ──
-function renderDocSettings(){
-  var DAYS=['จ','อ','พ','พฤ','ศ','ส'],SLOTS=[{k:'morning',l:'เช้า'},{k:'afternoon',l:'บ่าย'},{k:'allday',l:'ทั้งวัน'}];
-  document.getElementById('docList').innerHTML=docs.map(function(d,di){
-    return '<div class="dsr">'
-      +'<div class="dsr-h"><div class="dsr-c" style="background:'+d.color+'"></div><div class="dsr-n">'+d.name+'</div><button class="dsr-d" onclick="delDoc('+di+')">ลบ</button></div>'
-      +'<div class="sched-days">'+DAYS.map(function(dl,idx){
-        var dn=idx+1,isOR=(dn===1||dn===3);
-        return '<div class="sdc"><div class="sdl'+(isOR?' or':'')+'">'+dl+(isOR?'*':'')+'</div>'
-          +SLOTS.map(function(s){return '<button class="slb'+((d.sched[dn]||[]).includes(s.k)?' on':'')+'" onclick="togSlot('+di+','+dn+',\''+s.k+'\',this)">'+s.l+'</button>';}).join('')
-          +'</div>';
-      }).join('')+'</div>'
-      +'</div>';
-  }).join('');
-}
-
-function togSlot(di,dn,slot,btn){
-  var arr=docs[di].sched[dn]||(docs[di].sched[dn]=[]);
-  var i=arr.indexOf(slot);
-  i>-1?arr.splice(i,1):arr.push(slot);
-  btn.classList.toggle('on');
-}
-
-function addDoc(){
-  var name=document.getElementById('newDocName').value.trim();
-  if(!name){toast('⚠️ ใส่ชื่อแพทย์ก่อน','warn');return;}
-  docs.push({name:name,color:DCOL[docs.length%DCOL.length],sched:{1:[],2:[],3:[],4:[],5:[],6:[]},orDays:[]});
-  document.getElementById('newDocName').value='';
-  renderDocSettings();renderSide();renderLeaveSelects();renderSwapSelects();
-  toast('✅ เพิ่ม '+name+' แล้ว — กดบันทึกลง Sheet เพื่อซิงค์','ok');
-}
-
-function delOp(i){
-  if(!confirm('ลบ "'+ops[i]+'" ออกจากรายการ?'))return;
-  ops.splice(i,1);renderOpList();
-  toast('🗑️ ลบประเภทผ่าตัดแล้ว','warn');
-}
-
-function delDoc(di){
-  if(!confirm('ลบ "'+docs[di].name+'" ออกจากระบบ?'))return;
-  docs.splice(di,1);
-  apts.forEach(function(a){if(a.di===di)a.di=0;else if(a.di>di)a.di--;});
-  if(docFil!=='all'&&parseInt(docFil)>=docs.length)docFil='all';
-  if(calFil!=='all'&&parseInt(calFil)>=docs.length)calFil='all';
-  renderDocSettings();renderSide();renderAll();
-  if(curPg==='calendar'){renderCalFbar();renderCal();}
-  toast('🗑️ ลบแพทย์แล้ว','warn');
-}
-
-function renderOpList(){
-  document.getElementById('opList').innerHTML=ops.map(function(o,i){
-    return '<div class="op-item"><span>'+o+'</span><button class="bsr" onclick="delOp('+i+')">ลบ</button></div>';
-  }).join('');
-}
-
-function addOp(){
-  var v=document.getElementById('newOp').value.trim();
-  if(!v)return;
-  ops.push(v);
-  document.getElementById('newOp').value='';
-  renderOpList();
-  toast('✅ เพิ่มแล้ว','ok');
-}
-
-// ── GOOGLE SHEETS ──
-function loadCfg(){
-  // ★ ดึงจากตัวแปร Hardcoded แทน LocalStorage
-  document.getElementById('cfgUrl').value = sheetCfg.url;
-  document.getElementById('cfgSheet').value = sheetCfg.sheet;
-  document.getElementById('cfgSpId').value = sheetCfg.spId;
-}
-
-function saveSheetCfg(){
-  sheetCfg={
-    url:document.getElementById('cfgUrl').value.trim(),
-    sheet:document.getElementById('cfgSheet').value.trim(),
-    spId:document.getElementById('cfgSpId').value.trim()
-  };
-  toast('💾 บันทึกการตั้งค่าแล้ว','ok');
-  if(sheetCfg.url)pullSheet();
-}
-
-async function testConn(){
-  if(!sheetCfg.url){toast('⚠️ ยังไม่ได้ใส่ URL','warn');return;}
-  showLdr('กำลังทดสอบ...');
-  try{
-    var res=await fetch(sheetCfg.url+'?action=ping',{method:'GET',redirect:'follow'});
-    var text=await res.text();
-    hideLdr();
-    var ok=false;
-    try{var j=JSON.parse(text);ok=(j.status==='online'||j.status==='ok');}catch(e){ok=false;}
-    if(ok){setSyncBadge('synced');toast('🔌 เชื่อมต่อสำเร็จ!','ok');}
-    else{setSyncBadge('error');toast('⚠️ ตอบกลับ: '+text.slice(0,80),'warn');}
-  }catch(er){
-    hideLdr();setSyncBadge('error');
-    toast('❌ เชื่อมต่อไม่ได้: '+er.message,'err');
-    showCorsHelp();
-  }
-}
-
-function showCorsHelp(){
-  var el=document.getElementById('corsHelp');
-  if(el)el.style.display='block';
-}
-
-async function pullSheet(mode){
-  mode = mode || 'full';
-  if(!sheetCfg.url){toast('⚠️ ยังไม่ได้ตั้งค่า URL','warn');return;}
-  // ★ auto-sync ในพื้นหลัง ไม่แสดง loader เพื่อไม่บัง UI
-  var isSilent = (mode === 'silent');
-  if(!isSilent) showLdr(mode==='apts'?'กำลังอัพเดทนัด...':'กำลังโหลดข้อมูล...');
-  setSyncBadge('syncing');
-  // ★ safety timeout 15 วิ — ถ้าโหลดนานเกินให้ซ่อน loader ก่อนเสมอ
-  var ldrTimeout = setTimeout(function(){ hideLdr(); }, 15000);
-  try{
-    var url = sheetCfg.url+'?action=getAll&sheet='+encodeURIComponent(sheetCfg.sheet)+'&_t='+Date.now();
-    // ★ ถ้า mode=apts ให้ส่ง param บอก Apps Script ว่าดึงแค่ appointments
-    if(mode==='apts') url += '&only=apts';
-    var res = await fetch(url,{method:'GET',redirect:'follow'});
-    if(!res.ok) throw new Error('HTTP '+res.status);
-    var data = await res.json();
-
-    if(data.appointments){
-      apts=data.appointments.map(function(a){
-        return Object.assign({},a,{
-          id:+a.id, di:+a.di,
-          di2:a.di2!=null&&a.di2!==''?+a.di2:null,
-          date:normalizeDate(a.date),
-          ts:normalizeTime(a.ts), te:normalizeTime(a.te),
-          status:a.status?String(a.status).trim():'wait',
-          note:a.note?String(a.note):'',
-          doctorName:a.doctorName?String(a.doctorName).trim():'',
-          doctor2Name:a.doctor2Name?String(a.doctor2Name).trim():'',
-          anesthesia:a.anesthesia?String(a.anesthesia).trim():'',
-          tel1:normalizeTel((a.tel1!==undefined&&a.tel1!==null)?a.tel1:''),
-          tel2:normalizeTel((a.tel2!==undefined&&a.tel2!==null)?a.tel2:''),
-        });
-      }).filter(function(a){return a.date&&a.name&&String(a.name).trim()!=='name';});
-    }
-
-    // ★ ถ้า mode=apts ข้ามส่วน doctors/ops/leaves/swaps ไปเลย
-    if(mode==='full'){
-      if(data.doctors&&data.doctors.length){
-        docs=data.doctors.map(function(d){
-          return {
-            di:+d.di, name:String(d.name||'').trim(),
-            color:String(d.color||DCOL[0]),
-            sched:(function(){
-              try{
-                var raw=d.sched;
-                var parsed=(typeof raw==='string')?JSON.parse(raw||'{}'):(raw||{});
-                return Object.assign({1:[],2:[],3:[],4:[],5:[],6:[]},parsed);
-              }catch(e){return {1:[],2:[],3:[],4:[],5:[],6:[]};}
-            }()),
-            orDays:(function(){
-              try{var raw=d.orDays;return(typeof raw==='string')?JSON.parse(raw||'[]'):(raw||[]);}
-              catch(e){return[];}
-            }()),
-          };
-        }).sort(function(a,b){return a.di-b.di;});
-        apts.forEach(function(a){
-          var idx=docs.findIndex(function(d){return d.name===a.doctorName;});
-          if(idx!==-1)a.di=idx;
-        });
-      }
-      if(data.operations&&data.operations.length){
-        ops=data.operations.map(function(o){return String(o.name||'').trim();}).filter(Boolean);
-      }
-      if(data.leaves) leaves=(data.leaves||[]).map(function(l){return Object.assign({},l,{id:+l.id,di:+l.di,start:normalizeDate(l.start),end:normalizeDate(l.end)});});
-      if(data.swaps) swaps=(data.swaps||[]).map(function(s){return Object.assign({},s,{id:+s.id,di:+s.di,date:normalizeDate(s.date)});});
-    }
-
-    clearTimeout(ldrTimeout);
-    hideLdr(); setSyncBadge('synced');
-    lastPullTime = Date.now();
-    renderSide(); renderAll(); renderCal();
-    if(mode==='full'){
-      renderDocSettings(); renderOpList();
-      renderLeaveSelects(); renderSwapSelects();
-      renderLeaveTable(); renderSwapTable();
-    }
-    var sample=apts.slice(0,3).map(function(a){return(a.name&&a.name.split(' ')[1]||'?')+'@'+a.date;}).join(', ');
-    if(!isSilent) toast('✅ โหลดสำเร็จ · '+apts.length+' รายการ'+(sample?' ('+sample+')':''),'ok');
-    else setSyncBadge('synced');
-  }catch(er){clearTimeout(ldrTimeout);hideLdr();setSyncBadge('error');if(!isSilent)toast('❌ โหลดไม่สำเร็จ: '+er.message,'err');}
-}
-
-async function pushAll(){
-  if(!sheetCfg.url){toast('⚠️ ยังไม่ได้ตั้งค่า URL','warn');return;}
-  showLdr('กำลังอัพโหลด...');setSyncBadge('syncing');
-  try{
-    var res=await fetch(sheetCfg.url,{method:'POST',headers:{'Content-Type':'text/plain'},
-      body:JSON.stringify({action:'pushAll',sheet:sheetCfg.sheet,appointments:apts,doctors:docs,operations:ops,leaves:leaves,swaps:swaps})});
-    var data=await res.json();hideLdr();setSyncBadge('synced');
-    toast('✅ อัพโหลดสำเร็จ · '+(data.count||0)+' รายการ','ok');
-  }catch(er){hideLdr();setSyncBadge('error');toast('❌ อัพโหลดไม่สำเร็จ: '+er.message,'err');}
-}
-
-async function pushRow(a){
-  if(!sheetCfg.url)return;setSyncBadge('syncing');
-  var doc=docs[a.di]||{name:'–'};
-  try{
-    await fetch(sheetCfg.url,{method:'POST',headers:{'Content-Type':'text/plain'},
-      body:JSON.stringify({action:'upsert',sheet:sheetCfg.sheet,row:Object.assign({},a,{doctorName:doc.name})})});
-    setSyncBadge('synced');
-  }catch(er){setSyncBadge('error');}
-}
-
-// ★ แก้ไขให้หลังบันทึก Settings โหลดข้อมูลกลับมาอีกรอบเพื่อให้ชัวร์ว่าลง Google Sheets ได้ 100%
-async function saveSettings(){
-  if(!sheetCfg.url){toast('⚠️ ยังไม่ได้ตั้งค่า URL','warn');return;}
-  showLdr('กำลังบันทึก Settings...');setSyncBadge('syncing');
-  try{
-    var doctorRows=docs.map(function(d,i){
-      return {di:i,name:d.name,color:d.color,sched:JSON.stringify(d.sched||{}),orDays:JSON.stringify(d.orDays||[])};
-    });
-    var opRows=ops.map(function(name){return {name:name};});
-    var res=await fetch(sheetCfg.url,{
-      method:'POST',headers:{'Content-Type':'text/plain'},
-      body:JSON.stringify({action:'saveSettings',doctors:doctorRows,operations:opRows}),
-    });
-    var data=await res.json();
-    
-    toast('✅ บันทึก Settings ลง Sheet แล้ว','ok');
-    
-    // บังคับดึงข้อมูลใหม่หลังบันทึกเพื่อ Sync ให้ตรงกับ Database ของจริงเสมอ 
-    await pullSheet();
-    
-  }catch(er){
-    hideLdr();setSyncBadge('error');
-    toast('❌ บันทึกไม่สำเร็จ: '+er.message,'err');
-  }
-}
-
-function setSyncBadge(s){
-  document.getElementById('syncBadge').className='sync-badge '+s;
-  var labels={synced:'ซิงค์แล้ว',syncing:'กำลังซิงค์...',error:'ซิงค์ล้มเหลว',idle:'ไม่ได้เชื่อมต่อ'};
-  document.getElementById('syncTxt').textContent=labels[s]||'–';
-}
-
-// ── SCRIPT BOX ──
-function buildScript(){
-  var el=document.getElementById('scriptBox');if(!el)return;
-  el.textContent='// ══ Google Apps Script (Code.gs) – ENT OR Schedule v4 ══════════\n'
-+'// Sheet tabs: ENT_Schedule, ENT_Doctors, ENT_Ops, ENT_Leaves, ENT_Swaps\n'
-+'const SHEET_ID = \'YOUR_SPREADSHEET_ID_HERE\';\n\n'
-+'const APT_COLS   = [\'id\',\'hn\',\'name\',\'date\',\'ts\',\'te\',\'op\',\'doctorName\',\'di\',\'di2\',\'doctor2Name\',\'anesthesia\',\'tel1\',\'tel2\',\'status\',\'note\'];\n'
-+'const LEAVE_COLS = [\'id\',\'di\',\'start\',\'end\',\'reason\',\'status\'];\n'
-+'const SWAP_COLS  = [\'id\',\'di\',\'date\',\'type\',\'note\'];\n'
-+'const DOC_COLS   = [\'di\',\'name\',\'color\',\'sched\',\'orDays\'];\n'
-+'const OP_COLS    = [\'name\'];\n\n'
-+'function doGet(e) {\n'
-+'  const p = e.parameter || {};\n'
-+'  if (p.action === \'ping\') return ok({ status: \'online\' });\n'
-+'  if (p.action === \'getAll\') {\n'
-+'    const ss = SpreadsheetApp.openById(SHEET_ID);\n'
-+'    return ok({\n'
-+'      appointments: readSheet(ss, p.sheet || \'ENT_Schedule\', APT_COLS),\n'
-+'      doctors:      readSheet(ss, \'ENT_Doctors\', DOC_COLS),\n'
-+'      operations:   readSheet(ss, \'ENT_Ops\',     OP_COLS),\n'
-+'      leaves:       readSheet(ss, \'ENT_Leaves\',  LEAVE_COLS),\n'
-+'      swaps:        readSheet(ss, \'ENT_Swaps\',   SWAP_COLS),\n'
-+'    });\n'
-+'  }\n'
-+'  return ContentService.createTextOutput(JSON.stringify({status:\'ok\'})).setMimeType(ContentService.MimeType.JSON);\n'
-+'}\n\n'
-+'function doPost(e) {\n'
-+'  const body = JSON.parse(e.postData.contents || \'{}\');\n'
-+'  const ss = SpreadsheetApp.openById(SHEET_ID);\n'
-+'  if (body.action === \'upsert\') { upsert(ss, body.sheet, APT_COLS, body.row); return ok({ status: \'upserted\' }); }\n'
-+'  if (body.action === \'pushAll\') {\n'
-+'    write(ss, body.sheet,    APT_COLS,   body.appointments || []);\n'
-+'    write(ss, \'ENT_Doctors\', DOC_COLS,   body.doctors      || []);\n'
-+'    write(ss, \'ENT_Ops\',     OP_COLS,    body.operations   || []);\n'
-+'    write(ss, \'ENT_Leaves\',  LEAVE_COLS, body.leaves       || []);\n'
-+'    write(ss, \'ENT_Swaps\',   SWAP_COLS,  body.swaps        || []);\n'
-+'    return ok({ status: \'pushed\', count: (body.appointments||[]).length });\n'
-+'  }\n'
-+'  if (body.action === \'saveSettings\') {\n'
-+'    write(ss, \'ENT_Doctors\', DOC_COLS, body.doctors    || []);\n'
-+'    write(ss, \'ENT_Ops\',     OP_COLS,  body.operations || []);\n'
-+'    return ok({ status: \'saved\' });\n'
-+'  }\n'
-+'  return ok({ status: \'ok\' });\n'
-+'}\n\n'
-+'function readSheet(ss, name, cols) {\n'
-+'  const sh = ss.getSheetByName(name);\n'
-+'  if (!sh || sh.getLastRow() < 2) return [];\n'
-+'  const rows = sh.getDataRange().getValues();\n'
-+'  const hdrs = rows[0];\n'
-+'  return rows.slice(1).map(r => { const o = {}; hdrs.forEach((h,i) => { o[h] = r[i]; }); return o; });\n'
-+'}\n\n'
-+'function write(ss, name, cols, rows) {\n'
-+'  let sh = ss.getSheetByName(name) || ss.insertSheet(name);\n'
-+'  sh.clearContents(); sh.appendRow(cols);\n'
-+'  if (rows.length) sh.getRange(2,1,rows.length,cols.length).setValues(rows.map(r => cols.map(c => r[c] ?? \'\')));\n'
-+'}\n\n'
-+'function upsert(ss, name, cols, row) {\n'
-+'  let sh = ss.getSheetByName(name) || ss.insertSheet(name);\n'
-+'  if (sh.getLastRow() === 0) sh.appendRow(cols);\n'
-+'  const data = sh.getDataRange().getValues();\n'
-+'  for (let i = 1; i < data.length; i++) {\n'
-+'    if (String(data[i][0]) === String(row.id)) {\n'
-+'      sh.getRange(i+1,1,1,cols.length).setValues([cols.map(c => row[c] ?? \'\')]);\n'
-+'      return;\n'
-+'    }\n'
-+'  }\n'
-+'  sh.appendRow(cols.map(c => row[c] ?? \'\'));\n'
-+'}\n\n'
-+'function ok(data) {\n'
-+'  return ContentService.createTextOutput(JSON.stringify(data)).setMimeType(ContentService.MimeType.JSON);\n'
-+'}';
-}
-
-// ── UTILS ──
-function openModal(id){document.getElementById(id).classList.add('open');document.body.style.overflow='hidden';}
-function closeModal(id){
-  document.getElementById(id).classList.remove('open');
-  if(!document.querySelector('.overlay.open,.dp-overlay.open'))document.body.style.overflow='';
-}
-
-document.querySelectorAll('.overlay').forEach(function(o){
-  o.addEventListener('click',function(e){
-    if(e.target===o){
-      o.classList.remove('open');
-      if(!document.querySelector('.overlay.open,.dp-overlay.open'))document.body.style.overflow='';
-    }
-  });
-});
-
-function showLdr(msg){document.getElementById('ldrTxt').textContent=msg;document.getElementById('ldr').classList.add('show');}
-function hideLdr(){document.getElementById('ldr').classList.remove('show');}
-function toast(msg,type){
-  type=type||'';
-  var t=document.getElementById('toast');
-  // หยุด timer เก่าถ้ามี
-  if(t._hideTimer) clearTimeout(t._hideTimer);
-  if(t._displayTimer) clearTimeout(t._displayTimer);
-  t.textContent=msg;t.className='toast '+type+' show';
-  t._hideTimer=setTimeout(function(){
-    t.classList.remove('show');
-    // หลัง transition จบ ซ่อน element จริงๆ ด้วย display:none
-    t._displayTimer=setTimeout(function(){
-      if(!t.classList.contains('show'))t.style.display='none';
-    },350);
-  },3600);
-  // ล้าง display:none ที่อาจค้างอยู่
-  t.style.display='';
-}
-
-// ── MOBILE SIDEBAR ──
-function toggleSidebar(){
-  var sb=document.querySelector('.sidebar');
-  var bd=document.getElementById('sbBackdrop');
-  var isOpen=sb.classList.contains('mob-open');
-  sb.classList.toggle('mob-open',!isOpen);
-  bd.classList.toggle('open',!isOpen);
-}
-function closeSidebar(){
-  document.querySelector('.sidebar').classList.remove('mob-open');
-  document.getElementById('sbBackdrop').classList.remove('open');
-}
-
-document.querySelectorAll('.sidebar .nav-item').forEach(function(el){
-  el.addEventListener('click',function(){if(window.innerWidth<=768)closeSidebar();});
-});
-
-document.querySelectorAll('.fi,.fs,.fta,.time-inp,input[type=tel]').forEach(function(el){
-  el.style.fontSize='16px';
-});
-
-document.addEventListener('visibilitychange',function(){
-  if(document.visibilityState==='visible' && sheetCfg.url && curPg!=='settings'){
-    var now=Date.now();
-    if(now-lastPullTime > PULL_COOLDOWN){
-      pullSheet('silent');
-    }
-  }
-});
-
-// ── THEME TOGGLE ──
-function toggleTheme(){
-  var isLight=document.documentElement.classList.toggle('light');
-  document.getElementById('themeBtn').textContent=isLight?'☀️':'🌙';
-  try{localStorage.setItem('ent_theme',isLight?'light':'dark');}catch(e){}
-}
-(function(){
-  var saved='dark';
-  try{saved=localStorage.getItem('ent_theme')||'dark';}catch(e){}
-  if(saved==='light'){
-    document.documentElement.classList.add('light');
-    document.addEventListener('DOMContentLoaded',function(){
-      var btn=document.getElementById('themeBtn');
-      if(btn)btn.textContent='☀️';
-    });
-  }
-})();
-
-// ── SERVICE WORKER (PWA) ──
-if('serviceWorker' in navigator){
-  window.addEventListener('load',function(){
-    navigator.serviceWorker.register('sw.js').catch(function(){});
-  });
-}
-
-// ── DETECT IN-APP BROWSER & REDIRECT ──
-(function(){
-  var ua = navigator.userAgent || '';
-  var isLine    = /Line\//i.test(ua);
-  var isFB      = /FBAN|FBAV|FB_IAB/i.test(ua);
-  var isIG      = /Instagram/i.test(ua);
-  var isTikTok  = /musical_ly|TikTok/i.test(ua);
-  var isAndroid = /Android/i.test(ua);
-  var isIOS     = /iPhone|iPad|iPod/i.test(ua);
-  var isInApp   = isLine || isFB || isIG || isTikTok;
-  var isStandalone = window.matchMedia('(display-mode:standalone)').matches || window.navigator.standalone;
-
-  if(!isInApp || isStandalone) return;
-
-  var url = window.location.href;
-
-  // ── วิธีที่ 1: พยายาม redirect ออกไปเปิดใน browser ภายนอกเลย ──
-  // Android: ใช้ intent:// scheme บังคับเปิด Chrome
-  // iOS: ใช้ window.open กับ _blank (Line iOS บางเวอร์ชันยอม)
-  var redirected = false;
-
-  if(isAndroid){
-    // intent scheme บังคับให้ Android เปิดใน browser ที่ตั้งไว้เป็น default
-    var intent = 'intent://' + url.replace(/^https?:\/\//,'')
-      + '#Intent;scheme=https;action=android.intent.action.VIEW;'
-      + 'category=android.intent.category.BROWSABLE;'
-      + 'package=com.android.chrome;end';
-    // fallback ถ้าไม่มี Chrome ให้เปิด browser ไหนก็ได้
-    var intentGeneric = 'intent://' + url.replace(/^https?:\/\//,'')
-      + '#Intent;scheme=https;action=android.intent.action.VIEW;'
-      + 'category=android.intent.category.BROWSABLE;end';
-    try {
-      window.location.href = intent;
-      redirected = true;
-    } catch(e){}
-  } else if(isIOS){
-    // iOS Line: ลอง x-safari เพื่อบังคับเปิด Safari
-    try {
-      // x-safari-https:// เปิดใน Safari โดยตรง
-      window.location.href = url.replace(/^https:\/\//,'x-safari-https://');
-      redirected = true;
-    } catch(e){}
-  }
-
-  // ── วิธีที่ 2: แสดง Overlay พร้อม Copy + ปุ่มเปิด Browser ──
-  // แสดงทันที (redirect อาจใช้เวลา หรืออาจไม่สำเร็จ)
-  var appName = isLine?'LINE':isFB?'Facebook':isIG?'Instagram':'แอพนี้';
-  var div = document.createElement('div');
-  div.id = '_oicOverlay';
-  div.style.cssText = [
-    'position:fixed;inset:0;z-index:99999;',
-    'background:#0F1923;',
-    'display:flex;flex-direction:column;align-items:center;justify-content:center;',
-    'padding:28px 24px;font-family:"Noto Sans Thai",sans-serif;text-align:center;',
-    '-webkit-tap-highlight-color:transparent;'
-  ].join('');
-
-  // สร้าง HTML ของ overlay
-  div.innerHTML =
-    // ไอคอน + หัวข้อ
-    '<div style="font-size:52px;margin-bottom:14px;line-height:1;">🌐</div>'
-    +'<div style="font-size:19px;font-weight:700;color:#E8F0F7;margin-bottom:8px;">เปิดใน Browser ภายนอก</div>'
-    +'<div style="font-size:13px;color:#8FA8BE;margin-bottom:6px;line-height:1.8;">'
-    +  'แอพนี้ไม่รองรับการใช้งานใน <b style="color:#F5A623;">'+appName+'</b><br>'
-    +  'กรุณาเปิดใน <b style="color:#00BFD8;">Chrome</b> หรือ <b style="color:#00BFD8;">Safari</b>'
-    +'</div>'
-
-    // คำแนะนำตาม OS
-    +(isIOS
-      ? '<div style="font-size:12px;color:#4F6B82;margin-bottom:20px;line-height:1.7;">'
-        +'แตะปุ่ม <b style="color:#E8F0F7;">เปิดใน Safari</b> ด้านล่าง<br>'
-        +'หรือกด <b style="color:#E8F0F7;">⋯</b> มุมขวาบน → "เปิดใน Safari"'
-        +'</div>'
-      : '<div style="font-size:12px;color:#4F6B82;margin-bottom:20px;line-height:1.7;">'
-        +'แตะปุ่ม <b style="color:#E8F0F7;">เปิดใน Chrome</b> ด้านล่าง<br>'
-        +'หรือคัดลอก URL แล้ววางใน browser'
-        +'</div>'
-    )
-
-    // URL box (กดเพื่อ copy)
-    +'<div id="_oicUrl" style="'
-    +  'background:#16232F;border:1px solid rgba(0,191,216,.3);border-radius:10px;'
-    +  'padding:10px 14px;font-size:11px;color:#00BFD8;word-break:break-all;'
-    +  'margin-bottom:16px;width:100%;max-width:400px;cursor:pointer;'
-    +  'font-family:"JetBrains Mono",monospace;line-height:1.5;'
-    +'">'+url+'</div>'
-
-    // ปุ่มหลัก: เปิดใน browser
-    +'<button id="_oicOpen" style="'
-    +  'background:#00BFD8;color:#0F1923;border:none;border-radius:10px;'
-    +  'padding:15px 32px;font-size:15px;font-weight:700;cursor:pointer;'
-    +  'font-family:inherit;width:100%;max-width:400px;margin-bottom:10px;'
-    +  'display:flex;align-items:center;justify-content:center;gap:8px;'
-    +'"><span style="font-size:18px;">'+(isIOS?'🧭':'🌐')+'</span> เปิดใน '+(isIOS?'Safari':'Chrome')+'</button>'
-
-    // ปุ่มรอง: copy URL
-    +'<button id="_oicCopy" style="'
-    +  'background:#16232F;color:#00BFD8;border:1px solid rgba(0,191,216,.4);border-radius:10px;'
-    +  'padding:12px 32px;font-size:13px;font-weight:600;cursor:pointer;'
-    +  'font-family:inherit;width:100%;max-width:400px;margin-bottom:10px;'
-    +'">📋 คัดลอก URL</button>'
-
-    // ปุ่มปิด (ใช้งานต่อใน in-app ยอมรับความเสี่ยง)
-    +'<button id="_oicClose" style="'
-    +  'background:none;border:none;color:#4F6B82;font-size:12px;cursor:pointer;'
-    +  'font-family:inherit;padding:8px;margin-top:4px;'
-    +'">ใช้งานต่อใน '+appName+' (ไม่แนะนำ)</button>';
-
-  document.body.appendChild(div);
-
-  // ── Copy function ──
-  function doCopy(){
-    var copyBtn = document.getElementById('_oicCopy');
-    if(navigator.clipboard && navigator.clipboard.writeText){
-      navigator.clipboard.writeText(url).then(function(){
-        copyBtn.textContent='✅ คัดลอกแล้ว! วางใน browser ได้เลย';
-        copyBtn.style.color='#2ECC71';
-        copyBtn.style.borderColor='rgba(46,204,113,.4)';
-      }).catch(fallbackCopy);
-    } else { fallbackCopy(); }
-  }
-  function fallbackCopy(){
-    var ta=document.createElement('textarea');
-    ta.value=url;ta.style.cssText='position:fixed;top:-9999px;opacity:0;';
-    document.body.appendChild(ta);ta.focus();ta.select();
-    try{document.execCommand('copy');}catch(e){}
-    document.body.removeChild(ta);
-    var copyBtn = document.getElementById('_oicCopy');
-    if(copyBtn){
-      copyBtn.textContent='✅ คัดลอกแล้ว! วางใน browser ได้เลย';
-      copyBtn.style.color='#2ECC71';
-      copyBtn.style.borderColor='rgba(46,204,113,.4)';
-    }
-  }
-
-  // ── ปุ่มเปิดใน browser ──
-  document.getElementById('_oicOpen').addEventListener('click', function(){
-    if(isIOS){
-      // iOS: x-safari-https:// → เปิด Safari โดยตรง
-      window.location.href = url.replace(/^https:\/\//,'x-safari-https://');
-      // fallback: copy แล้วบอกให้ paste
-      setTimeout(function(){
-        doCopy();
-        var btn = document.getElementById('_oicOpen');
-        if(btn) btn.textContent = '✅ คัดลอกแล้ว — วางใน Safari ได้เลย';
-      }, 800);
-    } else {
-      // Android: intent scheme → Chrome
-      var intent = 'intent://' + url.replace(/^https?:\/\//,'')
-        + '#Intent;scheme=https;action=android.intent.action.VIEW;'
-        + 'category=android.intent.category.BROWSABLE;'
-        + 'package=com.android.chrome;S.browser_fallback_url='
-        + encodeURIComponent(url) + ';end';
-      window.location.href = intent;
-      // fallback ถ้า intent ไม่ทำงาน
-      setTimeout(function(){
-        doCopy();
-        var btn = document.getElementById('_oicOpen');
-        if(btn) btn.textContent = '✅ คัดลอกแล้ว — วางใน Chrome ได้เลย';
-      }, 1200);
-    }
-  });
-
-  document.getElementById('_oicCopy').addEventListener('click', doCopy);
-  document.getElementById('_oicUrl').addEventListener('click', doCopy);
-  document.getElementById('_oicClose').addEventListener('click', function(){
-    div.remove();
-  });
-})();
-
-// ── PWA INSTALL PROMPT ──
-var _pwaPrompt = null;
-window.addEventListener('beforeinstallprompt',function(e){
-  e.preventDefault();
-  _pwaPrompt = e;
-  if(window.matchMedia('(display-mode:standalone)').matches) return;
-  try{ if(localStorage.getItem('pwa_dismissed')) return; }catch(ex){}
-  setTimeout(function(){ document.getElementById('pwaBanner').classList.add('show'); },2000);
-});
-document.getElementById('pwaInstallBtn').addEventListener('click',function(){
-  if(_pwaPrompt){
-    _pwaPrompt.prompt();
-    _pwaPrompt.userChoice.then(function(){
-      document.getElementById('pwaBanner').classList.remove('show');
-      _pwaPrompt=null;
-    });
-  }
-});
-function dismissPWA(){
-  document.getElementById('pwaBanner').classList.remove('show');
-  try{ localStorage.setItem('pwa_dismissed','1'); }catch(e){}
-}
-window.addEventListener('appinstalled',function(){
-  document.getElementById('pwaBanner').classList.remove('show');
-  toast('✅ ติดตั้งแอพสำเร็จ!','ok');
-});
+function go(id){
+  document.querySelectorAll('.page').forEach(p=>p.classList.remove('on'));
+  document.getElementById('page-'+id).classList.add('on');
+  document.querySelectorAll('[data-nav]').forEach(a=>a.classList.toggle('on',a.dataset.nav===id));
+  document.getElementById('menu').classList.remove('open');
+  window.scrollTo({top:0,behavior:'smooth'});
+}
+function tab(btn,pane){
+  btn.parentNode.querySelectorAll('button').forEach(b=>b.classList.remove('on'));
+  btn.classList.add('on');
+  document.querySelectorAll('.tabpane').forEach(p=>p.classList.remove('on'));
+  document.getElementById(pane).classList.add('on');
+}
+function openLogin(mode){document.getElementById('loginModal').classList.add('on');mode==='register'?segReg():segLogin();}
+function closeLogin(){document.getElementById('loginModal').classList.remove('on');}
+function segLogin(){document.getElementById('segLogin').classList.add('on');document.getElementById('segReg').classList.remove('on');document.getElementById('loginForm').style.display='block';document.getElementById('regForm').style.display='none';document.getElementById('loginTitle').textContent='เข้าสู่ระบบ';}
+function segReg(){document.getElementById('segReg').classList.add('on');document.getElementById('segLogin').classList.remove('on');document.getElementById('loginForm').style.display='none';document.getElementById('regForm').style.display='block';document.getElementById('loginTitle').textContent='สมัครสมาชิกใหม่';}
+function toast(msg){var t=document.createElement('div');t.textContent=msg;t.style.cssText='position:fixed;bottom:60px;left:50%;transform:translateX(-50%);background:#1F2733;color:#fff;padding:12px 22px;border-radius:30px;font-size:13px;z-index:200;box-shadow:0 8px 24px rgba(0,0,0,.25);';document.body.appendChild(t);setTimeout(()=>t.remove(),2600);}
+document.getElementById('loginModal').addEventListener('click',function(e){if(e.target===this)closeLogin();});
 </script>
-
-<nav class="mob-bottom-nav" id="mobBottomNav">
-  <ul>
-    <li><a class="active" data-page="schedule" onclick="showPage('schedule')">
-      <span class="mni">📋</span>ตาราง
-    </a></li>
-    <li><a data-page="calendar" onclick="showPage('calendar')">
-      <span class="mni">📅</span>ปฏิทิน
-    </a></li>
-    <li><a data-page="leave" onclick="showPage('leave')">
-      <span class="mni">🏖️</span>วันลา
-    </a></li>
-    <li><a data-page="swap" onclick="showPage('swap')">
-      <span class="mni">🔁</span>สลับวัน
-    </a></li>
-    <li><a data-page="settings" onclick="showPage('settings')">
-      <span class="mni">⚙️</span>ตั้งค่า
-    </a></li>
-  </ul>
-</nav>
-<!-- PWA Install Banner -->
-<div class="pwa-banner" id="pwaBanner">
-  <div class="pwa-icon">🏥</div>
-  <div class="pwa-text">
-    <b>ติดตั้ง ENT OR Schedule</b>
-    <span>เพิ่มลงหน้าจอหลัก ใช้งานเหมือนแอพ</span>
-  </div>
-  <button class="pwa-install-btn" id="pwaInstallBtn">ติดตั้ง</button>
-  <button class="pwa-dismiss" onclick="dismissPWA()">✕</button>
-</div>
-
 </body>
 </html>
