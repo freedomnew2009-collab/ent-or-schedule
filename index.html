@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>ENT OR Schedule · v4 updated</title>
+<title>ENT OR Schedule · v5</title>
 <!-- PWA -->
 <link rel="manifest" href="manifest.json">
 <meta name="theme-color" content="#0F1923">
@@ -113,7 +113,7 @@ body{font-family:'Noto Sans Thai',sans-serif;background:var(--bg);color:var(--t)
 .page.active{display:flex;}
 
 /* ─ SCHEDULE ─ */
-.sg{display:grid;grid-template-columns:1fr 1fr;gap:16px;padding:14px 22px 22px;flex:1;}
+.sg{display:grid;grid-template-columns:repeat(auto-fit,minmax(300px,1fr));gap:16px;padding:14px 22px 22px;flex:1;}
 .day-col{background:var(--s);border:1px solid var(--b);border-radius:var(--r);overflow:hidden;display:flex;flex-direction:column;}
 .day-hd{padding:12px 14px;border-bottom:1px solid var(--b);display:flex;align-items:center;justify-content:space-between;background:var(--s2);}
 .day-hd-l{display:flex;align-items:center;gap:9px;}
@@ -428,7 +428,7 @@ body{font-family:'Noto Sans Thai',sans-serif;background:var(--bg);color:var(--t)
   <div class="sb-logo">
     <div class="ico">🏥</div>
     <h2>ENT OR Schedule</h2>
-    <p>แผนก หู คอ จมูก · v4f</p>
+    <p>แผนก หู คอ จมูก · v5</p>
   </div>
   <div class="nav-sec">
     <div class="nav-lbl">เมนูหลัก</div>
@@ -465,30 +465,7 @@ body{font-family:'Noto Sans Thai',sans-serif;background:var(--bg);color:var(--t)
   </div>
 
   <div class="page active" id="page-schedule">
-    <div class="sg">
-      <div class="day-col">
-        <div class="day-hd">
-          <div class="day-hd-l">
-            <div class="day-badge"><div class="dnum" id="monN">–</div><div class="dshort">MON</div></div>
-            <div><div class="day-name">วันจันทร์</div><div class="day-dlbl" id="monD">–</div></div>
-          </div>
-          <div class="day-cnt" id="monCnt">0 ราย</div>
-        </div>
-        <div class="day-body" id="monBody"></div>
-        <div style="padding:0 11px 11px"><button class="add-day-btn" onclick="openAdd('mon')">＋ เพิ่มนัดวันจันทร์</button></div>
-      </div>
-      <div class="day-col">
-        <div class="day-hd">
-          <div class="day-hd-l">
-            <div class="day-badge"><div class="dnum" id="wedN">–</div><div class="dshort">WED</div></div>
-            <div><div class="day-name">วันพุธ</div><div class="day-dlbl" id="wedD">–</div></div>
-          </div>
-          <div class="day-cnt" id="wedCnt">0 ราย</div>
-        </div>
-        <div class="day-body" id="wedBody"></div>
-        <div style="padding:0 11px 11px"><button class="add-day-btn" onclick="openAdd('wed')">＋ เพิ่มนัดวันพุธ</button></div>
-      </div>
-    </div>
+    <div class="sg" id="sgGrid"></div>
   </div>
 
   <div class="page" id="page-calendar">
@@ -499,10 +476,7 @@ body{font-family:'Noto Sans Thai',sans-serif;background:var(--bg);color:var(--t)
       </div>
       <div id="calSummary"></div>
       <div class="cal-wrap">
-        <div class="cal-wds">
-          <div class="cal-wd">อา</div><div class="cal-wd hi">จ</div><div class="cal-wd">อ</div>
-          <div class="cal-wd hi">พ</div><div class="cal-wd">พฤ</div><div class="cal-wd">ศ</div><div class="cal-wd">ส</div>
-        </div>
+        <div class="cal-wds" id="calWds"></div>
         <div class="cal-dg" id="calGrid"></div>
       </div>
       <div style="display:flex;gap:12px;margin-top:8px;flex-wrap:wrap;">
@@ -590,8 +564,13 @@ body{font-family:'Noto Sans Thai',sans-serif;background:var(--bg);color:var(--t)
           <div style="margin-top:8px;"><div class="script-box" id="scriptBox"></div></div></details>
       </div>
       <div class="set-sec">
+        <h3>📅 วันผ่าตัดของแผนก (OR Days)</h3>
+        <p class="set-sub">หน้า "ตารางนัดผ่าตัด" จะแสดงคอลัมน์ตามวันที่เลือกไว้ — เพิ่มวันได้ทันทีเมื่อได้คิวห้องผ่าตัดเพิ่ม</p>
+        <div id="orDayBtns" style="display:flex;gap:6px;flex-wrap:wrap;"></div>
+      </div>
+      <div class="set-sec">
         <h3>👨‍⚕️ แพทย์และตารางผ่าตัด</h3>
-        <p class="set-sub">* = วัน OR (จันทร์, พุธ)</p>
+        <p class="set-sub">* = วันผ่าตัดของแผนก (กำหนดในหัวข้อ "วันผ่าตัดของแผนก" ด้านบน)</p>
         <div id="docList"></div>
         <div class="div"></div>
         <div style="display:flex;gap:7px;align-items:flex-end;">
@@ -774,7 +753,14 @@ const MS=['ม.ค.','ก.พ.','มี.ค.','เม.ย.','พ.ค.','มิ.�
 const DTH=['อาทิตย์','จันทร์','อังคาร','พุธ','พฤหัสบดี','ศุกร์','เสาร์'];
 const WTH=['อา','จ','อ','พ','พฤ','ศ','ส'];
 const DCOL=['#00BFD8','#F5A623','#2ECC71','#E74C3C','#9B59B6','#1ABC9C','#E67E22','#3498DB'];
-const OR=[1,3];
+const DEN=['SUN','MON','TUE','WED','THU','FRI','SAT'];
+
+// ── วันผ่าตัดของแผนก (1=จ ... 6=ส) — ตั้งค่าเพิ่ม/ลดได้ในหน้าตั้งค่า และซิงค์ผ่าน Sheet ──
+var ORDAYS=[1,3];
+try{
+  var _od=JSON.parse(localStorage.getItem('ent_ordays')||'null');
+  if(Array.isArray(_od)&&_od.length)ORDAYS=_od.filter(function(x){return x>=1&&x<=6;});
+}catch(e){}
 
 // ── STATE ──
 var apts=[];
@@ -847,6 +833,8 @@ var fmtShort=function(d){return d.getDate()+' '+MS[d.getMonth()]+' '+(d.getFullY
 var fmtFull=function(s){var d=parseD(s);if(isNaN(d))return String(s);return d.getDate()+' '+MS[d.getMonth()]+' '+(d.getFullYear()+543)+' ('+DTH[d.getDay()]+')';};
 var shortN=function(n){if(!n)return '–';var p=String(n).split(' ');return p.length>=2?p[0]+' '+p[1]:n;};
 var hexDim=function(h){return h+'22';};
+// ป้องกันข้อความที่ผู้ใช้พิมพ์ (ชื่อ, หมายเหตุ ฯลฯ) ทำ HTML พัง
+var esc=function(s){return String(s==null?'':s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');};
 
 // ── TIME FORMAT ──
 function fmtTimeInp(el){var v=el.value.replace(/[^0-9]/g,'');if(v.length>=3)v=v.slice(0,2)+':'+v.slice(2,4);el.value=v;}
@@ -857,7 +845,7 @@ function validateTime(s){if(!s)return false;var m=s.match(/^(\d{1,2}):(\d{2})$/)
   loadCfg(); // นำค่าที่ Hardcode ไปใส่ใน Input สำหรับโชว์ใน Settings
   buildScript();
   renderSide();renderAll();renderCal();
-  renderDocSettings();renderOpList();
+  renderDocSettings();renderOpList();renderORDaySettings();
   renderLeaveSelects();renderSwapSelects();
   renderLeaveTable();renderSwapTable();
   
@@ -886,27 +874,43 @@ function showPage(pg){
     a.classList.toggle('active',a.dataset.page===pg);
   });
   if(pg==='calendar'){renderCalFbar();renderCal();}
-  if(pg==='settings'){renderDocSettings();renderOpList();}
+  if(pg==='settings'){renderDocSettings();renderOpList();renderORDaySettings();}
   if(pg==='leave'){renderLeaveSelects();renderLeaveTable();}
   if(pg==='swap'){renderSwapSelects();renderSwapTable();}
   closeSidebar();
 }
 
 // ── WEEK ──
-function getMonWed(off){off=off||0;var t=new Date();t.setHours(0,0,0,0);var dow=t.getDay(),mon=new Date(t);mon.setDate(t.getDate()-(dow===0?6:dow-1)+off*7);var wed=new Date(mon);wed.setDate(mon.getDate()+2);return{mon:mon,wed:wed};}
+function weekStart(off){off=off||0;var t=new Date();t.setHours(0,0,0,0);var dow=t.getDay(),mon=new Date(t);mon.setDate(t.getDate()-(dow===0?6:dow-1)+off*7);return mon;}
+// คืนรายการวันที่ (Date) ของวันผ่าตัดทุกวันในสัปดาห์นั้น ตาม ORDAYS
+function getWeekDates(off){
+  var mon=weekStart(off);
+  return ORDAYS.slice().sort(function(a,b){return(a===0?7:a)-(b===0?7:b);}).map(function(dn){
+    var x=new Date(mon);x.setDate(mon.getDate()+((dn===0?7:dn)-1));return x;
+  });
+}
 function changeWeek(d){weekOff+=d;renderAll();}
 
 // ── SCHEDULE RENDER ──
 function renderAll(){
-  var wk=getMonWed(weekOff);var mon=wk.mon,wed=wk.wed;
-  document.getElementById('monN').textContent=mon.getDate();
-  document.getElementById('wedN').textContent=wed.getDate();
-  document.getElementById('monD').textContent=fmtShort(mon);
-  document.getElementById('wedD').textContent=fmtShort(wed);
+  var days=getWeekDates(weekOff);
   var wl=weekOff===0?'สัปดาห์นี้':weekOff===-1?'สัปดาห์ที่แล้ว':weekOff===1?'สัปดาห์หน้า':weekOff>1?'+'+weekOff+' สัปดาห์':weekOff+' สัปดาห์';
   document.getElementById('wkLabel').textContent=wl;
-  var md=iso(mon),wd=iso(wed);
-  renderDay('monBody','monCnt',md);renderDay('wedBody','wedCnt',wd);updateStats(md,wd);
+  var grid=document.getElementById('sgGrid');
+  grid.innerHTML=days.map(function(d){
+    var s=iso(d);
+    return '<div class="day-col">'
+      +'<div class="day-hd"><div class="day-hd-l">'
+      +'<div class="day-badge"><div class="dnum">'+d.getDate()+'</div><div class="dshort">'+DEN[d.getDay()]+'</div></div>'
+      +'<div><div class="day-name">วัน'+DTH[d.getDay()]+'</div><div class="day-dlbl">'+fmtShort(d)+'</div></div>'
+      +'</div><div class="day-cnt" id="cnt-'+s+'">0 ราย</div></div>'
+      +'<div class="day-body" id="body-'+s+'"></div>'
+      +'<div style="padding:0 11px 11px"><button class="add-day-btn" onclick="openAdd(\''+s+'\')">＋ เพิ่มนัดวัน'+DTH[d.getDay()]+'</button></div>'
+      +'</div>';
+  }).join('');
+  var isos=days.map(iso);
+  isos.forEach(function(s){renderDay('body-'+s,'cnt-'+s,s);});
+  updateStats(isos);
 }
 
 function renderDay(bid,cid,date){
@@ -929,19 +933,19 @@ function cardHTML(a){
   var sl={confirm:'ยืนยันแล้ว',wait:'รอยืนยัน',pending:'รอยืนยัน',cancel:'ยกเลิก'};
   var sw=swaps.find(function(s){return s.di===a.di&&s.date&&a.date&&s.date===a.date;});
   return '<div class="ac s-'+a.status+'" id="card-'+a.id+'" onclick="toggleCard('+a.id+')">'
-    +'<div class="ac-r1"><div class="a-hn">HN: '+a.hn+'</div><div class="a-time">'+a.ts+(a.te?'–'+a.te:'')+'</div></div>'
-    +'<div class="a-name">'+a.name+'</div>'
-    +((a.tel1||a.tel2)?'<div class="a-tel">📞 '+[a.tel1,a.tel2].filter(Boolean).join(' / ')+'</div>':'')
-    +'<div class="a-op">🔪 '+a.op+'</div>'
-    +(a.anesthesia?'<div class="a-anes">💉 '+a.anesthesia+'</div>':'')
-    +(a.doctor2Name?'<div class="a-doc2">👨‍⚕️ ร่วม: '+a.doctor2Name+'</div>':'')
+    +'<div class="ac-r1"><div class="a-hn">HN: '+esc(a.hn)+'</div><div class="a-time">'+esc(a.ts)+(a.te?'–'+esc(a.te):'')+'</div></div>'
+    +'<div class="a-name">'+esc(a.name)+'</div>'
+    +((a.tel1||a.tel2)?'<div class="a-tel">📞 '+[a.tel1,a.tel2].filter(Boolean).map(esc).join(' / ')+'</div>':'')
+    +'<div class="a-op">🔪 '+esc(a.op)+'</div>'
+    +(a.anesthesia?'<div class="a-anes">💉 '+esc(a.anesthesia)+'</div>':'')
+    +(a.doctor2Name?'<div class="a-doc2">👨‍⚕️ ร่วม: '+esc(a.doctor2Name)+'</div>':'')
     +'<div class="ac-r3">'
-    +'<div class="a-doc"><div class="d-dot" style="background:'+docColor+'"></div>'+docName+'</div>'
-    +'<div class="spill '+(sm[a.status]||'sp-wt')+'">'+(sl[a.status]||a.status)+'</div>'
+    +'<div class="a-doc"><div class="d-dot" style="background:'+docColor+'"></div>'+esc(docName)+'</div>'
+    +'<div class="spill '+(sm[a.status]||'sp-wt')+'">'+esc(sl[a.status]||a.status)+'</div>'
     +(sw?'<span class="swap-bdg">⚠ สลับวันผ่าตัด</span>':'')
     +'</div>'
-    +(a.note?'<div class="a-note-r">⚠️ '+a.note+'</div>':'')
-    +(sw?'<div class="a-note-y">⚠ หมายเหตุ: แพทย์ท่านนี้มีการสลับวันผ่าตัด'+(sw.note?' · '+sw.note:'')+'</div>':'')
+    +(a.note?'<div class="a-note-r">⚠️ '+esc(a.note)+'</div>':'')
+    +(sw?'<div class="a-note-y">⚠ หมายเหตุ: แพทย์ท่านนี้มีการสลับวันผ่าตัด'+(sw.note?' · '+esc(sw.note):'')+'</div>':'')
     +'<div class="ac-actions">'
     +(a.status!=='confirm'?'<button class="ab g" onclick="qs(event,'+a.id+',\'confirm\')">✅ ยืนยัน</button>':'')
     +'<button class="ab o" onclick="openRS(event,'+a.id+')">🔄 เลื่อนนัด</button>'
@@ -954,8 +958,8 @@ function cardHTML(a){
 function toggleCard(id){var c=document.getElementById('card-'+id);if(c)c.classList.toggle('exp');}
 function qs(e,id,st){e.stopPropagation();var a=apts.find(function(x){return x.id===id;});if(a){a.status=st;renderAll();pushRow(a);toast(st==='confirm'?'✅ ยืนยันแล้ว':'❌ ยกเลิกแล้ว',st==='confirm'?'ok':'err');}}
 
-function updateStats(md,wd){
-  var wk=apts.filter(function(a){return a.date&&(a.date===md||a.date===wd);});
+function updateStats(dayIsos){
+  var wk=apts.filter(function(a){return a.date&&dayIsos.indexOf(a.date)!==-1;});
   if(docFil!=='all')wk=wk.filter(function(a){
     var f=parseInt(docFil);
     return a.di===f||(a.di2!=null&&a.di2===f);
@@ -1045,7 +1049,7 @@ function confirmOv(){
   var exists=swaps.find(function(s){return s.di===di&&s.date===dateStr;});
   if(exists){exists.type=type;exists.note=note;}
   else{var newId=Math.max.apply(null,[0].concat(swaps.map(function(s){return s.id;})))+1;swaps.push({id:newId,di:di,date:dateStr,type:type,note:note});}
-  renderSwapTable();renderCal();
+  renderSwapTable();renderCal();pushSwaps();
   valBlocked=false;
   var btn=document.getElementById('btnSave');btn.disabled=false;btn.style.opacity='1';
   var box=document.getElementById('valBox');
@@ -1073,7 +1077,7 @@ function renderSide(){
     el.onclick=fn;return el;
   }
   list.appendChild(mkChip('แพทย์ทุกท่าน','#00BFD8',docFil==='all',function(){setDocFil('all');}));
-  docs.forEach(function(d,i){list.appendChild(mkChip(shortN(d.name),d.color,docFil==i,function(){setDocFil(i);}));});
+  docs.forEach(function(d,i){list.appendChild(mkChip(esc(shortN(d.name)),d.color,docFil==i,function(){setDocFil(i);}));});
   renderCalFbar();
 }
 function setDocFil(v){docFil=v;renderSide();renderAll();}
@@ -1088,12 +1092,14 @@ function renderCalFbar(){
     el.onclick=fn;return el;
   }
   bar.appendChild(mkCfc('ทั้งหมด',null,calFil==='all',function(){setCalFil('all');}));
-  docs.forEach(function(d,i){bar.appendChild(mkCfc(shortN(d.name),d.color,calFil==i,function(){setCalFil(i);},true));});
+  docs.forEach(function(d,i){bar.appendChild(mkCfc(esc(shortN(d.name)),d.color,calFil==i,function(){setCalFil(i);},true));});
 }
 function setCalFil(v){calFil=v;renderCalFbar();renderCal();}
 
 function renderCal(){
   document.getElementById('calTitle').textContent=MTH[calMo]+' '+(calYr+543);
+  var wds=document.getElementById('calWds');
+  if(wds)wds.innerHTML=WTH.map(function(w,i){return '<div class="cal-wd'+(ORDAYS.includes(i)?' hi':'')+'">'+w+'</div>';}).join('');
   var grid=document.getElementById('calGrid');grid.innerHTML='';
   var first=new Date(calYr,calMo,1),sdow=first.getDay(),dim=new Date(calYr,calMo+1,0).getDate();
   var today=new Date();today.setHours(0,0,0,0);
@@ -1111,7 +1117,7 @@ function renderCal(){
       return a.di===f||(a.di2!=null&&a.di2===f);
     });
     if(!other){total+=list.length;confirm+=list.filter(function(a){return a.status==='confirm';}).length;wait+=list.filter(function(a){return a.status==='wait'||a.status==='pending';}).length;}
-    var isOR=OR.includes(d.getDay()),isToday=d.getTime()===today.getTime(),hasCases=list.length>0;
+    var isOR=ORDAYS.includes(d.getDay()),isToday=d.getTime()===today.getTime(),hasCases=list.length>0;
     var dayLv=!other?leaves.filter(function(l){return l.status==='Approved'&&isoStr>=l.start&&isoStr<=l.end;}):[];
     var daySw=!other?swaps.filter(function(s){return s.date===isoStr;}):[];
     var el=document.createElement('div');
@@ -1130,7 +1136,7 @@ function renderCal(){
           var doc=docs[parseInt(di)]||{name:'–',color:'#ccc'};
           return '<div style="display:flex;align-items:center;gap:3px;font-size:9px;line-height:1.3;">'
             +'<div style="width:5px;height:5px;border-radius:50%;background:'+doc.color+';flex-shrink:0;"></div>'
-            +'<span style="color:var(--t2);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:70px;">'+shortN(doc.name)+'</span>'
+            +'<span style="color:var(--t2);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:70px;">'+esc(shortN(doc.name))+'</span>'
             +'<span style="color:var(--teal);font-weight:700;margin-left:auto;">'+cnt+'</span>'
             +'</div>';
         }).join('')+'</div>';
@@ -1139,8 +1145,8 @@ function renderCal(){
       '<div class="cdn-w"><span class="cdn">'+d.getDate()+'</span>'+(isOR&&!other?'<span class="or-tag">OR</span>':'')+'</div>'
       +(hasCases?'<div class="cal-cnt">'+list.length+' ราย</div>':'')
       +docCountHTML
-      +dayLv.map(function(l){return '<span class="leave-tag">🏖 '+shortN((docs[l.di]||{name:'–'}).name)+'</span>';}).join('')
-      +daySw.map(function(s){return '<span class="swap-tag">🔁 '+shortN((docs[s.di]||{name:'–'}).name)+'</span>';}).join('');
+      +dayLv.map(function(l){return '<span class="leave-tag">🏖 '+esc(shortN((docs[l.di]||{name:'–'}).name))+'</span>';}).join('')
+      +daySw.map(function(s){return '<span class="swap-tag">🔁 '+esc(shortN((docs[s.di]||{name:'–'}).name))+'</span>';}).join('');
     
     // ★ แก้ไขให้กดวันที่เพื่อย้ายสัปดาห์ได้ "ทุกวัน" ในปฏิทิน
     if(!other)el.onclick=(function(s){return function(){jumpTo(s);};})(isoStr);
@@ -1190,11 +1196,11 @@ function renderDPGrid(){
   for(var i=0;i<sdow;i++)cells.push({d:new Date(dpYr,dpMo,1-sdow+i),other:true});
   for(var d=1;d<=dim;d++)cells.push({d:new Date(dpYr,dpMo,d),other:false});
   while(cells.length%7!==0)cells.push({d:new Date(dpYr,dpMo+1,cells.length-sdow-dim+1),other:true});
-  grid.innerHTML=WTH.map(function(w,i){return '<div class="dp-wd'+(OR.includes(i)?' hi':'')+'">'+w+'</div>';}).join('');
+  grid.innerHTML=WTH.map(function(w,i){return '<div class="dp-wd'+(ORDAYS.includes(i)?' hi':'')+'">'+w+'</div>';}).join('');
   cells.forEach(function(cell){
     var d=cell.d,other=cell.other;
     var s=iso(d),isSel=dpSel===s,isT=d.getTime()===today.getTime();
-    var isOR=OR.includes(d.getDay())&&!other;
+    var isOR=ORDAYS.includes(d.getDay())&&!other;
     var isLv=!other&&!isNaN(diN)&&leaves.some(function(l){return l.di===diN&&l.status==='Approved'&&s>=l.start&&s<=l.end;});
     var isSw=!other&&!isNaN(diN)&&swaps.some(function(sw){return sw.di===diN&&sw.date===s;});
     var cls='dp-d';
@@ -1241,7 +1247,7 @@ function buildRSCal(){
 
   // Header row
   grid.innerHTML=WTH.map(function(w,i){
-    return '<div class="dp-wd'+(OR.includes(i)?' hi':'')+'">'+w+'</div>';
+    return '<div class="dp-wd'+(ORDAYS.includes(i)?' hi':'')+'">'+w+'</div>';
   }).join('');
 
   // Get doctor index from current apt
@@ -1254,7 +1260,7 @@ function buildRSCal(){
     var isPast=!other&&d.getTime()<today.getTime();
     var isSel=rsDate===s;
     var isT=d.getTime()===today.getTime();
-    var isOR=OR.includes(d.getDay())&&!other;
+    var isOR=ORDAYS.includes(d.getDay())&&!other;
     var isLv=!other&&diN>=0&&leaves.some(function(l){
       return l.di===diN&&l.status==='Approved'&&s>=l.start&&s<=l.end;
     });
@@ -1293,9 +1299,9 @@ function selRSDate(date){
 function fillSelects(){
   document.getElementById('fOp').innerHTML=
     '<option value="">– เลือกประเภท –</option>'
-    +ops.map(function(o){return '<option>'+o+'</option>';}).join('')
+    +ops.map(function(o){return '<option>'+esc(o)+'</option>';}).join('')
     +'<option value="__other__">✏️ อื่นๆ (พิมพ์เอง)</option>';
-  var docOpts=docs.map(function(d,i){return '<option value="'+i+'">'+d.name+'</option>';}).join('');
+  var docOpts=docs.map(function(d,i){return '<option value="'+i+'">'+esc(d.name)+'</option>';}).join('');
   document.getElementById('fDoc').innerHTML='<option value="">– เลือกแพทย์ –</option>'+docOpts;
   document.getElementById('fDoc2').innerHTML='<option value="">– ไม่มี –</option>'+docOpts;
 }
@@ -1327,7 +1333,7 @@ function openAdd(hint){
   var _ov=document.getElementById('ovForm');if(_ov)_ov.classList.remove('show');
   var _ovn=document.getElementById('ovNote');if(_ovn)_ovn.value='';
   var _ovt=document.getElementById('ovType');if(_ovt)_ovt.value='Swap';
-  if(hint){var wk=getMonWed(weekOff);var d=hint==='mon'?wk.mon:wk.wed;dpYr=d.getFullYear();dpMo=d.getMonth();dpSelectDate(iso(d));}
+  if(hint){var d=parseD(hint);if(!isNaN(d)){dpYr=d.getFullYear();dpMo=d.getMonth();dpSelectDate(hint);}}
   else{dpYr=new Date().getFullYear();dpMo=new Date().getMonth();}
   openModal('addModal');
 }
@@ -1377,6 +1383,13 @@ function saveApt(){
   if(!hn||!name||!date||!ts||!op||di===''){toast('⚠️ กรุณากรอกข้อมูลที่จำเป็นให้ครบ','warn');return;}
   if(!validateTime(ts)){toast('⚠️ รูปแบบเวลาเริ่มไม่ถูกต้อง (HH:MM)','warn');return;}
   if(te&&!validateTime(te)){toast('⚠️ รูปแบบเวลาสิ้นสุดไม่ถูกต้อง (HH:MM)','warn');return;}
+  // ── เตือนนัดเวลาซ้อนกัน (แพทย์คนเดียวกัน วันเดียวกัน ช่วงเวลาทับกัน) ──
+  var dup=apts.find(function(a){
+    if(editId!=null&&a.id===editId)return false;
+    if(a.date!==date||a.status==='cancel'||a.di!==parseInt(di))return false;
+    return ts<=(a.te||a.ts)&&a.ts<=(te||ts);
+  });
+  if(dup&&!confirm('⚠️ เวลาอาจซ้อนกับนัดของ '+dup.name+' ('+dup.ts+(dup.te?'–'+dup.te:'')+')\n\nต้องการบันทึกต่อหรือไม่?'))return;
   if(editId!=null){
     var idx=apts.findIndex(function(a){return a.id===editId;});
     apts[idx]=Object.assign({},apts[idx],{hn:hn,name:name,date:date,ts:ts,te:te,op:op,di:parseInt(di),di2:di2,doctor2Name:doctor2Name,anesthesia:anesthesia,tel1:tel1,tel2:tel2,status:status,note:note});
@@ -1447,6 +1460,7 @@ function confirmRSWithOv(){
     var newId=Math.max.apply(null,[0].concat(swaps.map(function(s){return s.id;})))+1;
     swaps.push({id:newId,di:a.di,date:rsDate,type:type,note:note});
   }
+  pushSwaps();
   // แล้วเลื่อนนัด
   a.date=rsDate;a.ts=ts;a.status='wait';pushRow(a);
   toast('🔄 เลื่อนนัด + Override "'+type+'" สำเร็จ → '+fmtFull(rsDate),'ok');
@@ -1471,6 +1485,7 @@ function confirmQSwap(){
   var existing=swaps.find(function(s){return s.di===a.di&&s.date===a.date;});
   if(existing){existing.type=type;existing.note=note;toast('✅ แก้ไข Override แล้ว','ok');}
   else{var newId=Math.max.apply(null,[0].concat(swaps.map(function(s){return s.id;})))+1;swaps.push({id:newId,di:a.di,date:a.date,type:type,note:note});toast('✅ บันทึก Override แล้ว','ok');}
+  pushSwaps();
   closeModal('qSwapModal');renderAll();renderSwapTable();if(curPg==='calendar')renderCal();
 }
 
@@ -1478,7 +1493,7 @@ function confirmQSwap(){
 function renderLeaveSelects(){
   ['lvDoc','swDoc'].forEach(function(id){
     var el=document.getElementById(id);
-    if(el)el.innerHTML=docs.map(function(d,i){return '<option value="'+i+'">'+d.name+'</option>';}).join('');
+    if(el)el.innerHTML=docs.map(function(d,i){return '<option value="'+i+'">'+esc(d.name)+'</option>';}).join('');
   });
 }
 function saveLeave(){
@@ -1488,18 +1503,18 @@ function saveLeave(){
   if(start>end){toast('⚠️ วันเริ่มต้นต้องก่อนวันสิ้นสุด','warn');return;}
   var newId=Math.max.apply(null,[0].concat(leaves.map(function(l){return l.id;})))+1;
   leaves.push({id:newId,di:di,start:start,end:end,reason:reason,status:status});
-  renderLeaveTable();renderCal();
+  renderLeaveTable();renderCal();pushLeaves();
   ['lvStart','lvEnd','lvReason'].forEach(function(id){document.getElementById(id).value='';});
   toast('✅ บันทึกวันลาแล้ว','ok');
 }
-function delLeave(id){if(!confirm('ลบรายการวันลานี้?'))return;leaves=leaves.filter(function(l){return l.id!==id;});renderLeaveTable();renderCal();toast('🗑️ ลบวันลาแล้ว','warn');}
+function delLeave(id){if(!confirm('ลบรายการวันลานี้?'))return;leaves=leaves.filter(function(l){return l.id!==id;});renderLeaveTable();renderCal();pushLeaves();toast('🗑️ ลบวันลาแล้ว','warn');}
 function renderLeaveTable(){
   var tbody=document.getElementById('leaveTbody');if(!tbody)return;
   tbody.innerHTML=leaves.length?leaves.map(function(l){
     return '<tr>'
-      +'<td><div style="display:flex;align-items:center;gap:6px;"><div class="d-dot" style="background:'+(docs[l.di]||{color:'#ccc'}).color+'"></div>'+(docs[l.di]||{name:'–'}).name+'</div></td>'
+      +'<td><div style="display:flex;align-items:center;gap:6px;"><div class="d-dot" style="background:'+(docs[l.di]||{color:'#ccc'}).color+'"></div>'+esc((docs[l.di]||{name:'–'}).name)+'</div></td>'
       +'<td>'+fmtShort(parseD(l.start))+' – '+fmtShort(parseD(l.end))+'</td>'
-      +'<td style="color:var(--t2)">'+(l.reason||'–')+'</td>'
+      +'<td style="color:var(--t2)">'+esc(l.reason||'–')+'</td>'
       +'<td><span class="'+(l.status==='Approved'?'ls-a':'ls-p')+'">'+l.status+'</span></td>'
       +'<td><button class="bsr" onclick="delLeave('+l.id+')">ลบ</button></td>'
       +'</tr>';
@@ -1507,7 +1522,7 @@ function renderLeaveTable(){
 }
 
 // ── SWAP MANAGEMENT ──
-function renderSwapSelects(){var el=document.getElementById('swDoc');if(el)el.innerHTML=docs.map(function(d,i){return '<option value="'+i+'">'+d.name+'</option>';}).join('');}
+function renderSwapSelects(){var el=document.getElementById('swDoc');if(el)el.innerHTML=docs.map(function(d,i){return '<option value="'+i+'">'+esc(d.name)+'</option>';}).join('');}
 function saveSwap(){
   var di=parseInt(document.getElementById('swDoc').value),date=document.getElementById('swDate').value;
   var type=document.getElementById('swType').value,note=document.getElementById('swNote').value.trim();
@@ -1515,20 +1530,20 @@ function saveSwap(){
   var ex=swaps.find(function(s){return s.di===di&&s.date===date;});
   if(ex){ex.type=type;ex.note=note;toast('✅ แก้ไข Override แล้ว','ok');}
   else{var newId=Math.max.apply(null,[0].concat(swaps.map(function(s){return s.id;})))+1;swaps.push({id:newId,di:di,date:date,type:type,note:note});toast('✅ บันทึก Override แล้ว','ok');}
-  renderSwapTable();renderCal();renderAll();
+  renderSwapTable();renderCal();renderAll();pushSwaps();
   ['swDate','swNote'].forEach(function(id){document.getElementById(id).value='';});
 }
-function delSwap(id){if(!confirm('ลบรายการ Override นี้?'))return;swaps=swaps.filter(function(s){return s.id!==id;});renderSwapTable();renderCal();renderAll();toast('🗑️ ลบ Override แล้ว','warn');}
+function delSwap(id){if(!confirm('ลบรายการ Override นี้?'))return;swaps=swaps.filter(function(s){return s.id!==id;});renderSwapTable();renderCal();renderAll();pushSwaps();toast('🗑️ ลบ Override แล้ว','warn');}
 function renderSwapTable(){
   var tbody=document.getElementById('swapTbody');if(!tbody)return;
   var tl={Swap:'🔁 สลับเวร',Additional:'➕ ผ่าตัดเพิ่ม',Replacement:'↔️ แทน'};
   var tc={Swap:'ot-sw',Additional:'ot-ad',Replacement:'ot-rp'};
   tbody.innerHTML=swaps.length?swaps.map(function(s){
     return '<tr>'
-      +'<td><div style="display:flex;align-items:center;gap:6px;"><div class="d-dot" style="background:'+(docs[s.di]||{color:'#ccc'}).color+'"></div>'+(docs[s.di]||{name:'–'}).name+'</div></td>'
+      +'<td><div style="display:flex;align-items:center;gap:6px;"><div class="d-dot" style="background:'+(docs[s.di]||{color:'#ccc'}).color+'"></div>'+esc((docs[s.di]||{name:'–'}).name)+'</div></td>'
       +'<td>'+fmtShort(parseD(s.date))+' ('+DTH[parseD(s.date).getDay()]+')</td>'
-      +'<td><span class="'+(tc[s.type]||'')+'">'+(tl[s.type]||s.type)+'</span></td>'
-      +'<td style="color:var(--t2)">'+(s.note||'–')+'</td>'
+      +'<td><span class="'+(tc[s.type]||'')+'">'+esc(tl[s.type]||s.type)+'</span></td>'
+      +'<td style="color:var(--t2)">'+esc(s.note||'–')+'</td>'
       +'<td><button class="bsr" onclick="delSwap('+s.id+')">ลบ</button></td>'
       +'</tr>';
   }).join(''):'<tr><td colspan="5" style="text-align:center;color:var(--t3);padding:18px">ยังไม่มีรายการ Override</td></tr>';
@@ -1539,9 +1554,9 @@ function renderDocSettings(){
   var DAYS=['จ','อ','พ','พฤ','ศ','ส'],SLOTS=[{k:'morning',l:'เช้า'},{k:'afternoon',l:'บ่าย'},{k:'allday',l:'ทั้งวัน'}];
   document.getElementById('docList').innerHTML=docs.map(function(d,di){
     return '<div class="dsr">'
-      +'<div class="dsr-h"><div class="dsr-c" style="background:'+d.color+'"></div><div class="dsr-n">'+d.name+'</div><button class="dsr-d" onclick="delDoc('+di+')">ลบ</button></div>'
+      +'<div class="dsr-h"><div class="dsr-c" style="background:'+d.color+'"></div><div class="dsr-n">'+esc(d.name)+'</div><button class="dsr-d" onclick="delDoc('+di+')">ลบ</button></div>'
       +'<div class="sched-days">'+DAYS.map(function(dl,idx){
-        var dn=idx+1,isOR=(dn===1||dn===3);
+        var dn=idx+1,isOR=ORDAYS.includes(dn);
         return '<div class="sdc"><div class="sdl'+(isOR?' or':'')+'">'+dl+(isOR?'*':'')+'</div>'
           +SLOTS.map(function(s){return '<button class="slb'+((d.sched[dn]||[]).includes(s.k)?' on':'')+'" onclick="togSlot('+di+','+dn+',\''+s.k+'\',this)">'+s.l+'</button>';}).join('')
           +'</div>';
@@ -1560,10 +1575,20 @@ function togSlot(di,dn,slot,btn){
 function addDoc(){
   var name=document.getElementById('newDocName').value.trim();
   if(!name){toast('⚠️ ใส่ชื่อแพทย์ก่อน','warn');return;}
-  docs.push({name:name,color:DCOL[docs.length%DCOL.length],sched:{1:[],2:[],3:[],4:[],5:[],6:[]},orDays:[]});
+  if(docs.some(function(d){return d.name===name;})){toast('⚠️ มีชื่อแพทย์นี้ในระบบแล้ว','warn');return;}
+  // เลือกสีที่ยังไม่ถูกใช้ก่อน เพื่อไม่ให้สีซ้ำกัน
+  var used=docs.map(function(d){return d.color;});
+  var color=DCOL.filter(function(c){return used.indexOf(c)===-1;})[0]||DCOL[docs.length%DCOL.length];
+  docs.push({name:name,color:color,sched:{1:[],2:[],3:[],4:[],5:[],6:[]},orDays:[]});
   document.getElementById('newDocName').value='';
   renderDocSettings();renderSide();renderLeaveSelects();renderSwapSelects();
-  toast('✅ เพิ่ม '+name+' แล้ว — กดบันทึกลง Sheet เพื่อซิงค์','ok');
+  if(sheetCfg.url){
+    // บันทึกลง Sheet ทันที เพื่อไม่ให้ข้อมูลหายเวลารีเฟรชหน้า
+    saveSettings();
+    toast('✅ เพิ่ม '+name+' และบันทึกลง Sheet แล้ว — อย่าลืมตั้งวันผ่าตัดของแพทย์ แล้วกดบันทึกอีกครั้ง','ok');
+  }else{
+    toast('✅ เพิ่ม '+name+' แล้ว — กดบันทึกลง Sheet เพื่อซิงค์','ok');
+  }
 }
 
 function delOp(i){
@@ -1573,20 +1598,63 @@ function delOp(i){
 }
 
 function delDoc(di){
-  if(!confirm('ลบ "'+docs[di].name+'" ออกจากระบบ?'))return;
+  var d=docs[di];if(!d)return;
+  var nApt=apts.filter(function(a){return a.di===di||a.di2===di;}).length;
+  var nLv=leaves.filter(function(l){return l.di===di;}).length;
+  var nSw=swaps.filter(function(s){return s.di===di;}).length;
+  var warn=(nApt||nLv||nSw)?'\n\nข้อมูลที่เกี่ยวข้อง: นัด '+nApt+' รายการ, วันลา '+nLv+', Override '+nSw+'\nวันลา/Override ของแพทย์ท่านนี้จะถูกลบ และนัดจะถูกย้ายให้แพทย์ท่านแรก':'';
+  if(!confirm('ลบ "'+d.name+'" ออกจากระบบ?'+warn))return;
   docs.splice(di,1);
-  apts.forEach(function(a){if(a.di===di)a.di=0;else if(a.di>di)a.di--;});
-  if(docFil!=='all'&&parseInt(docFil)>=docs.length)docFil='all';
-  if(calFil!=='all'&&parseInt(calFil)>=docs.length)calFil='all';
+  // ★ ปรับ index อ้างอิงแพทย์ให้ครบทุกชุดข้อมูล (นัด, แพทย์คนที่ 2, วันลา, Override)
+  apts.forEach(function(a){
+    if(a.di===di){a.di=0;a.doctorName=docs[0]?docs[0].name:'';}
+    else if(a.di>di)a.di--;
+    if(a.di2!=null){
+      if(a.di2===di){a.di2=null;a.doctor2Name='';}
+      else if(a.di2>di)a.di2--;
+    }
+  });
+  leaves=leaves.filter(function(l){return l.di!==di;});
+  leaves.forEach(function(l){if(l.di>di)l.di--;});
+  swaps=swaps.filter(function(s){return s.di!==di;});
+  swaps.forEach(function(s){if(s.di>di)s.di--;});
+  if(docFil!=='all'){var f=parseInt(docFil);if(f===di)docFil='all';else if(f>di)docFil=String(f-1);}
+  if(calFil!=='all'){var c=parseInt(calFil);if(c===di)calFil='all';else if(c>di)calFil=c-1;}
   renderDocSettings();renderSide();renderAll();
+  renderLeaveSelects();renderSwapSelects();renderLeaveTable();renderSwapTable();
   if(curPg==='calendar'){renderCalFbar();renderCal();}
+  // ★ ซิงค์ข้อมูลทั้งหมดขึ้น Sheet ทันที ไม่ให้ index ในเครื่องกับใน Sheet เพี้ยนกัน
+  if(sheetCfg.url)pushAll();
   toast('🗑️ ลบแพทย์แล้ว','warn');
 }
 
 function renderOpList(){
   document.getElementById('opList').innerHTML=ops.map(function(o,i){
-    return '<div class="op-item"><span>'+o+'</span><button class="bsr" onclick="delOp('+i+')">ลบ</button></div>';
+    return '<div class="op-item"><span>'+esc(o)+'</span><button class="bsr" onclick="delOp('+i+')">ลบ</button></div>';
   }).join('');
+}
+
+// ── SETTINGS: OR DAYS (วันผ่าตัดของแผนก) ──
+function renderORDaySettings(){
+  var wrap=document.getElementById('orDayBtns');if(!wrap)return;
+  wrap.innerHTML=[1,2,3,4,5,6].map(function(dn){
+    var on=ORDAYS.includes(dn);
+    return '<button class="cfc'+(on?' active':'')+'" onclick="togORDay('+dn+')" type="button">'+(on?'✓ ':'')+'วัน'+DTH[dn]+'</button>';
+  }).join('');
+}
+function togORDay(dn){
+  var i=ORDAYS.indexOf(dn);
+  if(i>-1){
+    if(ORDAYS.length<=1){toast('⚠️ ต้องมีวันผ่าตัดอย่างน้อย 1 วัน','warn');return;}
+    ORDAYS.splice(i,1);
+  }else{
+    ORDAYS.push(dn);
+  }
+  ORDAYS.sort(function(a,b){return a-b;});
+  try{localStorage.setItem('ent_ordays',JSON.stringify(ORDAYS));}catch(e){}
+  pushConfig(); // ซิงค์ขึ้น Sheet ให้ทุกเครื่องเห็นตรงกัน
+  renderORDaySettings();renderDocSettings();renderAll();renderCal();
+  toast('✅ อัพเดทวันผ่าตัดเป็น: '+ORDAYS.map(function(d){return DTH[d];}).join(', '),'ok');
 }
 
 function addOp(){
@@ -1697,7 +1765,22 @@ async function pullSheet(mode){
         apts.forEach(function(a){
           var idx=docs.findIndex(function(d){return d.name===a.doctorName;});
           if(idx!==-1)a.di=idx;
+          // ★ remap แพทย์คนที่ 2 ตามชื่อด้วย กัน index เพี้ยนเมื่อลำดับแพทย์ใน Sheet เปลี่ยน
+          if(a.doctor2Name){
+            var i2=docs.findIndex(function(d){return d.name===a.doctor2Name;});
+            if(i2!==-1)a.di2=i2;
+          }
         });
+      }
+      // ★ โหลดวันผ่าตัดของแผนก (ORDAYS) จาก Sheet ถ้ามี
+      if(data.config&&data.config.orDays){
+        try{
+          var od=(typeof data.config.orDays==='string')?JSON.parse(data.config.orDays):data.config.orDays;
+          if(Array.isArray(od)&&od.length){
+            ORDAYS=od.map(Number).filter(function(x){return x>=1&&x<=6;});
+            try{localStorage.setItem('ent_ordays',JSON.stringify(ORDAYS));}catch(e){}
+          }
+        }catch(e){}
       }
       if(data.operations&&data.operations.length){
         ops=data.operations.map(function(o){return String(o.name||'').trim();}).filter(Boolean);
@@ -1711,7 +1794,7 @@ async function pullSheet(mode){
     lastPullTime = Date.now();
     renderSide(); renderAll(); renderCal();
     if(mode==='full'){
-      renderDocSettings(); renderOpList();
+      renderDocSettings(); renderOpList(); renderORDaySettings();
       renderLeaveSelects(); renderSwapSelects();
       renderLeaveTable(); renderSwapTable();
     }
@@ -1741,6 +1824,27 @@ async function pushRow(a){
     setSyncBadge('synced');
   }catch(er){setSyncBadge('error');}
 }
+
+// ── AUTO-SYNC: วันลา / Override / Config ขึ้น Sheet ทันทีที่มีการแก้ไข ──
+var _scriptWarned=false;
+function warnScriptOutdated(){
+  if(_scriptWarned)return;_scriptWarned=true;
+  toast('⚠️ Apps Script เป็นเวอร์ชันเก่า — วันลา/Override/วันผ่าตัดจะยังไม่ซิงค์อัตโนมัติ กรุณาอัพเดท Code.gs ตามตัวอย่างในหน้าตั้งค่า แล้ว Deploy เวอร์ชันใหม่','warn');
+}
+async function pushSheetData(action,payload,label){
+  if(!sheetCfg.url)return;
+  setSyncBadge('syncing');
+  try{
+    var res=await fetch(sheetCfg.url,{method:'POST',headers:{'Content-Type':'text/plain'},
+      body:JSON.stringify(Object.assign({action:action},payload))});
+    var data=await res.json();
+    if(data&&data.status==='saved'){setSyncBadge('synced');}
+    else{setSyncBadge('error');warnScriptOutdated();}
+  }catch(er){setSyncBadge('error');toast('❌ ซิงค์'+label+'ไม่สำเร็จ: '+er.message,'err');}
+}
+function pushLeaves(){pushSheetData('saveLeaves',{leaves:leaves},'วันลา');}
+function pushSwaps(){pushSheetData('saveSwaps',{swaps:swaps},'Override');}
+function pushConfig(){pushSheetData('saveConfig',{config:{orDays:JSON.stringify(ORDAYS)}},'วันผ่าตัด');}
 
 // ★ แก้ไขให้หลังบันทึก Settings โหลดข้อมูลกลับมาอีกรอบเพื่อให้ชัวร์ว่าลง Google Sheets ได้ 100%
 async function saveSettings(){
@@ -1777,25 +1881,29 @@ function setSyncBadge(s){
 // ── SCRIPT BOX ──
 function buildScript(){
   var el=document.getElementById('scriptBox');if(!el)return;
-  el.textContent='// ══ Google Apps Script (Code.gs) – ENT OR Schedule v4 ══════════\n'
-+'// Sheet tabs: ENT_Schedule, ENT_Doctors, ENT_Ops, ENT_Leaves, ENT_Swaps\n'
+  el.textContent='// ══ Google Apps Script (Code.gs) – ENT OR Schedule v5 ══════════\n'
++'// Sheet tabs: ENT_Schedule, ENT_Doctors, ENT_Ops, ENT_Leaves, ENT_Swaps, ENT_Config\n'
 +'const SHEET_ID = \'YOUR_SPREADSHEET_ID_HERE\';\n\n'
 +'const APT_COLS   = [\'id\',\'hn\',\'name\',\'date\',\'ts\',\'te\',\'op\',\'doctorName\',\'di\',\'di2\',\'doctor2Name\',\'anesthesia\',\'tel1\',\'tel2\',\'status\',\'note\'];\n'
 +'const LEAVE_COLS = [\'id\',\'di\',\'start\',\'end\',\'reason\',\'status\'];\n'
 +'const SWAP_COLS  = [\'id\',\'di\',\'date\',\'type\',\'note\'];\n'
 +'const DOC_COLS   = [\'di\',\'name\',\'color\',\'sched\',\'orDays\'];\n'
-+'const OP_COLS    = [\'name\'];\n\n'
++'const OP_COLS    = [\'name\'];\n'
++'const CFG_COLS   = [\'key\',\'value\'];\n\n'
 +'function doGet(e) {\n'
 +'  const p = e.parameter || {};\n'
 +'  if (p.action === \'ping\') return ok({ status: \'online\' });\n'
 +'  if (p.action === \'getAll\') {\n'
 +'    const ss = SpreadsheetApp.openById(SHEET_ID);\n'
++'    const config = {};\n'
++'    readSheet(ss, \'ENT_Config\', CFG_COLS).forEach(r => { config[r.key] = r.value; });\n'
 +'    return ok({\n'
 +'      appointments: readSheet(ss, p.sheet || \'ENT_Schedule\', APT_COLS),\n'
 +'      doctors:      readSheet(ss, \'ENT_Doctors\', DOC_COLS),\n'
 +'      operations:   readSheet(ss, \'ENT_Ops\',     OP_COLS),\n'
 +'      leaves:       readSheet(ss, \'ENT_Leaves\',  LEAVE_COLS),\n'
 +'      swaps:        readSheet(ss, \'ENT_Swaps\',   SWAP_COLS),\n'
++'      config:       config,\n'
 +'    });\n'
 +'  }\n'
 +'  return ContentService.createTextOutput(JSON.stringify({status:\'ok\'})).setMimeType(ContentService.MimeType.JSON);\n'
@@ -1805,7 +1913,7 @@ function buildScript(){
 +'  const ss = SpreadsheetApp.openById(SHEET_ID);\n'
 +'  if (body.action === \'upsert\') { upsert(ss, body.sheet, APT_COLS, body.row); return ok({ status: \'upserted\' }); }\n'
 +'  if (body.action === \'pushAll\') {\n'
-+'    write(ss, body.sheet,    APT_COLS,   body.appointments || []);\n'
++'    write(ss, body.sheet || \'ENT_Schedule\', APT_COLS, body.appointments || []);\n'
 +'    write(ss, \'ENT_Doctors\', DOC_COLS,   body.doctors      || []);\n'
 +'    write(ss, \'ENT_Ops\',     OP_COLS,    body.operations   || []);\n'
 +'    write(ss, \'ENT_Leaves\',  LEAVE_COLS, body.leaves       || []);\n'
@@ -1815,6 +1923,14 @@ function buildScript(){
 +'  if (body.action === \'saveSettings\') {\n'
 +'    write(ss, \'ENT_Doctors\', DOC_COLS, body.doctors    || []);\n'
 +'    write(ss, \'ENT_Ops\',     OP_COLS,  body.operations || []);\n'
++'    return ok({ status: \'saved\' });\n'
++'  }\n'
++'  // ★ v5: บันทึกวันลา / Override / Config แยกส่วน (auto-sync จากหน้าเว็บ)\n'
++'  if (body.action === \'saveLeaves\') { write(ss, \'ENT_Leaves\', LEAVE_COLS, body.leaves || []); return ok({ status: \'saved\' }); }\n'
++'  if (body.action === \'saveSwaps\')  { write(ss, \'ENT_Swaps\',  SWAP_COLS,  body.swaps  || []); return ok({ status: \'saved\' }); }\n'
++'  if (body.action === \'saveConfig\') {\n'
++'    const rows = Object.keys(body.config || {}).map(k => ({ key: k, value: body.config[k] }));\n'
++'    write(ss, \'ENT_Config\', CFG_COLS, rows);\n'
 +'    return ok({ status: \'saved\' });\n'
 +'  }\n'
 +'  return ok({ status: \'ok\' });\n'
@@ -2118,14 +2234,19 @@ window.addEventListener('beforeinstallprompt',function(e){
   try{ if(localStorage.getItem('pwa_dismissed')) return; }catch(ex){}
   setTimeout(function(){ document.getElementById('pwaBanner').classList.add('show'); },2000);
 });
-document.getElementById('pwaInstallBtn').addEventListener('click',function(){
-  if(_pwaPrompt){
-    _pwaPrompt.prompt();
-    _pwaPrompt.userChoice.then(function(){
-      document.getElementById('pwaBanner').classList.remove('show');
-      _pwaPrompt=null;
-    });
-  }
+// ★ ปุ่มติดตั้งอยู่ท้าย body (หลัง script) ต้องรอ DOM พร้อมก่อนค่อยผูก event
+document.addEventListener('DOMContentLoaded',function(){
+  var btn=document.getElementById('pwaInstallBtn');
+  if(!btn)return;
+  btn.addEventListener('click',function(){
+    if(_pwaPrompt){
+      _pwaPrompt.prompt();
+      _pwaPrompt.userChoice.then(function(){
+        document.getElementById('pwaBanner').classList.remove('show');
+        _pwaPrompt=null;
+      });
+    }
+  });
 });
 function dismissPWA(){
   document.getElementById('pwaBanner').classList.remove('show');
