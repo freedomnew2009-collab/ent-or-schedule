@@ -4,6 +4,13 @@
 // Sheet tabs: ENT_Schedule, ENT_Doctors, ENT_Ops, ENT_Leaves, ENT_Swaps, ENT_Config
 const SHEET_ID = '1KWH-9JobfctIp-prqGSlZIJ4xOuP4Yb6QVA0spTE8sk';
 
+// ★ v5: เสิร์ฟหน้าเว็บล่าสุดจาก GitHub (branch main) โดยตรง
+// → อัพเดทโค้ดที่ GitHub ที่เดียว ผู้ใช้ /exec ทุกคนได้เวอร์ชันใหม่อัตโนมัติ
+//   ไม่ต้อง copy index.html มาวางใน Apps Script และไม่ต้อง Deploy ใหม่อีก
+// หมายเหตุ: ถ้าเปลี่ยน repo เป็น private ภายหลัง ลิงก์ raw นี้จะใช้ไม่ได้ ต้องกลับไปใช้ไฟล์ index ที่ฝังไว้
+const LIVE_HTML_URL = 'https://raw.githubusercontent.com/freedomnew2009-collab/ent-or-schedule/main/index.html';
+const APP_VERSION = 'v5';
+
 const APT_COLS   = ['id','hn','name','date','ts','te','op','doctorName','di','di2','doctor2Name','anesthesia','tel1','tel2','status','note','preopDate','preopStatus','lab','cxr','ekg','npo','preopNote','history'];
 const LEAVE_COLS = ['id','di','start','end','reason','status'];
 const SWAP_COLS  = ['id','di','date','type','note'];
@@ -13,7 +20,8 @@ const CFG_COLS   = ['key','value'];   // ★ v5: เก็บค่าตั้�
 
 function doGet(e) {
   const p = e.parameter || {};
-  if (p.action === 'ping') return ok({ status: 'online' });
+  // เปิด URL?action=ping ใน browser เพื่อเช็คว่า deployment เป็นเวอร์ชันล่าสุดหรือยัง
+  if (p.action === 'ping') return ok({ status: 'online', version: APP_VERSION, serving: 'github-main' });
 
   if (p.action === 'getAll') {
     try {
@@ -40,6 +48,17 @@ function doGet(e) {
     }
   }
 
+  // ★ หน้าเว็บ: ดึงเวอร์ชันล่าสุดจาก GitHub main มาเสิร์ฟเสมอ
+  try {
+    const res = UrlFetchApp.fetch(LIVE_HTML_URL, { muteHttpExceptions: true });
+    if (res.getResponseCode() === 200) {
+      return HtmlService.createHtmlOutput(res.getContentText())
+        .setTitle('ENT OR Schedule')
+        .setXFrameOptionsMode(HtmlService.XFrameOptionsMode.ALLOWALL);
+    }
+  } catch (err) { /* GitHub ล่ม/เข้าไม่ได้ → ใช้ตัวสำรองด้านล่าง */ }
+
+  // ตัวสำรอง: ไฟล์ index ที่ฝังในโปรเจกต์ (ใช้เมื่อดึงจาก GitHub ไม่สำเร็จเท่านั้น)
   return HtmlService.createHtmlOutputFromFile('index')
     .setTitle('ENT OR Schedule')
     .addMetaTag('viewport', 'width=device-width, initial-scale=1')

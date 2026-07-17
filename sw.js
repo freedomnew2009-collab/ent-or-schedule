@@ -7,10 +7,12 @@ const ASSETS = [
   'https://fonts.googleapis.com/css2?family=Noto+Sans+Thai:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;600&display=swap'
 ];
 
-// ติดตั้ง — cache ไฟล์หลัก
+// ติดตั้ง — cache ไฟล์หลัก (ทีละไฟล์ ถ้าไฟล์ไหนโหลดไม่ได้ให้ข้าม ไม่ให้การติดตั้งล้มทั้งตัว)
 self.addEventListener('install', function(e){
   e.waitUntil(
-    caches.open(CACHE).then(function(c){ return c.addAll(ASSETS); })
+    caches.open(CACHE).then(function(c){
+      return Promise.all(ASSETS.map(function(a){ return c.add(a).catch(function(){}); }));
+    })
   );
   self.skipWaiting();
 });
