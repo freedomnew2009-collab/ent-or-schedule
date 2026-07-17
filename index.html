@@ -2262,6 +2262,35 @@ function closeSidebar(){
   document.getElementById('sbBackdrop').classList.remove('open');
 }
 
+// ── SWIPE GESTURE (มือถือ): ปัดจากขอบซ้ายเพื่อเปิดเมนู / ปัดไปทางซ้ายเพื่อปิด ──
+(function(){
+  var startX=0,startY=0,tracking=false,fromEdge=false,wasOpen=false;
+  var EDGE=32;    // ระยะจากขอบซ้ายที่เริ่มนับเป็น "ปัดจากขอบ" (px)
+  var THRESH=60;  // ระยะปัดขั้นต่ำถึงจะทำงาน (px)
+  document.addEventListener('touchstart',function(e){
+    tracking=false;
+    if(window.innerWidth>768)return;
+    if(e.touches.length!==1)return;
+    // ถ้ามี modal/date picker เปิดอยู่ ไม่ต้องยุ่งกับเมนู
+    if(document.querySelector('.overlay.open,.dp-overlay.open'))return;
+    var t=e.touches[0];
+    startX=t.clientX;startY=t.clientY;
+    wasOpen=document.querySelector('.sidebar').classList.contains('mob-open');
+    fromEdge=!wasOpen&&startX<=EDGE;
+    tracking=fromEdge||wasOpen; // เปิด: ต้องเริ่มจากขอบซ้าย · ปิด: ปัดจากตรงไหนก็ได้
+  },{passive:true});
+  document.addEventListener('touchend',function(e){
+    if(!tracking)return;
+    tracking=false;
+    var t=e.changedTouches[0];
+    var dx=t.clientX-startX,dy=t.clientY-startY;
+    // ต้องเป็นการปัดแนวนอนชัดเจน (กันชนกับการเลื่อนหน้าจอขึ้นลง)
+    if(Math.abs(dx)<THRESH||Math.abs(dy)>Math.abs(dx))return;
+    if(!wasOpen&&fromEdge&&dx>0)toggleSidebar();
+    else if(wasOpen&&dx<0)closeSidebar();
+  },{passive:true});
+})();
+
 document.querySelectorAll('.sidebar .nav-item').forEach(function(el){
   el.addEventListener('click',function(){if(window.innerWidth<=768)closeSidebar();});
 });
