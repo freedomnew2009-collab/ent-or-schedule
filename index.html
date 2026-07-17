@@ -2326,10 +2326,28 @@ function toggleTheme(){
   }
 })();
 
-// ── SERVICE WORKER (PWA) ──
+// ── SERVICE WORKER (PWA) + AUTO-UPDATE ──
+// เมื่อมีเวอร์ชันใหม่บนเซิร์ฟเวอร์ แอพจะตรวจเจอเองแล้วรีโหลดหน้าให้อัตโนมัติ
+// ผู้ใช้ไม่ต้องลบแอพลงใหม่อีก
 if('serviceWorker' in navigator){
   window.addEventListener('load',function(){
-    navigator.serviceWorker.register('sw.js').catch(function(){});
+    navigator.serviceWorker.register('sw.js').then(function(reg){
+      // เช็คอัพเดททันทีที่เปิด และทุกครั้งที่สลับกลับมาที่แอพ
+      reg.update().catch(function(){});
+      document.addEventListener('visibilitychange',function(){
+        if(document.visibilityState==='visible')reg.update().catch(function(){});
+      });
+    }).catch(function(){});
+  });
+  // service worker ตัวใหม่เข้าควบคุมเมื่อไหร่ → รีโหลดหน้าหนึ่งครั้งเพื่อใช้เวอร์ชันใหม่ทันที
+  // (ข้ามการรีโหลดตอนติดตั้งครั้งแรก ที่ยังไม่มี controller เดิม)
+  var _hadController=!!navigator.serviceWorker.controller;
+  var _swReloaded=false;
+  navigator.serviceWorker.addEventListener('controllerchange',function(){
+    if(!_hadController){_hadController=true;return;}
+    if(_swReloaded)return;
+    _swReloaded=true;
+    location.reload();
   });
 }
 
