@@ -1,9 +1,10 @@
 // ══ Google Apps Script (Code.gs) – ENT OR Schedule v5 ══════════
 // อัพเดทจาก v4 (Fixed): เพิ่ม saveLeaves / saveSwaps / saveConfig + ส่ง config กลับใน getAll
+// v5 navy: เพิ่มคอลัมน์ Pre-Op (preopDate, preopStatus, lab, cxr, ekg, npo, preopNote, history)
 // Sheet tabs: ENT_Schedule, ENT_Doctors, ENT_Ops, ENT_Leaves, ENT_Swaps, ENT_Config
 const SHEET_ID = '1KWH-9JobfctIp-prqGSlZIJ4xOuP4Yb6QVA0spTE8sk';
 
-const APT_COLS   = ['id','hn','name','date','ts','te','op','doctorName','di','di2','doctor2Name','anesthesia','tel1','tel2','status','note'];
+const APT_COLS   = ['id','hn','name','date','ts','te','op','doctorName','di','di2','doctor2Name','anesthesia','tel1','tel2','status','note','preopDate','preopStatus','lab','cxr','ekg','npo','preopNote','history'];
 const LEAVE_COLS = ['id','di','start','end','reason','status'];
 const SWAP_COLS  = ['id','di','date','type','note'];
 const DOC_COLS   = ['di','name','color','sched','orDays'];

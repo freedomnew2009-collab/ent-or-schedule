@@ -4,8 +4,8 @@
   "description": "ระบบตารางนัดผ่าตัด แผนก หู คอ จมูก",
   "start_url": "./index.html",
   "display": "standalone",
-  "background_color": "#0F1923",
-  "theme_color": "#0F1923",
+  "background_color": "#F2F0EA",
+  "theme_color": "#1E3A5F",
   "orientation": "portrait-primary",
   "lang": "th",
   "icons": [
