@@ -1,4 +1,4 @@
-const CACHE = 'ent-or-v1';
+const CACHE = 'ent-or-v5-navy';
 const ASSETS = [
   './index.html',
   './manifest.json',
@@ -28,7 +28,7 @@ self.addEventListener('activate', function(e){
   self.clients.claim();
 });
 
-// Fetch — Network first สำหรับ API, Cache first สำหรับ assets
+// Fetch — Network first สำหรับ API และหน้าเว็บ, Cache first สำหรับ assets
 self.addEventListener('fetch', function(e){
   var url = e.request.url;
 
@@ -39,6 +39,25 @@ self.addEventListener('fetch', function(e){
         headers:{'Content-Type':'application/json'}
       });
     }));
+    return;
+  }
+
+  // หน้าเว็บ (index.html) — Network first เพื่อให้ผู้ใช้ได้เวอร์ชันใหม่เสมอ
+  // (ถ้าออฟไลน์ค่อยใช้ตัวที่ cache ไว้)
+  if(e.request.mode === 'navigate' || url.includes('index.html')){
+    e.respondWith(
+      fetch(e.request).then(function(res){
+        if(res.ok){
+          var clone = res.clone();
+          caches.open(CACHE).then(function(c){ c.put(e.request, clone); });
+        }
+        return res;
+      }).catch(function(){
+        return caches.match(e.request).then(function(cached){
+          return cached || caches.match('./index.html');
+        });
+      })
+    );
     return;
   }
 
