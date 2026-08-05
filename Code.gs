@@ -9,7 +9,8 @@ const SHEET_ID = '1KWH-9JobfctIp-prqGSlZIJ4xOuP4Yb6QVA0spTE8sk';
 //   ไม่ต้อง copy index.html มาวางใน Apps Script และไม่ต้อง Deploy ใหม่อีก
 // หมายเหตุ: ถ้าเปลี่ยน repo เป็น private ภายหลัง ลิงก์ raw นี้จะใช้ไม่ได้ ต้องกลับไปใช้ไฟล์ index ที่ฝังไว้
 const LIVE_HTML_URL = 'https://raw.githubusercontent.com/freedomnew2009-collab/ent-or-schedule/main/index.html';
-const APP_VERSION = 'v5';
+// เลขนี้เปลี่ยนทุกครั้งที่แก้ Code.gs — ใช้เช็คว่า deployment รับโค้ดใหม่แล้วหรือยัง
+const APP_VERSION = 'v5.1';
 
 const APT_COLS   = ['id','hn','name','date','ts','te','op','doctorName','di','di2','doctor2Name','anesthesia','tel1','tel2','status','note','preopDate','preopStatus','lab','cxr','ekg','npo','preopNote','history'];
 const LEAVE_COLS = ['id','di','start','end','reason','status'];
@@ -21,7 +22,14 @@ const CFG_COLS   = ['key','value'];   // ★ v5: เก็บค่าตั้�
 function doGet(e) {
   const p = e.parameter || {};
   // เปิด URL?action=ping ใน browser เพื่อเช็คว่า deployment เป็นเวอร์ชันล่าสุดหรือยัง
-  if (p.action === 'ping') return ok({ status: 'online', version: APP_VERSION, serving: 'github-main' });
+  // ping = ตรวจสุขภาพระบบ + บอกว่า deployment ที่ใช้อยู่มีอะไรบ้าง
+  // lock:true คือมีระบบกันเขียนชนกันแล้ว (ถ้าไม่ขึ้นบรรทัดนี้เลย = deployment ยังเป็นโค้ดเก่า)
+  if (p.action === 'ping') return ok({
+    status: 'online',
+    version: APP_VERSION,
+    serving: 'github-main',
+    lock: (typeof handlePost === 'function')
+  });
 
   if (p.action === 'getAll') {
     try {
