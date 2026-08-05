@@ -928,6 +928,30 @@ var docs=[
 var ops=['Tonsillectomy (ตัดต่อมทอนซิล)','Septoplasty (ผ่าตัดผนังกั้นจมูก)','Tympanoplasty (ผ่าตัดเยื่อแก้วหู)','FESS (ผ่าตัดโพรงจมูก Endoscopic)','Myringotomy + Tube (ใส่ท่อหู)','Mastoidectomy (ผ่าตัดกระดูกหลังหู)','Adenoidectomy (ตัดต่อมอะดีนอยด์)','Direct Laryngoscopy (ส่องกล่องเสียง)','อื่น ๆ (ระบุในหมายเหตุ)'];
 var leaves=[];
 var swaps=[];
+var _syncState='idle';
+// ── คิวรอส่ง: เคสที่ส่งขึ้น Sheet ไม่สำเร็จ (เน็ตหลุด/Sheet ไม่ตอบ) จะถูกเก็บไว้ส่งใหม่อัตโนมัติ ──
+var pendingRows=[];
+try{var _pj=JSON.parse(localStorage.getItem('ent_pending')||'[]');if(Array.isArray(_pj))pendingRows=_pj;}catch(e){}
+function savePendingStore(){try{localStorage.setItem('ent_pending',JSON.stringify(pendingRows));}catch(e){}}
+function queueRow(row){
+  pendingRows=pendingRows.filter(function(r){return String(r.id)!==String(row.id);});
+  pendingRows.push(row);savePendingStore();setSyncBadge(_syncState);
+}
+function unqueueRow(id){
+  var n=pendingRows.length;
+  pendingRows=pendingRows.filter(function(r){return String(r.id)!==String(id);});
+  if(pendingRows.length!==n){savePendingStore();setSyncBadge(_syncState);}
+}
+// แปลงแถวที่เก็บในคิว (รูปแบบสำหรับ Sheet) กลับเป็นข้อมูลที่แอพใช้
+function unserializeApt(r){
+  return Object.assign({},r,{
+    id:+r.id,di:+r.di,
+    di2:(r.di2!=null&&r.di2!=='')?+r.di2:null,
+    lab:r.lab==='Y'||r.lab===true,cxr:r.cxr==='Y'||r.cxr===true,ekg:r.ekg==='Y'||r.ekg===true,
+    history:(function(){try{var h=r.history;return typeof h==='string'?(JSON.parse(h||'[]')||[]):(h||[]);}catch(e){return[];}})()
+  });
+}
+
 var lastPullTime = 0;
 var PULL_COOLDOWN = 5 * 60 * 1000; // 5 นาที
 
@@ -985,6 +1009,13 @@ function normalizeTime(v) {
   return s.substring(0, 5); 
 }
 
+// ── สร้างเลขที่ (id) ที่ไม่ซ้ำกันข้ามเครื่อง ──
+// เดิมใช้ "เลขสูงสุดในเครื่อง + 1" ทำให้ 2 เครื่องที่ยังไม่ทันซิงค์กันได้เลขเดียวกัน
+// แล้วคนบันทึกทีหลังเขียนทับเคสของคนแรกโดยไม่มีใครรู้
+var newUid=function(){
+  return Math.floor(Date.now()/1000)*100000+Math.floor(Math.random()*100000);
+};
+
 var parseD=function(s){if(!s)return new Date(NaN);var ns=normalizeDate(s);if(!ns)return new Date(NaN);var parts=ns.split('-');var dt=new Date(+parts[0],+parts[1]-1,+parts[2]);dt.setHours(0,0,0,0);return dt;};
 var fmtShort=function(d){return d.getDate()+' '+MS[d.getMonth()]+' '+(d.getFullYear()+543);};
 var fmtFull=function(s){var d=parseD(s);if(isNaN(d))return String(s);return d.getDate()+' '+MS[d.getMonth()]+' '+(d.getFullYear()+543)+' ('+DTH[d.getDay()]+')';};
@@ -1033,9 +1064,14 @@ function validateTime(s){if(!s)return false;var m=s.match(/^(\d{1,2}):(\d{2})$/)
     pullSheet();
   }
   
+  flushPending(); // มีรายการค้างจากครั้งก่อน (เช่น ปิดแอพตอนเน็ตหลุด) ให้ส่งต่อทันที
   window._autoSyncTimer=setInterval(function(){
-    if(sheetCfg.url&&document.visibilityState!=='hidden')pullSheet('silent');
+    if(sheetCfg.url&&document.visibilityState!=='hidden'){flushPending();pullSheet('silent');}
   },300000);
+  // ลองส่งรายการค้างถี่กว่านั้น (ทุก 30 วิ) จนกว่าจะหมดคิว
+  window._flushTimer=setInterval(function(){
+    if(sheetCfg.url&&pendingRows.length&&document.visibilityState!=='hidden')flushPending();
+  },30000);
 })();
 
 // ── PAGE NAV ──
@@ -1175,14 +1211,16 @@ function renderPreopAlert(){
   w.innerHTML='<div class="preop-alert" onclick="showPage(\'preop\')"><span class="pa-ico">⚠️</span><div class="pa-txt"><b>'+u.length+' เคส</b> ผ่าตัดภายใน 7 วัน แต่ Pre-Op ยังไม่เรียบร้อย'+(noAppt?' (ยังไม่นัด Pre-Op '+noAppt+' เคส)':'')+'</div><span class="pa-go">ดูรายการ ›</span></div>';
   w.style.display=curPg==='schedule'?'block':'none';
 }
-function markPreopDone(e,id){
+async function markPreopDone(e,id){
   if(e)e.stopPropagation();
   var a=apts.find(function(x){return x.id===id;});if(!a)return;
   a.preopStatus='done';
   if(!a.preopDate)a.preopDate=iso(new Date());
-  pushRow(a);renderAll();renderPreopPage();
+  renderAll();renderPreopPage();
   var dm=document.getElementById('dtlModal');
   if(dm&&dm.classList.contains('open'))openDetail(id);
+  var pr=await pushRow(a);
+  if(!pr.ok){toast('⚠️ บันทึกในเครื่องแล้ว แต่ยังไม่ขึ้น Sheet — ระบบจะส่งให้อัตโนมัติ','warn');return;}
   toast('✅ Pre-Op เรียบร้อย · '+a.name,'ok');
 }
 function ppRowHTML(a){
@@ -1267,7 +1305,14 @@ function openDetail(id){
     +'</div>';
   openModal('dtlModal');
 }
-function qs(e,id,st){e.stopPropagation();var a=apts.find(function(x){return x.id===id;});if(a){a.status=st;renderAll();pushRow(a);toast(st==='confirm'?'✅ ยืนยันแล้ว':'❌ ยกเลิกแล้ว',st==='confirm'?'ok':'err');}}
+async function qs(e,id,st){
+  e.stopPropagation();
+  var a=apts.find(function(x){return x.id===id;});if(!a)return;
+  a.status=st;renderAll();
+  var pr=await pushRow(a);
+  if(pr.ok)toast(st==='confirm'?'✅ ยืนยันแล้ว':'❌ ยกเลิกแล้ว',st==='confirm'?'ok':'err');
+  else toast('⚠️ เปลี่ยนสถานะในเครื่องแล้ว แต่ยังไม่ขึ้น Sheet — ระบบจะส่งให้อัตโนมัติ','warn');
+}
 
 function updateStats(dayIsos){
   var wk=apts.filter(function(a){return a.date&&dayIsos.indexOf(a.date)!==-1;});
@@ -1359,7 +1404,7 @@ function confirmOv(){
   if(!dateStr||isNaN(di)){toast('⚠️ ยังไม่ได้เลือกแพทย์หรือวันที่','warn');return;}
   var exists=swaps.find(function(s){return s.di===di&&s.date===dateStr;});
   if(exists){exists.type=type;exists.note=note;}
-  else{var newId=Math.max.apply(null,[0].concat(swaps.map(function(s){return s.id;})))+1;swaps.push({id:newId,di:di,date:dateStr,type:type,note:note});}
+  else{var newId=newUid();swaps.push({id:newId,di:di,date:dateStr,type:type,note:note});}
   renderSwapTable();renderCal();pushSwaps();
   valBlocked=false;
   var btn=document.getElementById('btnSave');btn.disabled=false;btn.style.opacity='1';
@@ -1721,7 +1766,7 @@ function openEdit(e,id){
   runVal();openModal('addModal');
 }
 
-function saveApt(){
+async function saveApt(){
   if(valBlocked){toast('🚫 ไม่สามารถบันทึกได้ กรุณาแก้ไขข้อมูลหรือกด Override ก่อน','err');return;}
   var hn=document.getElementById('fHN').value.trim(),name=document.getElementById('fName').value.trim();
   var date=document.getElementById('fDate').value,ts=document.getElementById('fTs').value.trim(),te=document.getElementById('fTe').value.trim();
@@ -1752,16 +1797,20 @@ function saveApt(){
     return ts<=(a.te||a.ts)&&a.ts<=(te||ts);
   });
   if(dup&&!confirm('⚠️ เวลาอาจซ้อนกับนัดของ '+dup.name+' ('+dup.ts+(dup.te?'–'+dup.te:'')+')\n\nต้องการบันทึกต่อหรือไม่?'))return;
+  var target,okMsg;
   if(editId!=null){
     var idx=apts.findIndex(function(a){return a.id===editId;});
     apts[idx]=Object.assign({},apts[idx],{hn:hn,name:name,date:date,ts:ts,te:te,op:op,di:parseInt(di),di2:di2,doctor2Name:doctor2Name,anesthesia:anesthesia,tel1:tel1,tel2:tel2,status:status,note:note,preopDate:preopDate,preopStatus:preopStatus,lab:lab,cxr:cxr,ekg:ekg,npo:npo,preopNote:preopNote});
-    pushRow(apts[idx]);toast('✅ แก้ไขเรียบร้อย','ok');
+    target=apts[idx];okMsg='✅ แก้ไขเรียบร้อย';
   }else{
-    var newId=Math.max.apply(null,[0].concat(apts.map(function(a){return a.id;})))+1;
-    var r={id:newId,hn:hn,name:name,date:date,ts:ts,te:te,op:op,di:parseInt(di),di2:di2,doctor2Name:doctor2Name,anesthesia:anesthesia,tel1:tel1,tel2:tel2,status:status,note:note,preopDate:preopDate,preopStatus:preopStatus,lab:lab,cxr:cxr,ekg:ekg,npo:npo,preopNote:preopNote,history:[]};
-    apts.push(r);pushRow(r);toast('✅ เพิ่มนัดผ่าตัดเรียบร้อย','ok');
+    var r={id:newUid(),hn:hn,name:name,date:date,ts:ts,te:te,op:op,di:parseInt(di),di2:di2,doctor2Name:doctor2Name,anesthesia:anesthesia,tel1:tel1,tel2:tel2,status:status,note:note,preopDate:preopDate,preopStatus:preopStatus,lab:lab,cxr:cxr,ekg:ekg,npo:npo,preopNote:preopNote,history:[]};
+    apts.push(r);target=r;okMsg='✅ เพิ่มนัดผ่าตัดเรียบร้อย';
   }
   closeModal('addModal');renderAll();if(curPg==='calendar')renderCal();
+  // ★ รอผลจริงจาก Sheet ก่อนค่อยบอกว่าสำเร็จ (เดิมขึ้นว่าสำเร็จทันทีทั้งที่อาจยังไม่ได้บันทึก)
+  var pr=await pushRow(target);
+  if(pr.ok)toast(okMsg,'ok');
+  else toast('⚠️ บันทึกในเครื่องแล้ว แต่ยังไม่ขึ้น Sheet ('+pr.error+') — ระบบจะส่งให้อัตโนมัติ อย่าเพิ่งปิดแอพ','warn');
 }
 
 // ── RESCHEDULE ──
@@ -1820,7 +1869,7 @@ function confirmRSWithOv(){
   var ex=swaps.find(function(s){return s.di===a.di&&s.date===rsDate;});
   if(ex){ex.type=type;ex.note=note;}
   else{
-    var newId=Math.max.apply(null,[0].concat(swaps.map(function(s){return s.id;})))+1;
+    var newId=newUid();
     swaps.push({id:newId,di:a.di,date:rsDate,type:type,note:note});
   }
   pushSwaps();
@@ -1848,7 +1897,7 @@ function confirmQSwap(){
   var note=document.getElementById('qSwapNote').value.trim();
   var existing=swaps.find(function(s){return s.di===a.di&&s.date===a.date;});
   if(existing){existing.type=type;existing.note=note;toast('✅ แก้ไข Override แล้ว','ok');}
-  else{var newId=Math.max.apply(null,[0].concat(swaps.map(function(s){return s.id;})))+1;swaps.push({id:newId,di:a.di,date:a.date,type:type,note:note});toast('✅ บันทึก Override แล้ว','ok');}
+  else{var newId=newUid();swaps.push({id:newId,di:a.di,date:a.date,type:type,note:note});toast('✅ บันทึก Override แล้ว','ok');}
   pushSwaps();
   closeModal('qSwapModal');renderAll();renderSwapTable();if(curPg==='calendar')renderCal();
 }
@@ -1865,7 +1914,7 @@ function saveLeave(){
   var reason=document.getElementById('lvReason').value.trim(),status=document.getElementById('lvStat').value;
   if(!start||!end){toast('⚠️ กรุณาระบุช่วงวันลา','warn');return;}
   if(start>end){toast('⚠️ วันเริ่มต้นต้องก่อนวันสิ้นสุด','warn');return;}
-  var newId=Math.max.apply(null,[0].concat(leaves.map(function(l){return l.id;})))+1;
+  var newId=newUid();
   leaves.push({id:newId,di:di,start:start,end:end,reason:reason,status:status});
   renderLeaveTable();renderCal();pushLeaves();
   ['lvStart','lvEnd','lvReason'].forEach(function(id){document.getElementById(id).value='';});
@@ -1893,7 +1942,7 @@ function saveSwap(){
   if(!date){toast('⚠️ กรุณาระบุวันที่','warn');return;}
   var ex=swaps.find(function(s){return s.di===di&&s.date===date;});
   if(ex){ex.type=type;ex.note=note;toast('✅ แก้ไข Override แล้ว','ok');}
-  else{var newId=Math.max.apply(null,[0].concat(swaps.map(function(s){return s.id;})))+1;swaps.push({id:newId,di:di,date:date,type:type,note:note});toast('✅ บันทึก Override แล้ว','ok');}
+  else{var newId=newUid();swaps.push({id:newId,di:di,date:date,type:type,note:note});toast('✅ บันทึก Override แล้ว','ok');}
   renderSwapTable();renderCal();renderAll();pushSwaps();
   ['swDate','swNote'].forEach(function(id){document.getElementById(id).value='';});
 }
@@ -2163,8 +2212,18 @@ async function pullSheet(mode){
 
     clearTimeout(ldrTimeout);
     hideLdr(); setSyncBadge('synced');
+    // ★ เคสที่ยังส่งขึ้น Sheet ไม่สำเร็จ ต้องไม่ถูกข้อมูลจากเซิร์ฟเวอร์ลบทิ้ง
+    if(pendingRows.length){
+      pendingRows.forEach(function(pr){
+        var local=unserializeApt(pr);
+        var i=apts.findIndex(function(x){return String(x.id)===String(local.id);});
+        if(i>=0)apts[i]=local;else apts.push(local);
+      });
+    }
+
     lastPullTime = Date.now();
     renderSide(); renderAll(); renderCal(); renderPreopPage();
+    flushPending(); // มีอะไรค้างอยู่ ลองส่งใหม่ทันที
     if(mode==='full'){
       renderDocSettings(); renderOpList(); renderORDaySettings();
       renderLeaveSelects(); renderSwapSelects();
@@ -2190,14 +2249,45 @@ async function pushAll(){
 function serializeApt(a,docName){
   return Object.assign({},a,{doctorName:docName!==undefined?docName:((docs[a.di]||{name:a.doctorName||'–'}).name),lab:a.lab?'Y':'',cxr:a.cxr?'Y':'',ekg:a.ekg?'Y':'',history:JSON.stringify(a.history||[])});
 }
+// ส่งนัด 1 รายการขึ้น Sheet — ★ ตรวจผลจริงจากเซิร์ฟเวอร์ ไม่ใช่แค่ยิงแล้วถือว่าสำเร็จ
 async function pushRow(a){
-  if(!sheetCfg.url)return;setSyncBadge('syncing');
+  if(!sheetCfg.url)return{ok:false,error:'ยังไม่ได้ตั้งค่า URL'};
+  setSyncBadge('syncing');
   var doc=docs[a.di]||{name:'–'};
+  var row=serializeApt(a,doc.name);
   try{
-    await fetch(sheetCfg.url,{method:'POST',headers:{'Content-Type':'text/plain'},
-      body:JSON.stringify({action:'upsert',sheet:sheetCfg.sheet,row:serializeApt(a,doc.name)})});
-    setSyncBadge('synced');
-  }catch(er){setSyncBadge('error');}
+    var res=await fetch(sheetCfg.url,{method:'POST',headers:{'Content-Type':'text/plain'},
+      body:JSON.stringify({action:'upsert',sheet:sheetCfg.sheet,row:row})});
+    if(!res.ok)throw new Error('HTTP '+res.status);
+    var data=await res.json();
+    if(!data||(data.status!=='upserted'&&data.status!=='ok'))throw new Error(data&&data.status?String(data.status):'เซิร์ฟเวอร์ตอบกลับผิดปกติ');
+    unqueueRow(a.id);setSyncBadge('synced');
+    return{ok:true};
+  }catch(er){
+    queueRow(row);setSyncBadge('error');
+    return{ok:false,error:er.message};
+  }
+}
+
+// ลองส่งรายการที่ค้างในคิวใหม่ (เรียกตอนเปิดแอพ/สลับกลับมา/ทุกรอบ auto-sync)
+var _flushing=false;
+async function flushPending(){
+  if(_flushing||!sheetCfg.url||!pendingRows.length)return;
+  _flushing=true;
+  var before=pendingRows.length;
+  try{
+    var list=pendingRows.slice();
+    for(var i=0;i<list.length;i++){
+      var res=await fetch(sheetCfg.url,{method:'POST',headers:{'Content-Type':'text/plain'},
+        body:JSON.stringify({action:'upsert',sheet:sheetCfg.sheet,row:list[i]})});
+      if(!res.ok)break;
+      var data=await res.json();
+      if(!data||(data.status!=='upserted'&&data.status!=='ok'))break;
+      unqueueRow(list[i].id);
+    }
+  }catch(er){/* ยังส่งไม่ได้ ไว้ลองใหม่รอบหน้า */}
+  _flushing=false;
+  if(before&&!pendingRows.length){setSyncBadge('synced');toast('✅ ส่งรายการที่ค้างขึ้น Sheet สำเร็จ ('+before+' รายการ)','ok');}
 }
 
 // ── AUTO-SYNC: วันลา / Override / Config ขึ้น Sheet ทันทีที่มีการแก้ไข ──
@@ -2248,9 +2338,12 @@ async function saveSettings(){
 }
 
 function setSyncBadge(s){
-  document.getElementById('syncBadge').className='sync-badge '+s;
+  _syncState=s||_syncState;
+  var n=(typeof pendingRows!=='undefined'&&pendingRows)?pendingRows.length:0;
+  // มีรายการค้าง = ยังไม่ปลอดภัย ให้แสดงเป็นสถานะเตือนเสมอ
+  document.getElementById('syncBadge').className='sync-badge '+(n?'error':_syncState);
   var labels={synced:'ซิงค์แล้ว',syncing:'กำลังซิงค์...',error:'ซิงค์ล้มเหลว',idle:'ไม่ได้เชื่อมต่อ'};
-  document.getElementById('syncTxt').textContent=labels[s]||'–';
+  document.getElementById('syncTxt').textContent=n?('รอส่ง '+n+' รายการ'):(labels[_syncState]||'–');
 }
 
 // ── SCRIPT BOX ──
@@ -2355,6 +2448,7 @@ document.addEventListener('visibilitychange',function(){
     if(now-lastPullTime > PULL_COOLDOWN){
       pullSheet('silent');
     }
+    flushPending(); // กลับมาที่แอพ = ลองส่งรายการค้างทันที
   }
 });
 

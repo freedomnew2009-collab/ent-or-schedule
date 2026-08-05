@@ -65,7 +65,23 @@ function doGet(e) {
     .setXFrameOptionsMode(HtmlService.XFrameOptionsMode.ALLOWALL);
 }
 
+// ★ v5: ล็อกก่อนเขียนทุกครั้ง — ถ้าเจ้าหน้าที่ 2 คนกดบันทึกพร้อมกัน
+// การเขียนจะเรียงคิวทีละคน ไม่อ่าน-เขียนซ้อนกันจนข้อมูลหาย
 function doPost(e){
+  const lock = LockService.getScriptLock();
+  try {
+    lock.waitLock(28000);
+  } catch (err) {
+    return ok({ status: 'busy', message: 'ระบบกำลังบันทึกรายการอื่นอยู่ กรุณาลองใหม่' });
+  }
+  try {
+    return handlePost(e);
+  } finally {
+    lock.releaseLock();
+  }
+}
+
+function handlePost(e){
   const body = JSON.parse(e.postData.contents || '{}');
   const ss = SpreadsheetApp.openById(SHEET_ID);
 
