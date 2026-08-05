@@ -95,6 +95,16 @@ body{font-family:'Noto Sans Thai',sans-serif;background:var(--bg);color:var(--t)
 .doc-chip:hover{background:var(--s2);}
 .d-dot{width:7px;height:7px;border-radius:50%;flex-shrink:0;}
 
+/* ─ ปุ่มกรองแพทย์ (มือถือ) + รายการเลือกแบบ bottom sheet ─ */
+.doc-filter-btn{display:none;width:100%;margin-top:2px;padding:12px 14px;border-radius:10px;border:1px solid var(--b2);background:var(--s2);color:var(--t);font-family:inherit;font-size:14px;font-weight:700;cursor:pointer;align-items:center;gap:9px;min-height:48px;transition:all .15s;}
+.doc-filter-btn .d-dot{width:10px;height:10px;}
+.doc-filter-btn.active{border-color:var(--teal);background:var(--td);color:var(--teal);}
+.dfl-item{display:flex;align-items:center;gap:11px;padding:13px 14px;border-radius:10px;font-size:15px;font-weight:600;color:var(--t2);cursor:pointer;border:1px solid transparent;margin-bottom:4px;min-height:48px;}
+.dfl-item:hover,.dfl-item:active{background:var(--s2);}
+.dfl-item.on{background:var(--td);color:var(--teal);border-color:color-mix(in srgb, var(--teal) 40%, transparent);}
+.dfl-item .d-dot{width:11px;height:11px;}
+.dfl-check{margin-left:auto;font-weight:700;}
+
 /* ─ CONTENT ─ */
 .content{margin-left:220px;flex:1;display:flex;flex-direction:column;}
 .topbar{background:var(--s);border-bottom:1px solid var(--b);padding:11px 22px;display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;z-index:40;}
@@ -510,7 +520,9 @@ body{font-family:'Noto Sans Thai',sans-serif;background:var(--bg);color:var(--t)
   .toast{top:12px;bottom:auto;left:12px;right:12px;max-width:none;font-size:12px;transform:translateY(-20px);z-index:55;}
   .toast.show{transform:translateY(0);}
 
-  #sideDocList{display:flex;flex-wrap:nowrap;overflow-x:auto;gap:5px;padding-bottom:4px;-webkit-overflow-scrolling:touch;}
+  /* มือถือ: ซ่อนแถวชิป ใช้ปุ่มกดเปิดรายการเลือกแทน */
+  #sideDocList{display:none;}
+  .doc-filter-btn{display:flex;}
   .doc-chip{white-space:nowrap;flex-shrink:0;padding:5px 10px;font-size:11px;}
 }
 @media (max-width: 400px){
@@ -545,6 +557,7 @@ body{font-family:'Noto Sans Thai',sans-serif;background:var(--bg);color:var(--t)
   <div class="sb-docs">
     <div class="sb-dlbl">กรองแพทย์</div>
     <div id="sideDocList"></div>
+    <button class="doc-filter-btn" id="docFilBtn" onclick="openDocFil()" type="button"></button>
   </div>
 </aside>
 
@@ -879,6 +892,13 @@ body{font-family:'Noto Sans Thai',sans-serif;background:var(--bg);color:var(--t)
 </div>
 
 <div class="overlay" id="dtlModal"><div class="modal" id="dtlBox"></div></div>
+
+<div class="overlay" id="docFilModal">
+  <div class="modal sm">
+    <div class="mhd"><div class="mtl">🩺 กรองตามแพทย์</div><button class="mcl" onclick="closeModal('docFilModal')">✕</button></div>
+    <div id="docFilList"></div>
+  </div>
+</div>
 
 <div class="ldr" id="ldr"><div class="spinner"></div><div class="ldr-t" id="ldrTxt">กำลังโหลด...</div></div>
 <div class="toast" id="toast"></div>
@@ -1369,9 +1389,39 @@ function renderSide(){
   }
   list.appendChild(mkChip('แพทย์ทุกท่าน','#D9B463',docFil==='all',function(){setDocFil('all');}));
   docs.forEach(function(d,i){list.appendChild(mkChip(esc(shortN(d.name)),d.color,docFil==i,function(){setDocFil(i);}));});
+  renderDocFilBtn();
   renderCalFbar();
 }
 function setDocFil(v){docFil=v;renderSide();renderAll();}
+
+// ── ปุ่มกรองแพทย์ (มือถือ): กดแล้วมีรายการเด้งขึ้นมาให้เลือก ──
+function renderDocFilBtn(){
+  var b=document.getElementById('docFilBtn');if(!b)return;
+  var isAll=docFil==='all';
+  var doc=isAll?null:docs[parseInt(docFil)];
+  var color=isAll?'#D9B463':((doc||{}).color||'#ccc');
+  var lbl=isAll?'แพทย์ทุกท่าน':esc(shortN((doc||{name:'–'}).name));
+  b.innerHTML='<span class="d-dot" style="background:'+color+'"></span>'
+    +'<span style="flex:1;text-align:left;">'+lbl+'</span>'
+    +'<span style="opacity:.55;font-size:11px;">▲</span>';
+  b.classList.toggle('active',!isAll);
+}
+function openDocFil(){
+  var el=document.getElementById('docFilList');if(!el)return;
+  function mk(val,lbl,color,on){
+    return '<div class="dfl-item'+(on?' on':'')+'" onclick="pickDocFil(\''+val+'\')">'
+      +'<span class="d-dot" style="background:'+color+'"></span>'+lbl
+      +(on?'<span class="dfl-check">✓</span>':'')+'</div>';
+  }
+  el.innerHTML=mk('all','แพทย์ทุกท่าน','#D9B463',docFil==='all')
+    +docs.map(function(d,i){return mk(String(i),esc(shortN(d.name)),d.color,docFil==i);}).join('');
+  openModal('docFilModal');
+}
+function pickDocFil(v){
+  setDocFil(v==='all'?'all':parseInt(v));
+  closeModal('docFilModal');
+  closeSidebar(); // เลือกเสร็จปิดเมนูข้าง กลับไปดูตารางได้เลย
+}
 
 // ── CALENDAR ──
 function renderCalFbar(){
@@ -2550,6 +2600,25 @@ window.addEventListener('appinstalled',function(){
   document.getElementById('pwaBanner').classList.remove('show');
   toast('✅ ติดตั้งแอพสำเร็จ!','ok');
 });
+
+// ── iPhone/iPad: Safari ไม่มีปุ่มติดตั้งอัตโนมัติ → บอกวิธีเพิ่มลงหน้าจอเอง ──
+(function(){
+  var ua=navigator.userAgent||'';
+  var isIOS=/iPhone|iPad|iPod/i.test(ua)||(/Macintosh/.test(ua)&&navigator.maxTouchPoints>1);
+  var standalone=window.matchMedia('(display-mode:standalone)').matches||window.navigator.standalone;
+  if(!isIOS||standalone)return;
+  try{ if(localStorage.getItem('pwa_dismissed'))return; }catch(e){}
+  window.addEventListener('load',function(){
+    setTimeout(function(){
+      var bn=document.getElementById('pwaBanner');if(!bn)return;
+      var txt=bn.querySelector('.pwa-text span');
+      if(txt)txt.textContent='แตะปุ่มแชร์ ⎋ ด้านล่าง → เลือก "เพิ่มไปยังหน้าจอโฮม"';
+      var btn=document.getElementById('pwaInstallBtn');
+      if(btn)btn.style.display='none';
+      bn.classList.add('show');
+    },2500);
+  });
+})();
 </script>
 
 
