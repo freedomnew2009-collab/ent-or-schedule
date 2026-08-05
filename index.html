@@ -2600,6 +2600,25 @@ window.addEventListener('appinstalled',function(){
   document.getElementById('pwaBanner').classList.remove('show');
   toast('✅ ติดตั้งแอพสำเร็จ!','ok');
 });
+
+// ── iPhone/iPad: Safari ไม่มีปุ่มติดตั้งอัตโนมัติ → บอกวิธีเพิ่มลงหน้าจอเอง ──
+(function(){
+  var ua=navigator.userAgent||'';
+  var isIOS=/iPhone|iPad|iPod/i.test(ua)||(/Macintosh/.test(ua)&&navigator.maxTouchPoints>1);
+  var standalone=window.matchMedia('(display-mode:standalone)').matches||window.navigator.standalone;
+  if(!isIOS||standalone)return;
+  try{ if(localStorage.getItem('pwa_dismissed'))return; }catch(e){}
+  window.addEventListener('load',function(){
+    setTimeout(function(){
+      var bn=document.getElementById('pwaBanner');if(!bn)return;
+      var txt=bn.querySelector('.pwa-text span');
+      if(txt)txt.textContent='แตะปุ่มแชร์ ⎋ ด้านล่าง → เลือก "เพิ่มไปยังหน้าจอโฮม"';
+      var btn=document.getElementById('pwaInstallBtn');
+      if(btn)btn.style.display='none';
+      bn.classList.add('show');
+    },2500);
+  });
+})();
 </script>
 
 

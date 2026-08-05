@@ -48,7 +48,9 @@ self.addEventListener('fetch', function(e){
   // (ถ้าออฟไลน์ค่อยใช้ตัวที่ cache ไว้)
   if(e.request.mode === 'navigate' || url.includes('index.html')){
     e.respondWith(
-      fetch(e.request).then(function(res){
+      // cache:'no-cache' = ถามเซิร์ฟเวอร์ทุกครั้งว่ามีของใหม่ไหม
+      // (GitHub Pages ตั้ง cache ไว้ 10 นาที ถ้าไม่บังคับจะได้ของใหม่ช้า)
+      fetch(url, {cache:'no-cache', credentials:'same-origin'}).then(function(res){
         if(res.ok){
           var clone = res.clone();
           caches.open(CACHE).then(function(c){ c.put(e.request, clone); });
