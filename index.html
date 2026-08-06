@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>ENT OR Schedule · v5.1</title>
+<title>ENT OR Schedule · v5.2</title>
 <!-- PWA -->
 <link rel="manifest" href="manifest.json">
 <meta name="theme-color" content="#1E3A5F">
@@ -402,6 +402,12 @@ body{font-family:'Noto Sans Thai',sans-serif;background:var(--bg);color:var(--t)
 .mcl:hover{background:var(--s3);color:var(--t);}
 .mft{display:flex;gap:7px;justify-content:flex-end;margin-top:14px;}
 
+/* ─ ช่องกรอกเพิ่มเติม (ซ่อนไว้ ให้ฟอร์มสั้นลง) ─ */
+.opt-toggle{width:100%;padding:12px 10px;margin-bottom:11px;border:1.5px dashed var(--b2);background:none;border-radius:var(--rs);color:var(--t2);font-family:inherit;font-size:12px;font-weight:600;cursor:pointer;text-align:center;transition:all .15s;}
+.opt-toggle:hover{border-color:var(--teal);color:var(--teal);background:var(--td2);}
+.opt-fields{display:none;}
+.opt-fields.show{display:block;}
+
 /* ─ RS CALENDAR ─ */
 .rs-cal-wrap{background:var(--s2);border:1px solid var(--b);border-radius:var(--rs);padding:12px;}
 .rs-cal-nav{display:flex;align-items:center;justify-content:space-between;margin-bottom:8px;}
@@ -468,11 +474,12 @@ body{font-family:'Noto Sans Thai',sans-serif;background:var(--bg);color:var(--t)
   .btn-add{padding:7px 10px;font-size:11px;}
   .btn-add span{display:none;}
   .mob-menu-btn{display:flex;}
-  .stats-row{grid-template-columns:1fr 1fr;padding:10px 12px 0;gap:7px;}
-  .stat-card{padding:10px 10px;}
-  .stat-icon{width:30px;height:30px;font-size:14px;}
-  .sn{font-size:16px;}
-  .sl{font-size:9px;}
+  /* สถิติแบบกะทัดรัด 4 ช่องแถวเดียว — เหลือพื้นที่ให้รายการเคสมากขึ้น */
+  .stats-row{grid-template-columns:repeat(4,1fr);padding:8px 10px 0;gap:5px;}
+  .stat-card{padding:6px 4px;flex-direction:column;align-items:center;gap:0;text-align:center;}
+  .stat-icon{display:none;}
+  .sn{font-size:18px;}
+  .sl{font-size:9px;line-height:1.25;margin-top:1px;}
   .sg{grid-template-columns:1fr;padding:10px 10px 20px;gap:10px;}
   .cal-pg{padding:10px 10px 20px;}
   .set-pg{padding:10px 10px 20px;}
@@ -506,6 +513,12 @@ body{font-family:'Noto Sans Thai',sans-serif;background:var(--bg);color:var(--t)
   .modal.sm{width:100%;max-width:100%;}
   .fr{grid-template-columns:1fr;}
   .ov-row{grid-template-columns:1fr;}
+  /* รายการเคส: ให้เลื่อนไปกับหน้าเว็บ ไม่ต้องมีแถบเลื่อนซ้อนอยู่ข้างใน */
+  .day-body{max-height:none;overflow:visible;}
+  /* ปุ่มบันทึก/ยกเลิก ติดอยู่ก้นหน้าต่างเสมอ ไม่ต้องเลื่อนหาจนสุดฟอร์ม */
+  .mft{position:sticky;bottom:0;background:var(--s);margin:14px -16px 0;padding:10px 16px calc(6px + env(safe-area-inset-bottom,0px));border-top:1px solid var(--b);box-shadow:0 -6px 16px rgba(0,0,0,.10);z-index:5;}
+  .mft .bs,.mft .bss{min-height:48px;font-size:15px;}
+  .mft .bs{flex:2;}
   .mft{gap:8px;}
   .mft .bs,.mft .bss{flex:1;text-align:center;}
   .cal-pg{padding:10px 10px 20px;}
@@ -520,15 +533,24 @@ body{font-family:'Noto Sans Thai',sans-serif;background:var(--bg);color:var(--t)
   .toast{top:12px;bottom:auto;left:12px;right:12px;max-width:none;font-size:12px;transform:translateY(-20px);z-index:55;}
   .toast.show{transform:translateY(0);}
 
+  /* การ์ดเคส: ย่อให้เห็นได้หลายเคสต่อหน้าจอ
+     (เบอร์โทรและวิธีระงับความรู้สึกยังดูได้ในหน้ารายละเอียด แตะที่การ์ด) */
+  .ac .a-tel,.ac .a-anes{display:none;}
+  .ac{padding:11px 12px;margin-bottom:7px;}
+  .a-name{font-size:16px;margin-bottom:3px;}
+  .a-preop{margin-top:4px;}
+  .day-hd{padding:10px 12px;}
+
   /* มือถือ: ซ่อนแถวชิป ใช้ปุ่มกดเปิดรายการเลือกแทน */
   #sideDocList{display:none;}
   .doc-filter-btn{display:flex;}
   .doc-chip{white-space:nowrap;flex-shrink:0;padding:5px 10px;font-size:11px;}
 }
 @media (max-width: 400px){
-  .stats-row{grid-template-columns:1fr 1fr;gap:5px;padding:8px 8px 0;}
-  .stat-card{padding:8px 8px;}
-  .sn{font-size:14px;}
+  .stats-row{gap:4px;padding:8px 8px 0;}
+  .stat-card{padding:6px 3px;}
+  .sn{font-size:16px;}
+  .sl{font-size:8px;}
   .cal-day{min-height:52px;padding:4px 3px;}
   .cdn{font-size:10px;}
 }
@@ -542,7 +564,7 @@ body{font-family:'Noto Sans Thai',sans-serif;background:var(--bg);color:var(--t)
   <div class="sb-logo">
     <div class="ico">🏥</div>
     <h2>ENT OR Schedule</h2>
-    <p>แผนก หู คอ จมูก · v5.1</p>
+    <p>แผนก หู คอ จมูก · v5.2</p>
   </div>
   <div class="nav-sec">
     <div class="nav-lbl">เมนูหลัก</div>
@@ -802,6 +824,8 @@ body{font-family:'Noto Sans Thai',sans-serif;background:var(--bg);color:var(--t)
       <input class="fi" id="fOpCustom" placeholder="พิมพ์ประเภทการผ่าตัด..." style="display:none;margin-top:6px;">
     </div>
     <div class="fg"><label class="fl">แพทย์ผ่าตัด <span>*</span></label><select class="fs" id="fDoc" onchange="runVal()"></select></div>
+    <button type="button" class="opt-toggle" id="optToggle" onclick="toggleOptFields()"></button>
+    <div id="optFields" class="opt-fields">
     <div class="fg"><label class="fl">แพทย์ผ่าตัดคนที่ 2 (ถ้ามี)</label><select class="fs" id="fDoc2"><option value="">– ไม่มี –</option></select></div>
     <div class="fg"><label class="fl">วิธีระงับความรู้สึก</label><select class="fs" id="fAnes"><option value="">– ไม่ระบุ –</option><option value="GA">GA (ดมยาสลบ)</option><option value="LA">LA (ยาชาเฉพาะที่)</option><option value="NLA">NLA (ยาสลบร่วมยาชา)</option><option value="Sedation">Sedation (ยาระงับประสาท)</option><option value="Spinal">Spinal Block</option></select></div>
     <div class="fr">
@@ -828,6 +852,7 @@ body{font-family:'Noto Sans Thai',sans-serif;background:var(--bg);color:var(--t)
     </div>
     <div class="fg"><label class="fl">สถานะ</label><select class="fs" id="fStatus"><option value="wait">รอยืนยัน</option><option value="confirm">ยืนยันแล้ว</option><option value="cancel">ยกเลิก</option></select></div>
     <div class="fg"><label class="fl">หมายเหตุ / ข้อควรระวัง</label><textarea class="fta" id="fNote" placeholder="เช่น แพ้ยา, โรคประจำตัว..."></textarea></div>
+    </div>
     <div class="mft"><button class="bss" onclick="closeModal('addModal')">ยกเลิก</button><button class="bs" id="btnSave" onclick="saveApt()">💾 บันทึกนัด</button></div>
   </div>
 </div>
@@ -1693,6 +1718,25 @@ function fillSelects(){
   document.getElementById('fDoc2').innerHTML='<option value="">– ไม่มี –</option>'+docOpts;
 }
 
+// ── ช่องกรอกเพิ่มเติม: ซ่อนไว้ให้ฟอร์มสั้น กดเปิดเมื่อต้องใช้ ──
+// (ช่องยังอยู่ในหน้าเสมอ แค่ซ่อน — ค่าที่กรอกไว้จึงถูกบันทึกครบเหมือนเดิม)
+function toggleOptFields(force){
+  var w=document.getElementById('optFields'),b=document.getElementById('optToggle');
+  if(!w||!b)return;
+  var show=(force===undefined)?!w.classList.contains('show'):!!force;
+  w.classList.toggle('show',show);
+  b.textContent=show?'－ ซ่อนข้อมูลเพิ่มเติม'
+                    :'＋ ข้อมูลเพิ่มเติม (แพทย์คนที่ 2 · เบอร์โทร · Pre-Op · หมายเหตุ)';
+}
+// เปิดอัตโนมัติถ้าเคสนี้มีข้อมูลในส่วนเพิ่มเติมอยู่แล้ว จะได้ไม่พลาดของที่กรอกไว้
+function optFieldsHaveData(a){
+  if(!a)return false;
+  return !!(a.di2!=null||a.anesthesia||a.tel1||a.tel2||a.note
+    ||a.preopDate||(a.preopStatus&&a.preopStatus!=='none')
+    ||a.lab||a.cxr||a.ekg||a.npo||a.preopNote
+    ||(a.status&&a.status!=='wait'));
+}
+
 function toggleOpCustom(val){
   var inp=document.getElementById('fOpCustom');
   if(val==='__other__'){
@@ -1719,6 +1763,7 @@ function openAdd(hint){
   document.getElementById('dpTriggerTxt').textContent='เลือกวันที่...';
   document.getElementById('dpTrigger').classList.add('placeholder');document.getElementById('dpTrigger').classList.remove('has-val');
   document.getElementById('fStatus').value='wait';
+  toggleOptFields(false); // เพิ่มนัดใหม่ = แสดงเฉพาะช่องที่จำเป็น
   clearVal();fillSelects();
   document.getElementById('fOpCustom').style.display='none';
   document.getElementById('fOpCustom').value='';
@@ -1763,6 +1808,7 @@ function openEdit(e,id){
   document.getElementById('fPreopNote').value=a.preopNote||'';
   document.getElementById('fTel1').value=a.tel1||'';document.getElementById('fTel2').value=a.tel2||'';
   document.getElementById('fStatus').value=a.status;document.getElementById('fNote').value=a.note||'';
+  toggleOptFields(optFieldsHaveData(a));
   runVal();openModal('addModal');
 }
 
