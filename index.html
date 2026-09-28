@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>ENT OR Schedule · v5.7</title>
+<title>ENT OR Schedule · v5.8</title>
 <!-- PWA -->
 <link rel="manifest" href="manifest.json">
 <meta name="theme-color" content="#1E3A5F">
@@ -833,8 +833,8 @@ body{font-family:'Noto Sans Thai',sans-serif;background:var(--bg);color:var(--t)
 #opdPrint .og{grid-template-columns:repeat(5,minmax(0,1fr)) repeat(2,minmax(0,.3fr));}
 #opdPrint .oc{min-height:0;break-inside:avoid;}
 #opdPrint .oc-more,#opdPrint .os-tp{display:none;}
-#opdPrint .os.gh{border:1px dashed var(--b2);background:transparent;}
-#opdPrint .os.gh .os-n{visibility:hidden;}
+#opdPrint .os.gh{border:0;background:color-mix(in srgb, var(--dc) 15%, var(--s));box-shadow:inset 3px 0 0 var(--dc);}
+#opdPrint .os.gh .os-n{color:var(--t);font-style:normal;font-weight:700;font-size:12px;opacity:1;}
 #opdPrint .os.dim,#opdPrint .os.wdim{opacity:1;}
 #opdPrint .or.none{opacity:.4;}
 #opdPrint .opd-legend{margin-top:5px;font-size:10px;}
@@ -857,7 +857,7 @@ body{font-family:'Noto Sans Thai',sans-serif;background:var(--bg);color:var(--t)
   <div class="sb-logo">
     <div class="ico">🏥</div>
     <h2>ENT OR Schedule</h2>
-    <p>แผนก หู คอ จมูก · v5.7</p>
+    <p>แผนก หู คอ จมูก · v5.8</p>
   </div>
   <div class="nav-sec">
     <div class="nav-lbl">เมนูหลัก</div>
@@ -946,6 +946,7 @@ body{font-family:'Noto Sans Thai',sans-serif;background:var(--bg);color:var(--t)
           <div class="cal-mnav"><button class="cnbtn" onclick="opdNav(-1)" type="button">‹</button><div class="cal-mt" id="opdTitle">–</div><button class="cnbtn" onclick="opdNav(1)" type="button">›</button></div>
           <div class="opd-acts">
             <button class="bss" id="opdUndoBtn" onclick="opdUndo()" type="button" disabled>↩️ เลิกทำ</button>
+            <button class="bss" id="opdDragBtn" onclick="opdDragToggle()" type="button" title="กดเปิด = ลากชื่อแล้วย้ายทุกสัปดาห์ (แม่แบบเปลี่ยนตาม) · ปิด = ย้ายเฉพาะวันนั้น">🔁 ลากย้าย: เฉพาะวันนั้น</button>
             <button class="bss" id="opdSyncBtn" onclick="opdSyncToggle()" type="button" title="แก้ปฏิทินแล้วแม่แบบเปลี่ยนตาม และแก้แม่แบบแล้วปฏิทินเปลี่ยนตาม">🔗 ซิงค์แม่แบบ</button>
             <button class="bs" onclick="openOpdGen()" type="button">⚡ สร้างอัตโนมัติ</button>
             <button class="bss" onclick="opdPrint('cal')" type="button">🖨️ พิมพ์ปฏิทิน A4</button>
@@ -3037,11 +3038,12 @@ function renderOpdMonth(){
   document.getElementById('opdTitle').textContent=MTH[opdMo]+' '+(opdYr+543);
   document.getElementById('opdUndoBtn').disabled=!opdUndoStack.length;
   var sb=document.getElementById('opdSyncBtn');sb.textContent=opdSyncLabel();sb.classList.toggle('on',opdSync);
+  var db=document.getElementById('opdDragBtn');db.textContent=opdDragAll?'🔁 ลากย้าย: ทุกสัปดาห์':'📅 ลากย้าย: เฉพาะวันนั้น';db.classList.toggle('on',opdDragAll);
   document.getElementById('opdLgAm').textContent=OPD.settings.am;
   document.getElementById('opdLgPm').textContent=OPD.settings.pm;
   var isos=opdMonthIsos(opdYr,opdMo),rooms=opdRooms(),cnt={};
   isos.forEach(function(i){
-    if(opdIsClosed(i))return;var s=opdDayOf(i).s||{};
+    if(opdIsClosed(i))return;var s=opdEffS(i);
     Object.keys(s).forEach(function(k){if(+k.split('-')[0]<rooms.length)cnt[s[k].d]=(cnt[s[k].d]||0)+1;});
   });
   if(opdFocus&&!opdDoc(opdFocus))opdFocus=null;
@@ -3154,7 +3156,7 @@ function renderOpdSum(isos){
   var rooms=opdRooms(),items=[],half=0;
   isos.forEach(function(i){
     if(opdIsClosed(i))return;
-    var s=opdDayOf(i).s||{},parts=[];
+    var s=opdEffS(i),parts=[];
     rooms.forEach(function(rn,ri){
       var a=s[ri+'-am'],p=s[ri+'-pm'],ia=a&&a.d===d.id,ip=p&&p.d===d.id;
       if(ia)half++;if(ip)half++;
@@ -3172,7 +3174,7 @@ function opdLoadData(isos){
   var rooms=opdRooms(),by={};
   OPD.doctors.forEach(function(d){by[d.id]={d:d,am:0,pm:0,lv:0,lvDays:0};});
   isos.forEach(function(i){
-    if(opdIsClosed(i))return;var s=opdDayOf(i).s||{};
+    if(opdIsClosed(i))return;var s=opdEffS(i);
     OPD.doctors.forEach(function(d){if(opdLeave(d.id,i))by[d.id].lvDays++;});
     Object.keys(s).forEach(function(k){
       var p=k.split('-'),r=by[s[k].d];if(!r||+p[0]>=rooms.length)return;
@@ -3196,7 +3198,7 @@ function renderOpdLoad(isos){
     ?'<div class="ld-v bad">ไม่สมดุล · '+esc(heavy.map(function(r){return opdShort(r.d.name)+' '+r.n+' ช่วง';}).join(', '))+' สูงกว่าเฉลี่ยชัดเจน</div>'
     :'<div class="ld-v ok">ภาระงานค่อนข้างสมดุล (ต่างจากค่าเฉลี่ยไม่เกิน 25%)</div>';
   var h='<div class="opd-card"><div class="opd-ch"><div><div class="opd-ct">สรุปภาระงานแพทย์ · '+MTH[opdMo]+' '+(opdYr+543)+'</div>'
-    +'<div class="opd-cs">นับเป็นช่วง (ครึ่งวัน) ไม่รวมช่วงที่ลา · เส้นตั้งคือค่าเฉลี่ย '+opdFix(mean)+' ช่วง/คน · ไม่แสดงตอนพิมพ์</div></div>'+verdict+'</div>'
+    +'<div class="opd-cs">นับเป็นช่วง (ครึ่งวัน) รวมชื่อตามแม่แบบ (เส้นประ) ไม่รวมช่วงที่ลา · เส้นตั้งคือค่าเฉลี่ย '+opdFix(mean)+' ช่วง/คน · ไม่แสดงตอนพิมพ์</div></div>'+verdict+'</div>'
     +'<div class="ld"><div class="ld-h">แพทย์</div><div class="ld-h"><span><i></i>เช้า</span><span><i class="pm"></i>บ่าย</span></div>'
     +'<div class="ld-h r">รวม</div><div class="ld-h c4">เทียบเฉลี่ย</div><div class="ld-h">ลา</div>';
   list.forEach(function(r){
@@ -3275,7 +3277,7 @@ function renderOpdMoveBar(){
   var el=document.getElementById('opdMoveBar');if(!el)return;
   if(!opdMoveSrc){el.classList.remove('show');el.innerHTML='';return;}
   var M=opdMoveSrc,v=opdCurOrGhost(M.i,M.k),d=v&&opdDoc(v.d),r=+M.k.split('-')[0];
-  el.innerHTML='<span>↔️ กำลังย้าย <b>'+esc(d?opdShort(d.name):'')+'</b> ('+opdFmt(M.i)+' · '+esc(M.whole?opdRooms()[r]+' ทั้งวัน':opdSlotName(M.k))+')<br><b>แตะช่องปลายทาง</b> — เปลี่ยนเดือนได้ · ถ้าช่องนั้นมีแพทย์อยู่จะสลับกัน</span>'
+  el.innerHTML='<span>↔️ กำลังย้าย <b>'+esc(d?opdShort(d.name):'')+'</b> ('+opdFmt(M.i)+' · '+esc(M.whole?opdRooms()[r]+' ทั้งวัน':opdSlotName(M.k))+')<br><b>แตะช่องปลายทาง</b> — '+(M.sync===true?'<b>ย้ายทุกสัปดาห์</b> (แม่แบบเปลี่ยนตาม)':Array.isArray(M.sync)?'ย้ายสัปดาห์ที่ '+M.sync.join(', '):'ย้ายเฉพาะวันนั้น')+' · ถ้าช่องนั้นมีแพทย์อยู่จะสลับกัน</span>'
     +'<button class="bss" onclick="opdCancelMove()" type="button">ยกเลิก</button>';
   el.classList.add('show');
 }
@@ -3286,11 +3288,12 @@ function opdCancelMove(silent){
 }
 function opdSlotTap(btn){
   var i=btn.dataset.i,k=btn.dataset.k;
-  if(opdMoveSrc){var src=opdMoveSrc;opdMoveSrc=null;opdMoveSlot(src,{i:i,k:k});return;}
+  if(opdMoveSrc){var src=opdMoveSrc;opdMoveSrc=null;opdMoveSlot(src,{i:i,k:k},src.sync);return;}
   opdOpenSlot(i,k,btn.dataset.all==='1');
 }
 // ย้ายแพทย์จากช่อง src ไป dst — ถ้าปลายทางมีคนอยู่ให้สลับกัน · whole = ย้ายทั้งเช้าและบ่ายของห้องนั้น
-function opdMoveSlot(src,dst){
+function opdMoveSlot(src,dst,sync){
+  if(sync===undefined)sync=opdDragAll;
   var sr=src.k.split('-')[0],dr=dst.k.split('-')[0];
   var pairs=src.whole?OPD_SES.map(function(s){return [sr+'-'+s,dr+'-'+s];}):[[src.k,dst.k]];
   if(src.i===dst.i&&pairs.every(function(p){return p[0]===p[1];})){renderOpd();return;}
@@ -3303,23 +3306,28 @@ function opdMoveSlot(src,dst){
     if(b&&(!a||a.d!==b.d))swapped=true;
     items.push({i:src.i,k:p[0],v:b},{i:dst.i,k:p[1],v:a});
   });
-  var n=opdSetSlots(items,'ย้าย '+nm,opdSync);
+  // ย้ายทุกสัปดาห์: ถ้าแม่แบบต้นทางกำหนดเฉพาะบางสัปดาห์ (เช่น จันทร์ที่ 1,3,4) ปลายทางได้สัปดาห์เดียวกัน
+  if(sync===true){
+    var sp=src.k.split('-'),se=opdTplPick(src.i,+sp[0],sp[1]);
+    if(se&&first&&se.d===first.d&&se.w&&se.w.length)sync=se.w.slice();
+  }
+  var n=opdSetSlots(items,'ย้าย '+nm,sync);
   toast((swapped?'🔁 สลับ ':'✅ ย้าย ')+nm+' → '+opdFmt(dst.i)+' · '+(src.whole?opdRooms()[+dr]+' ทั้งวัน':opdSlotName(dst.k))+opdSyncMsg(n),'ok');
 }
 function opdStartMove(whole){
-  var P=opdPick;opdMoveSrc={i:P.i,k:P.k,whole:!!whole};
+  var P=opdPick;opdMoveSrc={i:P.i,k:P.k,whole:!!whole,sync:P.sync};
   closeModal('opdModal');renderOpd();
 }
 function opdQuickMove(t){
   var P=opdPick,p=P.k.split('-'),dk=t==='ses'?p[0]+'-'+opdOther(p[1]):t+'-'+p[1];
   closeModal('opdModal');
-  opdMoveSlot({i:P.i,k:P.k,whole:P.all&&t!=='ses'},{i:P.i,k:dk});
+  opdMoveSlot({i:P.i,k:P.k,whole:P.all&&t!=='ses'},{i:P.i,k:dk},P.sync);
 }
 function opdMoveToDate(){
   var d=document.getElementById('opdMvDate').value,P=opdPick;
   if(!d||d===P.i)return;
   closeModal('opdModal');
-  opdMoveSlot({i:P.i,k:P.k,whole:P.all},{i:d,k:P.k});
+  opdMoveSlot({i:P.i,k:P.k,whole:P.all},{i:d,k:P.k},P.sync);
 }
 // ลากไปวาง: คอมพิวเตอร์ใช้ drag & drop · มือถือกดค้าง ~0.35 วิ แล้วลาก
 function opdDnd(root,itemSel,targetSel,onDrop){
@@ -3607,10 +3615,22 @@ function opdCurOrGhost(i,k){
   var p=k.split('-'),g=opdGhost(i,+p[0],p[1],opdDayOf(i).s||{});
   return g?{d:g.d,t:g.t||''}:null;
 }
+// ช่องทั้งหมดที่แสดงในปฏิทินวันนั้น = ที่ลงไว้ + ชื่อตามแม่แบบ (เส้นประ) — ใช้นับภาระงาน
+function opdEffS(i){
+  var out={},rooms=opdRooms();
+  rooms.forEach(function(rn,ri){OPD_SES.forEach(function(ses){var v=opdCurOrGhost(i,ri+'-'+ses);if(v)out[ri+'-'+ses]=v;});});
+  return out;
+}
 // ── ซิงค์ปฏิทิน ↔ แม่แบบ ──
 function opdSyncToggle(){
   opdSync=!opdSync;try{localStorage.setItem('ent_opd_sync',opdSync?'1':'0');}catch(e){}
   renderOpd();toast(opdSync?'🔗 เปิดซิงค์: แก้ปฏิทินจะแก้แม่แบบด้วย และกลับกัน':'📅 ปิดซิงค์: แก้เฉพาะวันที่เลือก ไม่แตะแม่แบบ','info');
+}
+// ลาก/แตะย้ายในปฏิทิน: เปิด = ย้ายทุกสัปดาห์ (แม่แบบเปลี่ยนตาม) · ปิด (ค่าเริ่มต้น) = เฉพาะวันนั้น
+var opdDragAll=false;try{opdDragAll=localStorage.getItem('ent_opd_dragall')==='1';}catch(e){}
+function opdDragToggle(){
+  opdDragAll=!opdDragAll;try{localStorage.setItem('ent_opd_dragall',opdDragAll?'1':'0');}catch(e){}
+  renderOpd();toast(opdDragAll?'🔁 ลากย้าย = ทุกสัปดาห์: วันเดียวกันทุกสัปดาห์และแม่แบบย้ายตาม':'📅 ลากย้าย = เฉพาะวันนั้น: แม่แบบไม่เปลี่ยน','info');
 }
 function opdSyncLabel(){return opdSync?'🔗 ซิงค์แม่แบบ: เปิด':'🔗 ซิงค์แม่แบบ: ปิด';}
 function opdKeyPick(key,i){var k=key.split('|')[1].split('-');return opdTplPick(i,+k[0],k[1]);}
