@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>ENT OR Schedule · v5.8</title>
+<title>ENT OR Schedule · v5.9</title>
 <!-- PWA -->
 <link rel="manifest" href="manifest.json">
 <meta name="theme-color" content="#1E3A5F">
@@ -832,7 +832,7 @@ body{font-family:'Noto Sans Thai',sans-serif;background:var(--bg);color:var(--t)
 #opdPrint .opd-ph span{font-size:11px;color:var(--t2);}
 #opdPrint .og{grid-template-columns:repeat(5,minmax(0,1fr)) repeat(2,minmax(0,.3fr));}
 #opdPrint .oc{min-height:0;break-inside:avoid;}
-#opdPrint .oc-more,#opdPrint .os-tp{display:none;}
+#opdPrint .oc-more,#opdPrint .os-tp,#opdPrint .lg-tp{display:none;}
 #opdPrint .os.gh{border:0;background:color-mix(in srgb, var(--dc) 15%, var(--s));box-shadow:inset 3px 0 0 var(--dc);}
 #opdPrint .os.gh .os-n{color:var(--t);font-style:normal;font-weight:700;font-size:12px;opacity:1;}
 #opdPrint .os.dim,#opdPrint .os.wdim{opacity:1;}
@@ -857,7 +857,7 @@ body{font-family:'Noto Sans Thai',sans-serif;background:var(--bg);color:var(--t)
   <div class="sb-logo">
     <div class="ico">🏥</div>
     <h2>ENT OR Schedule</h2>
-    <p>แผนก หู คอ จมูก · v5.8</p>
+    <p>แผนก หู คอ จมูก · v5.9</p>
   </div>
   <div class="nav-sec">
     <div class="nav-lbl">เมนูหลัก</div>
@@ -966,6 +966,8 @@ body{font-family:'Noto Sans Thai',sans-serif;background:var(--bg);color:var(--t)
           <span><span class="os-ad">ทั้งวัน</span> ออกตรวจทั้งเช้าและบ่าย</span>
           <span><span class="lg-sw lv"></span> แพทย์ลา ต้องหาคนแทน</span>
           <span><span class="lg-sw none"></span> ห้องไม่มีแพทย์ทั้งวัน</span>
+          <span class="lg-tp"><span class="os-tp">แทน</span> ลงคนอื่นแทนคนในแม่แบบ (แตะช่องดูว่าแม่แบบเป็นใคร)</span>
+          <span class="lg-tp"><span style="border:1.5px dashed var(--t3);padding:0 5px;border-radius:4px;font-style:italic;">ชื่อเส้นประ</span> ตามแม่แบบ ยังไม่ได้ลงวันนั้น</span>
           <span><span style="outline:2px solid var(--red);padding:0 4px;border-radius:3px;">กรอบแดง</span> แพทย์ถูกลงซ้ำ 2 ห้องช่วงเดียวกัน</span>
         </div>
         <div id="opdLoad"></div>
@@ -3425,6 +3427,8 @@ function renderOpdSlotModal(){
       +(lv?'✓ ยกเลิกการลา '+esc(nm)+' วันนี้':'🔴 ทำเครื่องหมาย '+esc(nm)+' ลาวันนี้')+'</button></div>';
   }
   var tp=opdTplPick(i,ri,ses),dw=parseD(i).getDay(),wd=dw>=1&&dw<=5,g=!v&&opdCurOrGhost(i,k),gd=g&&opdDoc(g.d);
+  var tpd=v&&tp&&tp.d!==v.d&&opdDoc(tp.d);
+  if(tpd)h+='<div class="opd-info"><span class="os-tp">แทน</span> วันนี้ '+esc(cur?opdShort(cur.name):'')+' ออกแทน <b>'+esc(opdShort(tpd.name))+'</b> ที่อยู่ในแม่แบบ</div>';
   if(gd)h+='<div class="opd-info">🧩 ตามแม่แบบควรเป็น <b>'+esc(opdShort(gd.name))+'</b> (เส้นประ = ยังไม่ได้ลงวันนี้)'
     +'<div class="opd-row" style="margin:8px 0 0;"><button type="button" class="bs" style="flex:1;min-height:44px;" onclick="opdGhostOk()">✓ ลง '+esc(opdShort(gd.name))+' วันนี้</button>'
     +'<button type="button" class="bss" style="min-height:44px;" onclick="opdGhostNone()">ว่างวันนี้</button></div></div>';
@@ -3434,7 +3438,7 @@ function renderOpdSlotModal(){
       +'<button type="button" class="'+(!P.sync?'on':'')+'" onclick="opdPickSync(false)">📅 เฉพาะวันนี้<small>'+esc(opdFmt(i))+'</small></button>'
       +'<button type="button" class="'+(P.sync===true?'on':'')+'" onclick="opdPickSync(true)">🔁 ทุกสัปดาห์<small>ทุกวัน'+DTH[dw]+'</small></button>'
       +'<button type="button" class="'+(W?'on':'')+'" onclick="opdPickSync(['+nth+'])">🗓️ บางสัปดาห์<small>เลือกได้</small></button></div>';
-    if(W)h+='<div class="opd-row">'+[1,2,3,4,5].map(function(n){return '<button type="button" class="chk-chip'+(W.indexOf(n)>-1?' on':'')+'" onclick="opdPickWeek('+n+')">'+DTH[dw]+'ที่ '+n+(n===nth?' (วันนี้)':'')+'</button>';}).join('')+'</div>';
+    if(W)h+='<div class="opd-row">'+[1,2,3,4,5].map(function(n){return '<button type="button" class="chk-chip'+(W.indexOf(n)>-1?' on':'')+'" onclick="opdPickWeek('+n+')">'+DTH[dw]+'ที่ '+n+' <small>('+opdNthLbl(dw,n,parseD(i).getFullYear(),parseD(i).getMonth())+(n===nth?' · วันนี้':'')+')</small></button>';}).join('')+'</div>';
     h+='<div class="opd-mh" style="margin:-2px 0 12px;">'
       +(!P.sync?'เปลี่ยนแค่วันนี้ แม่แบบไม่เปลี่ยน':P.sync===true?'วัน'+DTH[dw]+'ทุกสัปดาห์ในแม่แบบเปลี่ยนด้วย · วัน'+DTH[dw]+'อื่นของเดือนที่ยังตามแม่แบบจะเปลี่ยนตาม':'เปลี่ยนเฉพาะวัน'+DTH[dw]+'ที่ '+W.join(', ')+' ของทุกเดือน · สัปดาห์อื่นคงเดิม')
       +' · <a href="#" onclick="opdSlotTpl();return false;" style="color:var(--teal);">🧩 ดูแม่แบบช่องนี้</a></div>';
@@ -3743,7 +3747,7 @@ function renderOpdApply(){
     var d=A.v&&opdDoc(A.v.d),dw=parseD(A.i).getDay();
     h+='<div class="opd-ap"><b>วัน'+DTH[dw]+'</b> · '+esc(opdSlotName(A.k))+' → '+(d?'<b>'+esc(opdShort(d.name))+'</b>'+(A.v.t?' <span class="os-t">'+esc(A.v.t)+'</span>':''):'<b>ว่าง</b>')
       +'<div class="opd-row"><button type="button" class="chk-chip'+(!A.w.length?' on':'')+'" onclick="opdApplyWeek('+j+',0)">ทุกสัปดาห์</button>'
-      +[1,2,3,4,5].map(function(n){return '<button type="button" class="chk-chip'+(A.w.indexOf(n)>-1?' on':'')+'" onclick="opdApplyWeek('+j+','+n+')">'+DTH[dw]+'ที่ '+n+'</button>';}).join('')+'</div></div>';
+      +[1,2,3,4,5].map(function(n){return '<button type="button" class="chk-chip'+(A.w.indexOf(n)>-1?' on':'')+'" onclick="opdApplyWeek('+j+','+n+')">'+DTH[dw]+'ที่ '+n+' <small>('+opdNthLbl(dw,n,parseD(A.i).getFullYear(),parseD(A.i).getMonth())+')</small></button>';}).join('')+'</div></div>';
   });
   h+='<div class="opd-mh">วัน'+'ที่ n = ครั้งที่ n ของเดือน เช่น วันจันทร์ที่ 1–7 = ที่ 1 · วันอื่นของเดือนนี้ที่ยังตามแม่แบบเดิมจะเปลี่ยนตาม</div>'
     +'<div class="mft"><button class="bss" onclick="closeModal(\'opdModal\')" type="button">ยกเลิก</button><button class="bs" onclick="opdApplyRun()" type="button">📌 บันทึกลงแม่แบบ</button></div>';
@@ -3815,7 +3819,20 @@ function opdTplGo(dw,ri,ses){
 }
 
 // ── แท็บแม่แบบ ──
-function opdWeeksTxt(w){return (!w||!w.length)?'ทุกสัปดาห์':'สัปดาห์ที่ '+w.slice().sort().join(', ');}
+// วันที่จริงของ "วัน dw ที่ n" ในเดือน y,m (เช่น จันทร์ที่ 2 ของ พ.ย. 2569 = 9) — ไม่มีในเดือนนั้นคืน 0
+function opdNthDate(dw,n,y,m){
+  var d=(dw-new Date(y,m,1).getDay()+7)%7+1+(n-1)*7;
+  return d<=new Date(y,m+1,0).getDate()?d:0;
+}
+function opdNthLbl(dw,n,y,m){var d=opdNthDate(dw,n,y,m);return d?d+' '+MS[m]:'ไม่มี';}
+// ส่ง dw มา = ต่อท้ายด้วยวันที่จริงของเดือนที่เปิดอยู่
+function opdWeeksTxt(w,dw){
+  if(!w||!w.length)return 'ทุกสัปดาห์';
+  var ws=w.slice().sort();
+  if(!dw)return 'สัปดาห์ที่ '+ws.join(', ');
+  var ds=ws.map(function(n){return opdNthDate(dw,n,opdYr,opdMo);}).filter(Boolean);
+  return 'สัปดาห์ที่ '+ws.join(', ')+(ds.length?' ('+ds.join(', ')+' '+MS[opdMo]+')':'');
+}
 function renderOpdTpl(){
   var rooms=opdRooms(),isos=opdMonthIsos(opdYr,opdMo),ml=MTH[opdMo]+' '+(opdYr+543);
   document.getElementById('opdLearnBtn').textContent='📥 ใช้ตารางเดือน'+ml+' เป็นแม่แบบ';
@@ -3842,7 +3859,7 @@ function renderOpdTpl(){
       });
       h+='<td data-key="'+key+'" onclick="opdOpenTpl(\''+key+'\')">'+list.map(function(e,x){
         var d=opdDoc(e.d),m=hit[x];
-        return '<span class="ot-e" draggable="true" data-key="'+key+'" data-x="'+x+'" onclick="event.stopPropagation();opdOpenTpl(\''+key+'\','+x+')" style="--dc:'+(d?d.color:'#888')+'">'+esc(d?opdShort(d.name):'(ไม่พบชื่อ)')+(e.t?' <span class="os-t">'+esc(e.t)+'</span>':'')+'<i>'+opdWeeksTxt(e.w)+'</i>'
+        return '<span class="ot-e" draggable="true" data-key="'+key+'" data-x="'+x+'" onclick="event.stopPropagation();opdOpenTpl(\''+key+'\','+x+')" style="--dc:'+(d?d.color:'#888')+'">'+esc(d?opdShort(d.name):'(ไม่พบชื่อ)')+(e.t?' <span class="os-t">'+esc(e.t)+'</span>':'')+'<i>'+opdWeeksTxt(e.w,dw)+'</i>'
           +(m.n?'<span class="ot-m'+(m.ok===m.n?'':(m.ok?' part':' no'))+'">'+MS[opdMo]+' '+m.ok+'/'+m.n+'</span>':'')+'</span>';
       }).join('')
       +eo.map(function(id){var d=opdDoc(id);return '<span class="ot-x">นอกแม่แบบ: <b>'+esc(opdShort(d.name))+'</b> วันที่ '+extra[id].join(', ')+'</span>';}).join('')
@@ -3895,7 +3912,7 @@ function renderOpdTplModal(){
   var h='<div class="mhd"><div class="mtl">🧩 วัน'+DTH[+p[0]]+' · '+esc(opdSlotName(p[1]))+'</div><button class="mcl" onclick="closeModal(\'opdModal\')" type="button">✕</button></div>';
   h+=list.length?list.map(function(e,x){
     var d=opdDoc(e.d);
-    return '<div class="ot-li'+(N.x===x?' on':'')+'"><span class="d-dot" style="background:'+(d?d.color:'#888')+'"></span><b>'+esc(d?opdShort(d.name):'(ไม่พบชื่อ)')+'</b><span>'+opdWeeksTxt(e.w)+(e.t?' · '+esc(e.t):'')+'</span>'
+    return '<div class="ot-li'+(N.x===x?' on':'')+'"><span class="d-dot" style="background:'+(d?d.color:'#888')+'"></span><b>'+esc(d?opdShort(d.name):'(ไม่พบชื่อ)')+'</b><span>'+opdWeeksTxt(e.w,+p[0])+(e.t?' · '+esc(e.t):'')+'</span>'
       +'<button class="bss" onclick="opdTplEdit('+x+')" type="button">'+(N.x===x?'ยกเลิก':'✏️ แก้')+'</button><button class="bsr" onclick="opdTplDel('+x+')" type="button">ลบ</button></div>';
   }).join(''):'<div class="opd-info">ยังไม่มีแพทย์ในช่องนี้</div>';
   if(list.length>1)h+='<div class="opd-mh" style="margin:0 0 10px;">ถ้ามีหลายคนตรงสัปดาห์เดียวกัน ระบบใช้คนที่อยู่บนสุด</div>';
@@ -3906,7 +3923,7 @@ function renderOpdTplModal(){
     }).join('')+'</div>';
   h+='<div class="opd-sec">ออกตรวจสัปดาห์ไหนของเดือน</div><div class="opd-row">'
     +'<button type="button" class="chk-chip'+(!N.w.length?' on':'')+'" onclick="opdTplWeek(0)">ทุกสัปดาห์</button>'
-    +[1,2,3,4,5].map(function(n){return '<button type="button" class="chk-chip'+(N.w.indexOf(n)>-1?' on':'')+'" onclick="opdTplWeek('+n+')">ที่ '+n+'</button>';}).join('')+'</div>';
+    +[1,2,3,4,5].map(function(n){return '<button type="button" class="chk-chip'+(N.w.indexOf(n)>-1?' on':'')+'" onclick="opdTplWeek('+n+')">ที่ '+n+' <small>('+opdNthLbl(+p[0],n,opdYr,opdMo)+')</small></button>';}).join('')+'</div>';
   h+='<div class="opd-sec">ป้ายคลินิกพิเศษ</div><div class="opd-row">'+opdTagChips(N.t,'opdTplTag')+'</div>';
   var ml=MTH[opdMo]+' '+(opdYr+543);
   h+='<div class="opd-row"><button type="button" class="chk-chip'+(opdSync?' on':'')+'" onclick="opdSyncToggle();renderOpdTplModal()">'+opdSyncLabel()+' — แก้ปฏิทินเดือน'+esc(ml)+'ตามไปด้วย</button></div>'
