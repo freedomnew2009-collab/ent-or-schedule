@@ -1,7 +1,8 @@
 // ══ Google Apps Script (Code.gs) – ENT OR Schedule v5 ══════════
 // อัพเดทจาก v4 (Fixed): เพิ่ม saveLeaves / saveSwaps / saveConfig + ส่ง config กลับใน getAll
 // v5 navy: เพิ่มคอลัมน์ Pre-Op (preopDate, preopStatus, lab, cxr, ekg, npo, preopNote, history)
-// Sheet tabs: ENT_Schedule, ENT_Doctors, ENT_Ops, ENT_Leaves, ENT_Swaps, ENT_Config
+// v5.2: เพิ่มตารางแพทย์ออกตรวจ OPD (แท็บ ENT_OPD เก็บแบบ key/value ทีละวัน)
+// Sheet tabs: ENT_Schedule, ENT_Doctors, ENT_Ops, ENT_Leaves, ENT_Swaps, ENT_Config, ENT_OPD
 const SHEET_ID = '1KWH-9JobfctIp-prqGSlZIJ4xOuP4Yb6QVA0spTE8sk';
 
 // ★ v5: เสิร์ฟหน้าเว็บล่าสุดจาก GitHub (branch main) โดยตรง
@@ -10,7 +11,7 @@ const SHEET_ID = '1KWH-9JobfctIp-prqGSlZIJ4xOuP4Yb6QVA0spTE8sk';
 // หมายเหตุ: ถ้าเปลี่ยน repo เป็น private ภายหลัง ลิงก์ raw นี้จะใช้ไม่ได้ ต้องกลับไปใช้ไฟล์ index ที่ฝังไว้
 const LIVE_HTML_URL = 'https://raw.githubusercontent.com/freedomnew2009-collab/ent-or-schedule/main/index.html';
 // เลขนี้เปลี่ยนทุกครั้งที่แก้ Code.gs — ใช้เช็คว่า deployment รับโค้ดใหม่แล้วหรือยัง
-const APP_VERSION = 'v5.1';
+const APP_VERSION = 'v5.2';
 
 const APT_COLS   = ['id','hn','name','date','ts','te','op','doctorName','di','di2','doctor2Name','anesthesia','tel1','tel2','status','note','preopDate','preopStatus','lab','cxr','ekg','npo','preopNote','history'];
 const LEAVE_COLS = ['id','di','start','end','reason','status'];
@@ -18,6 +19,8 @@ const SWAP_COLS  = ['id','di','date','type','note'];
 const DOC_COLS   = ['di','name','color','sched','orDays'];
 const OP_COLS    = ['name'];
 const CFG_COLS   = ['key','value'];   // ★ v5: เก็บค่าตั้งระบบ เช่น วันผ่าตัดของแผนก (orDays)
+// ★ v5.2: ตาราง OPD — key เช่น doctors, settings, template, d2026-10-01 (1 แถวต่อ 1 วัน) / value เป็น JSON
+const OPD_COLS   = ['key','value'];
 
 function doGet(e) {
   const p = e.parameter || {};
@@ -28,7 +31,8 @@ function doGet(e) {
     status: 'online',
     version: APP_VERSION,
     serving: 'github-main',
-    lock: (typeof handlePost === 'function')
+    lock: (typeof handlePost === 'function'),
+    opd: (typeof upsertKV === 'function')
   });
 
   if (p.action === 'getAll') {
@@ -43,6 +47,8 @@ function doGet(e) {
       // ★ v5: อ่านค่าตั้งระบบ (ENT_Config) กลับไปด้วย — ถ้ายังไม่มีแท็บนี้จะได้ config ว่าง
       const config = {};
       readSheet(ss, 'ENT_Config', CFG_COLS).forEach(r => { config[r.key] = r.value; });
+      const opd = {};
+      readSheet(ss, 'ENT_OPD', OPD_COLS).forEach(r => { if (r.key) opd[String(r.key)] = String(r.value); });
       return ok({
         appointments: readSheet(ss, p.sheet || 'ENT_Schedule', APT_COLS),
         leaves:       readSheet(ss, 'ENT_Leaves',  LEAVE_COLS),
@@ -50,6 +56,7 @@ function doGet(e) {
         doctors:      readSheet(ss, 'ENT_Doctors', DOC_COLS),
         operations:   readSheet(ss, 'ENT_Ops',     OP_COLS),
         config:       config,
+        opd:          opd,
       });
     } catch (err) {
       return ok({ status: 'error', message: err.message });
@@ -119,6 +126,13 @@ function handlePost(e){
   if (body.action === 'saveConfig') {
     const rows = Object.keys(body.config || {}).map(k => ({ key: k, value: body.config[k] }));
     write(ss, 'ENT_Config', CFG_COLS, rows);
+    return ok({ status: 'saved' });
+  }
+
+  // ★ v5.2: ตาราง OPD — บันทึกเฉพาะ key ที่แก้ (ทีละวัน) ไม่เขียนทับทั้งแท็บ
+  // สองคนแก้คนละวันพร้อมกันจึงไม่ทับกัน
+  if (body.action === 'saveOpd') {
+    upsertKV(ss, 'ENT_OPD', body.items || []);
     return ok({ status: 'saved' });
   }
 
@@ -232,6 +246,28 @@ function upsert(ss, name, cols, row) {
     }
   }
   sh.appendRow(formattedRow);
+}
+
+// เขียนทับเฉพาะแถวที่ key ตรงกัน ถ้ายังไม่มีให้ต่อท้าย
+function upsertKV(ss, name, items) {
+  const sh = ss.getSheetByName(name) || ss.insertSheet(name);
+  if (sh.getLastRow() === 0) sh.appendRow(OPD_COLS);
+  // คอลัมน์ key ต้องเป็นข้อความเสมอ กัน Sheets แปลง key ที่หน้าตาคล้ายวันที่
+  sh.getRange('A:B').setNumberFormat('@');
+  const last = sh.getLastRow();
+  const keys = last > 1 ? sh.getRange(2, 1, last - 1, 1).getValues().map(r => String(r[0])) : [];
+  const rowOf = {};
+  keys.forEach((k, i) => { rowOf[k] = i + 2; });
+  const fresh = [];
+  items.forEach(it => {
+    const key = String(it.key || '');
+    if (!key) return;
+    const val = typeof it.value === 'string' ? it.value : JSON.stringify(it.value);
+    if (rowOf[key] > 0) sh.getRange(rowOf[key], 2).setValue(val);
+    else if (rowOf[key] < 0) fresh[-rowOf[key] - 1][1] = val;
+    else { fresh.push([key, val]); rowOf[key] = -fresh.length; }
+  });
+  if (fresh.length) sh.getRange(sh.getLastRow() + 1, 1, fresh.length, 2).setValues(fresh);
 }
 
 function debugPost_doctors() {
