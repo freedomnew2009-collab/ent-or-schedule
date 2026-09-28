@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>ENT OR Schedule · v5.9</title>
+<title>ENT OR Schedule · v6.0</title>
 <!-- PWA -->
 <link rel="manifest" href="manifest.json">
 <meta name="theme-color" content="#1E3A5F">
@@ -712,6 +712,10 @@ body{font-family:'Noto Sans Thai',sans-serif;background:var(--bg);color:var(--t)
 .wk-e3{display:inline-block;margin-top:2px;font-size:10px;font-weight:700;background:var(--red);color:#fff;border-radius:8px;padding:0 6px;}
 .wk-note{font-size:12px;color:var(--t2);margin-top:8px;}
 .wk-ttl{display:none;}
+.wk.wk-or{grid-template-columns:148px repeat(5,minmax(0,1fr));}
+.wk-or .wk-hd:first-child{background:#6B2D2D;}
+.wk-orn{background:color-mix(in srgb, #A6392A 12%, var(--s));color:var(--t);font-size:13px;font-weight:700;display:flex;align-items:center;justify-content:center;text-align:center;padding:6px;cursor:pointer;}
+.wk-orgap{height:12px;}
 
 /* หน้าต่างเลือก */
 .opd-mh{font-size:12px;color:var(--t2);margin:-6px 0 12px;}
@@ -857,7 +861,7 @@ body{font-family:'Noto Sans Thai',sans-serif;background:var(--bg);color:var(--t)
   <div class="sb-logo">
     <div class="ico">🏥</div>
     <h2>ENT OR Schedule</h2>
-    <p>แผนก หู คอ จมูก · v5.9</p>
+    <p>แผนก หู คอ จมูก · v6.0</p>
   </div>
   <div class="nav-sec">
     <div class="nav-lbl">เมนูหลัก</div>
@@ -992,6 +996,12 @@ body{font-family:'Noto Sans Thai',sans-serif;background:var(--bg);color:var(--t)
             <button class="bsr" onclick="opdTplClear()" type="button" style="padding:8px 12px;">🧹 ล้างแม่แบบ</button>
           </div>
           <div id="opdTplGrid"></div>
+        </div>
+        <div class="set-sec">
+          <h3>🏥 ตาราง OR / นอกเวลา (แยกจาก OPD)</h3>
+          <p class="set-sub">ตามแถว OR Major · OR Minor · premium นอกเวลา ใน PDF — แตะช่องเพื่อเพิ่ม/ลบ (เลือกแพทย์หลายคนได้) · แตะชื่อแถวเพื่อเปลี่ยนชื่อ · ไม่นับรวมในภาระงาน OPD · พิมพ์รวมกับ "ตารางประจำสัปดาห์"</p>
+          <div class="wk-wrap" id="opdOrGrid"></div>
+          <button class="bss" onclick="opdOrAddRow()" type="button" style="margin-top:8px;">＋ เพิ่มแถว</button>
         </div>
       </div>
 
@@ -2569,6 +2579,7 @@ async function pullSheet(mode){
   // ★ safety timeout 15 วิ — ถ้าโหลดนานเกินให้ซ่อน loader ก่อนเสมอ
   var ldrTimeout = setTimeout(function(){ hideLdr(); }, 15000);
   try{
+    var _opdT0 = Date.now();
     var url = sheetCfg.url+'?action=getAll&sheet='+encodeURIComponent(sheetCfg.sheet)+'&_t='+Date.now();
     // ★ ถ้า mode=apts ให้ส่ง param บอก Apps Script ว่าดึงแค่ appointments
     if(mode==='apts') url += '&only=apts';
@@ -2651,10 +2662,11 @@ async function pullSheet(mode){
     // ★ ตาราง OPD — รวมทุกครั้งที่ดึงข้อมูลเต็ม (รวมรอบ auto-sync) ให้เห็นที่คนอื่นแก้
     //   ถ้า Code.gs ยังไม่ส่ง opd มา แปลว่ายังเป็นเวอร์ชันเก่า
     if(mode!=='apts'){
-      if(data.opd&&typeof data.opd==='object')opdMergeServer(data.opd);
+      if(data.opd&&typeof data.opd==='object')opdMergeServer(data.opd,_opdT0);
       else opdServer=false;
       opdMaybeSeed();
       opdMigrateTags();
+      opdSeedOr();
     }
 
     clearTimeout(ldrTimeout);
@@ -2822,7 +2834,7 @@ function opdDefSettings(){return Object.assign({},OPD_DEF_SET,{rooms:OPD_DEF_SET
     if(j){
       OPD.doctors=Array.isArray(j.doctors)?j.doctors:[];
       OPD.settings=Object.assign(opdDefSettings(),j.settings||{});
-      OPD.template=j.template||{};OPD.days=j.days||{};
+      OPD.template=j.template||{};OPD.days=j.days||{};if(j.or)OPD.or=j.or;
     }
     var dj=JSON.parse(localStorage.getItem('ent_opd_dirty')||'[]');if(Array.isArray(dj))opdDirty=dj;
   }catch(e){}
@@ -2878,6 +2890,97 @@ function opdMigrateTags(){
   }
   OPD.settings.docTags=1;opdMark(keys);
 }
+// ตาราง OR / นอกเวลา ตาม PDF ต.ค. 2569 — แยกจากห้องตรวจ OPD ไม่นับในภาระงาน OPD
+//   OPD.or = {rows:['OR Major',...], c:{'1|0':[{d:[id,id],w:[1,3,4,5]}]}}  (วันจันทร์ แถวแรก)
+var OPD_OR_ROWS=['OR Major','OR Minor','premium นอกเวลา'];
+function opdSeedOr(){
+  if(OPD.or||!OPD.doctors.length)return;
+  var id=function(n){var d=OPD.doctors.filter(function(x){return opdKey(x.name)===n&&!x.tag;})[0];return d&&d.id;};
+  var keys=['or'],vy=id('นพวิญญู');
+  if(!vy){vy='ovinyu';OPD.doctors.push({id:vy,name:'นพ.วิญญู',color:'#5B6B7E',orOnly:1});keys.push('doctors');}
+  var c={},a=id('พญจิรัชญา'),b=id('พญลดาทิพย์');
+  if(a&&b)c['1|0']=[{d:[a,b],w:[1,3,4,5]}];
+  c['2|2']=[{d:[vy],w:[]}];c['4|2']=[{d:[vy],w:[]}];
+  OPD.or={rows:OPD_OR_ROWS.slice(),c:c};opdMark(keys);
+}
+function opdOrRows(){return (OPD.or&&OPD.or.rows&&OPD.or.rows.length)?OPD.or.rows:OPD_OR_ROWS;}
+function opdOrEnsure(){if(!OPD.or)OPD.or={rows:OPD_OR_ROWS.slice(),c:{}};if(!OPD.or.c)OPD.or.c={};if(!OPD.or.rows)OPD.or.rows=OPD_OR_ROWS.slice();return OPD.or;}
+function opdOrNames(e){return (e.d||[]).map(function(id){var d=opdDoc(id);return d?opdShort(d.name):'?';}).join('+');}
+// ตาราง OR: interactive = แตะแก้ได้ (แท็บแม่แบบ) · ไม่งั้นแสดง/พิมพ์
+function opdOrHTML(y,m,interactive){
+  var rows=opdOrRows(),C=(OPD.or&&OPD.or.c)||{};
+  var h='<div class="wk wk-or"><div class="wk-hd">ตาราง OR</div>';
+  for(var dw=1;dw<=5;dw++)h+='<div class="wk-hd">'+DTH[dw]+'</div>';
+  rows.forEach(function(rn,r){
+    h+='<div class="wk-orn"'+(interactive?' onclick="opdOrRowName('+r+')" title="แตะเพื่อเปลี่ยนชื่อแถว"':'')+'>'+esc(rn)+'</div>';
+    for(var dw=1;dw<=5;dw++){
+      var list=C[dw+'|'+r]||[];
+      h+='<div class="wk-c'+(list.length?'':' nil')+'"'+(interactive?' onclick="opdOpenOr('+dw+','+r+')"':' style="cursor:default"')+'>';
+      if(!list.length)h+=interactive?'<span class="ot-add">＋</span>':'';
+      list.forEach(function(e){
+        var d0=opdDoc((e.d||[])[0]);
+        h+='<div class="wk-e" style="--dc:'+(d0?d0.color:'#888')+'"><div class="wk-e1"><b>'+esc(opdOrNames(e))+'</b>'+(e.t?'<em>'+esc(e.t)+'</em>':'')+'</div>'
+          +'<div class="wk-e2">'+esc(opdWeeksTxtM(e.w,dw,y,m))+'</div></div>';
+      });
+      h+='</div>';
+    }
+  });
+  return h+'</div>';
+}
+function opdWeeksTxtM(w,dw,y,m){
+  if(!w||!w.length)return 'ทุกสัปดาห์';
+  var ws=w.slice().sort(),ds=ws.map(function(n){return opdNthDate(dw,n,y,m);}).filter(Boolean);
+  return 'สัปดาห์ที่ '+ws.join(', ')+(ds.length?' ('+ds.join(', ')+' '+MS[m]+')':'');
+}
+var opdOrCur=null,opdOrNew={d:[],w:[],t:''};
+function opdOpenOr(dw,r){opdOrCur={dw:dw,r:r};opdOrNew={d:[],w:[],t:''};renderOpdOrModal();openModal('opdModal');}
+function renderOpdOrModal(){
+  var O=opdOrCur,key=O.dw+'|'+O.r,list=((OPD.or&&OPD.or.c)||{})[key]||[],N=opdOrNew;
+  var h='<div class="mhd"><div class="mtl">🏥 '+esc(opdOrRows()[O.r])+' · วัน'+DTH[O.dw]+'</div><button class="mcl" onclick="closeModal(\'opdModal\')" type="button">✕</button></div>';
+  h+=list.length?list.map(function(e,x){
+    return '<div class="ot-li"><b>'+esc(opdOrNames(e))+'</b><span>'+esc(opdWeeksTxtM(e.w,O.dw,opdYr,opdMo))+(e.t?' · '+esc(e.t):'')+'</span><button class="bsr" onclick="opdOrDel('+x+')" type="button">ลบ</button></div>';
+  }).join(''):'<div class="opd-info">ยังไม่มีแพทย์ในช่องนี้</div>';
+  h+='<div class="div"></div><div class="opd-sec">＋ เพิ่ม — เลือกแพทย์ได้หลายคน (ผ่าตัดร่วมกัน)</div><div class="opd-dg">'
+    +OPD.doctors.map(function(d){
+      var on=N.d.indexOf(d.id)>-1;
+      return '<button type="button" class="opd-db'+(on?' on':'')+'" style="--dc:'+d.color+'" onclick="opdOrPick(\''+d.id+'\')"><span class="d-dot" style="background:'+d.color+'"></span>'+opdDocHTML(d)+(on?'<span class="tp">✓</span>':'')+'</button>';
+    }).join('')+'</div>';
+  h+='<div class="opd-sec">สัปดาห์ไหนของเดือน</div><div class="opd-row"><button type="button" class="chk-chip'+(!N.w.length?' on':'')+'" onclick="opdOrWeek(0)">ทุกสัปดาห์</button>'
+    +[1,2,3,4,5].map(function(n){return '<button type="button" class="chk-chip'+(N.w.indexOf(n)>-1?' on':'')+'" onclick="opdOrWeek('+n+')">ที่ '+n+' <small>('+opdNthLbl(O.dw,n,opdYr,opdMo)+')</small></button>';}).join('')+'</div>';
+  h+='<div class="fg"><label class="fl">หมายเหตุ (ถ้ามี)</label><input class="fi" id="opdOrT" value="'+esc(N.t)+'" placeholder="เช่น เคสใหญ่, นอกเวลา" oninput="opdOrNew.t=this.value"></div>';
+  h+='<div class="mft"><button class="bss" onclick="closeModal(\'opdModal\')" type="button">ปิด</button><button class="bs" onclick="opdOrAdd()" type="button">＋ เพิ่มลงตาราง OR</button></div>';
+  document.getElementById('opdModalBox').innerHTML=h;
+}
+function opdOrPick(id){var d=opdOrNew.d,x=d.indexOf(id);if(x>-1)d.splice(x,1);else d.push(id);renderOpdOrModal();}
+function opdOrWeek(n){
+  var w=opdOrNew.w;if(!n)opdOrNew.w=[];else{var x=w.indexOf(n);if(x>-1)w.splice(x,1);else w.push(n);w.sort();if(w.length>=5)opdOrNew.w=[];}
+  renderOpdOrModal();
+}
+function opdOrAdd(){
+  var N=opdOrNew;if(!N.d.length){toast('⚠️ เลือกแพทย์ก่อน','warn');return;}
+  var O=opdOrEnsure(),key=opdOrCur.dw+'|'+opdOrCur.r;
+  (O.c[key]||(O.c[key]=[])).push({d:N.d.slice(),w:N.w.slice(),t:(N.t||'').trim()});
+  opdMark('or');opdOrNew={d:[],w:[],t:''};renderOpdOrModal();renderOpd();toast('✅ เพิ่มลงตาราง OR แล้ว','ok');
+}
+function opdOrDel(x){
+  var O=opdOrEnsure(),key=opdOrCur.dw+'|'+opdOrCur.r,l=O.c[key]||[];
+  l.splice(x,1);if(!l.length)delete O.c[key];
+  opdMark('or');renderOpdOrModal();renderOpd();
+}
+function opdOrRowName(r){
+  var O=opdOrEnsure(),n=prompt('ชื่อแถว (ปล่อยว่าง = ลบแถวนี้)',O.rows[r]);if(n==null)return;n=n.trim();
+  if(n){O.rows[r]=n;}
+  else{
+    if(!confirm('ลบแถว "'+O.rows[r]+'" และแพทย์ในแถวนี้?'))return;
+    var c={};Object.keys(O.c).forEach(function(k){var p=k.split('|'),rr=+p[1];if(rr<r)c[k]=O.c[k];else if(rr>r)c[p[0]+'|'+(rr-1)]=O.c[k];});
+    O.c=c;O.rows.splice(r,1);
+  }
+  opdMark('or');renderOpd();
+}
+function opdOrAddRow(){
+  var n=prompt('ชื่อแถวใหม่ เช่น OR Minor, ผ่าตัดนอกเวลา');if(!n||!n.trim())return;
+  opdOrEnsure().rows.push(n.trim());opdMark('or');renderOpd();
+}
 // ── เก็บ/ซิงค์ ──
 function opdSaveLocal(){
   try{localStorage.setItem('ent_opd',JSON.stringify(OPD));localStorage.setItem('ent_opd_dirty',JSON.stringify(opdDirty));}catch(e){}
@@ -2886,11 +2989,14 @@ function opdVal(key){
   if(key==='doctors')return OPD.doctors;
   if(key==='settings')return OPD.settings;
   if(key==='template')return OPD.template;
+  if(key==='or')return OPD.or||{};
   return OPD.days[key.slice(1)]||{};
 }
 var _opdTimer=null,_opdPushing=false,_opdWarned=false;
+var opdTouched={};
 function opdMark(keys){
-  [].concat(keys).forEach(function(k){if(opdDirty.indexOf(k)<0)opdDirty.push(k);});
+  var now=Date.now();
+  [].concat(keys).forEach(function(k){opdTouched[k]=now;if(opdDirty.indexOf(k)<0)opdDirty.push(k);});
   opdSaveLocal();opdSyncTxt();
   if(opdServer===false)opdWarnScript();
   clearTimeout(_opdTimer);_opdTimer=setTimeout(pushOpd,800);
@@ -2933,14 +3039,16 @@ function opdSyncTxt(){
   el.textContent=t;el.className='opd-sync'+(w?' warn':'');
 }
 // ข้อมูลจาก Sheet — key ที่ยังแก้ค้างในเครื่อง (ยังส่งไม่สำเร็จ) ไม่ถูกทับ
-function opdMergeServer(obj){
+// t0 = เวลาที่เริ่มดึง — key ที่แก้หลังจากนั้นข้าม (ข้อมูลชุดนี้เก่ากว่า)
+function opdMergeServer(obj,t0){
   opdServer=true;
   Object.keys(obj||{}).forEach(function(k){
-    if(opdDirty.indexOf(k)>-1)return;
+    if(opdDirty.indexOf(k)>-1||(t0&&opdTouched[k]>=t0))return;
     var v;try{v=JSON.parse(obj[k]);}catch(e){return;}
     if(k==='doctors'&&Array.isArray(v))OPD.doctors=v;
     else if(k==='settings'&&v&&typeof v==='object')OPD.settings=Object.assign(opdDefSettings(),v);
     else if(k==='template'&&v&&typeof v==='object')OPD.template=v;
+    else if(k==='or'&&v&&typeof v==='object')OPD.or=v;
     else if(/^d\d{4}-\d{2}-\d{2}$/.test(k)){
       var i=k.slice(1);
       if(v&&(v.c||v.o||(v.s&&Object.keys(v.s).length)||(v.x&&Object.keys(v.x).length)))OPD.days[i]=v;else delete OPD.days[i];
@@ -2959,6 +3067,8 @@ function opdShort(n){
 function opdKey(n){return opdShort(n).replace(/[\s.]/g,'');}
 // ชื่อ + ป้ายประจำตัว (เช่น นพ.ชวลิต Chest) — แยกแพทย์ชื่อเดียวกันที่ออกคลินิกต่างกันได้
 function opdDocHTML(d){return esc(opdShort(d.name))+(d.tag?' <span class="os-t">'+esc(d.tag)+'</span>':'');}
+// แพทย์ที่มีเฉพาะในตาราง OR (orOnly) ไม่แสดงในปุ่มกรอง ภาระงาน และตัวเลือกช่อง OPD
+function opdOpdDocs(){return OPD.doctors.filter(function(d){return !d.orOnly;});}
 function opdDocTxt(d){return opdShort(d.name)+(d.tag?' ('+d.tag+')':'');}
 function opdDoc(id){for(var i=0;i<OPD.doctors.length;i++)if(OPD.doctors[i].id===id)return OPD.doctors[i];return null;}
 function opdRooms(){return (OPD.settings.rooms&&OPD.settings.rooms.length)?OPD.settings.rooms:OPD_DEF_SET.rooms;}
@@ -3052,7 +3162,7 @@ function renderOpdMonth(){
   var ch=document.getElementById('opdDocChips'),W=opdWeekSel;
   ch.innerHTML=OPD.doctors.length
     ?'<button class="odc'+(!opdFocus?' on':'')+'" onclick="opdSetFocus(null)" type="button">👥 ทั้งหมด</button>'
-      +OPD.doctors.map(function(d){
+      +opdOpdDocs().map(function(d){
         return '<button class="odc'+(opdFocus===d.id?' on':'')+'" style="--dc:'+d.color+'" onclick="opdSetFocus(\''+d.id+'\')" type="button" title="'+esc(d.name)+'">'
           +'<span class="d-dot" style="background:'+d.color+'"></span>'+opdDocHTML(d)+'<b>'+(cnt[d.id]||0)+'</b></button>';
       }).join('')
@@ -3183,7 +3293,7 @@ function opdLoadData(isos){
       if(opdLeave(s[k].d,i))r.lv++;else r[p[1]]++;
     });
   });
-  var list=OPD.doctors.map(function(d){var r=by[d.id];r.n=r.am+r.pm;return r;});
+  var list=opdOpdDocs().map(function(d){var r=by[d.id];r.n=r.am+r.pm;return r;});
   var active=list.filter(function(r){return r.n+r.lv>0;}).length||1;
   var mean=list.reduce(function(a,r){return a+r.n;},0)/active;
   list.sort(function(a,b){return b.n-a.n;});
@@ -3234,7 +3344,7 @@ function opdWeekHTML(y,m,interactive){
       for(var dw=1;dw<=5;dw++){
         var days=isos.filter(function(i){return parseD(i).getDay()===dw&&!opdIsClosed(i);}),by={},order=[];
         days.forEach(function(i){
-          var v=opdGet(i,ri+'-'+ses);if(!v||!opdDoc(v.d))return;
+          var v=opdCurOrGhost(i,ri+'-'+ses);if(!v||!opdDoc(v.d))return;
           var g=by[v.d];if(!g){g=by[v.d]={all:[],lv:[],t:''};order.push(v.d);}
           var n=parseD(i).getDate();g.all.push(n);if(opdLeave(v.d,i))g.lv.push(n);if(v.t&&!g.t)g.t=v.t;
         });
@@ -3257,7 +3367,7 @@ function opdWeekHTML(y,m,interactive){
 function opdWeekTitle(y,m){return 'ตารางออกตรวจประจำสัปดาห์ · '+OPD.settings.unit+' · '+MTH[m]+' '+(y+543);}
 function renderOpdWeek(){
   document.getElementById('opdWeekTitle').textContent=opdWeekTitle(opdYr,opdMo);
-  document.getElementById('opdWeek').innerHTML=opdWeekHTML(opdYr,opdMo,true);
+  document.getElementById('opdWeek').innerHTML=opdWeekHTML(opdYr,opdMo,true)+'<div class="wk-orgap"></div>'+opdOrHTML(opdYr,opdMo,false);
   var n=OPD.settings.note;
   document.getElementById('opdWeekNote').textContent=n?'หมายเหตุ: '+n:'';
 }
@@ -3411,7 +3521,7 @@ function opdTagAsk(fn){
 // whole = ช่องที่แสดงรวมทั้งวัน (แพทย์เดียวกันเช้า+บ่าย หรือห้องว่างทั้งวัน) → แก้ทั้งสองช่วงพร้อมกัน
 function opdOpenSlot(i,k,whole){
   var v=opdGet(i,k),p=k.split('-'),o=opdGet(i,p[0]+'-'+opdOther(p[1])),dw=parseD(i).getDay();
-  opdPick={i:i,k:k,t:v?(v.t||''):'',all:!!(v&&o&&o.d===v.d)||(!!whole&&!v&&!o),sync:opdSync&&dw>=1&&dw<=5&&!(v&&opdLeave(v.d,i))}; // หาคนแทนวันลา = เฉพาะวันนี้
+  opdPick={i:i,k:k,t:v?(v.t||''):'',all:!!(v&&o&&o.d===v.d)||(!!whole&&!v&&!o),sync:false}; // ค่าเริ่มต้น = เฉพาะวันนี้ กันวันอื่นที่แก้ไว้เปลี่ยนตามโดยไม่ตั้งใจ
   if(!v){var g=opdCurOrGhost(i,k);if(g)opdPick.t=g.t;}
   renderOpdSlotModal();openModal('opdModal');
 }
@@ -3449,7 +3559,7 @@ function renderOpdSlotModal(){
     +'<button type="button" class="'+(sp==='pm'?'on':'')+'" onclick="opdSetSpan(\'pm\')">🌤️ บ่ายอย่างเดียว<small>'+esc(OPD.settings.pm)+'</small></button>'
     +'<button type="button" class="'+(sp==='all'?'on':'')+'" onclick="opdSetSpan(\'all\')">☀️+🌤️ ทั้งวัน<small>เช้าและบ่าย</small></button></div>';
   h+='<div class="opd-sec">เลือกแพทย์ — แตะแล้วบันทึกทันที</div><div class="opd-dg">'
-    +OPD.doctors.map(function(d){
+    +opdOpdDocs().map(function(d){
       var lv=opdLeave(d.id,i);
       return '<button type="button" class="opd-db'+(v&&v.d===d.id?' on':'')+'" style="--dc:'+d.color+'" onclick="opdApplyPick(\''+d.id+'\')">'
         +'<span class="d-dot" style="background:'+d.color+'"></span>'+opdDocHTML(d)+(lv?'<small>ลา</small>':(tp&&tp.d===d.id?'<span class="tp">แม่แบบ</span>':''))+'</button>';
@@ -3869,6 +3979,7 @@ function renderOpdTpl(){
     h+='</tr>';
   });
   document.getElementById('opdTplGrid').innerHTML=h+'</tbody></table></div>';
+  document.getElementById('opdOrGrid').innerHTML=opdOrHTML(opdYr,opdMo,true);
 }
 // อ่านตารางเดือนที่จัดไว้ แล้วสรุปเป็นแม่แบบ (ใครออกวันไหน ห้องไหน สัปดาห์ที่เท่าไหร่)
 function opdLearn(y,m){
@@ -3904,12 +4015,16 @@ function opdTplClear(){
 function opdOpenTpl(key,x){
   var e=x!=null&&(OPD.template[key]||[])[x];
   opdTplKey=key;opdTplNew=e?{d:e.d,w:(e.w||[]).slice(),t:e.t||'',x:x}:{d:null,w:[],t:''};
+  // รายการเดิมที่อีกช่วงมีแพทย์+สัปดาห์เดียวกัน = ทั้งวัน
+  var p=key.split('|'),kk=p[1].split('-'),o=OPD.template[p[0]+'|'+kk[0]+'-'+opdOther(kk[1])]||[];
+  opdTplNew.all0=!!(e&&o.some(function(z){return opdTplSame(z,e);}));
+  opdTplNew.sp=opdTplNew.all0?'all':kk[1];
   renderOpdTplModal();openModal('opdModal');
 }
 function opdTplEdit(x){opdOpenTpl(opdTplKey,opdTplNew.x===x?null:x);}
 function renderOpdTplModal(){
   var key=opdTplKey,p=key.split('|'),list=OPD.template[key]||[],N=opdTplNew;
-  var h='<div class="mhd"><div class="mtl">🧩 วัน'+DTH[+p[0]]+' · '+esc(opdSlotName(p[1]))+'</div><button class="mcl" onclick="closeModal(\'opdModal\')" type="button">✕</button></div>';
+  var h='<div class="mhd"><div class="mtl">🧩 วัน'+DTH[+p[0]]+' · '+esc(opdRooms()[+p[1].split('-')[0]]||'')+'</div><button class="mcl" onclick="closeModal(\'opdModal\')" type="button">✕</button></div>';
   h+=list.length?list.map(function(e,x){
     var d=opdDoc(e.d);
     return '<div class="ot-li'+(N.x===x?' on':'')+'"><span class="d-dot" style="background:'+(d?d.color:'#888')+'"></span><b>'+esc(d?opdShort(d.name):'(ไม่พบชื่อ)')+'</b><span>'+opdWeeksTxt(e.w,+p[0])+(e.t?' · '+esc(e.t):'')+'</span>'
@@ -3918,9 +4033,13 @@ function renderOpdTplModal(){
   if(list.length>1)h+='<div class="opd-mh" style="margin:0 0 10px;">ถ้ามีหลายคนตรงสัปดาห์เดียวกัน ระบบใช้คนที่อยู่บนสุด</div>';
   var ed=N.x!=null;
   h+='<div class="div"></div><div class="opd-sec">'+(ed?'✏️ แก้รายการที่เลือก':'＋ เพิ่มแพทย์ในช่องนี้')+'</div><div class="opd-dg">'
-    +OPD.doctors.map(function(d){
+    +opdOpdDocs().map(function(d){
       return '<button type="button" class="opd-db'+(N.d===d.id?' on':'')+'" style="--dc:'+d.color+'" onclick="opdTplNew.d=\''+d.id+'\';opdTplNew.t=\''+esc(d.tag||'').replace(/'/g,'')+'\';renderOpdTplModal()"><span class="d-dot" style="background:'+d.color+'"></span>'+opdDocHTML(d)+'</button>';
     }).join('')+'</div>';
+  var sp=N.sp||p[1].split('-')[1];
+  h+='<div class="opd-sec">ช่วงเวลา</div><div class="opd-mode">'
+    +[['am','☀️ เช้าอย่างเดียว',OPD.settings.am],['pm','🌤️ บ่ายอย่างเดียว',OPD.settings.pm],['all','☀️+🌤️ ทั้งวัน','เช้าและบ่าย']].map(function(o){
+      return '<button type="button" class="'+(sp===o[0]?'on':'')+'" onclick="opdTplNew.sp=\''+o[0]+'\';renderOpdTplModal()">'+o[1]+'<small>'+esc(o[2])+'</small></button>';}).join('')+'</div>';
   h+='<div class="opd-sec">ออกตรวจสัปดาห์ไหนของเดือน</div><div class="opd-row">'
     +'<button type="button" class="chk-chip'+(!N.w.length?' on':'')+'" onclick="opdTplWeek(0)">ทุกสัปดาห์</button>'
     +[1,2,3,4,5].map(function(n){return '<button type="button" class="chk-chip'+(N.w.indexOf(n)>-1?' on':'')+'" onclick="opdTplWeek('+n+')">ที่ '+n+' <small>('+opdNthLbl(+p[0],n,opdYr,opdMo)+')</small></button>';}).join('')+'</div>';
@@ -3932,6 +4051,7 @@ function renderOpdTplModal(){
     +'<button class="bs" onclick="opdTplAdd()" type="button">'+(ed?'💾 บันทึกการแก้ไข':'＋ เพิ่มลงแม่แบบ')+'</button></div>';
   document.getElementById('opdModalBox').innerHTML=h;
 }
+function opdTplSame(a,b){return a.d===b.d&&JSON.stringify((a.w||[]).slice().sort())===JSON.stringify((b.w||[]).slice().sort());}
 function opdTplWeek(n){
   var w=opdTplNew.w;
   if(!n)opdTplNew.w=[];
@@ -3942,11 +4062,26 @@ function opdTplTag(t){opdTplNew.t=t;renderOpdTplModal();}
 function opdTplAdd(){
   var N=opdTplNew,key=opdTplKey;if(!N.d){toast('⚠️ เลือกแพทย์ก่อน','warn');return;}
   var d=opdDoc(N.d),e={d:N.d,w:N.w.slice(),t:N.t},ed=N.x!=null;
-  var n=opdTplChange([key],function(){
-    var l=OPD.template[key]||(OPD.template[key]=[]);
-    if(ed&&l[N.x])l[N.x]=e;else l.push(e);
+  var kp=key.split('|'),rr=kp[1].split('-')[0],sp=N.sp||kp[1].split('-')[1];
+  var pair=OPD_SES.map(function(x){return kp[0]+'|'+rr+'-'+x;});
+  var targets=sp==='all'?pair:[kp[0]+'|'+rr+'-'+sp];
+  var old=ed&&(OPD.template[key]||[])[N.x];
+  var n=opdTplChange(pair,function(){
+    var at=-1;
+    if(old){
+      // เอารายการเดิมออก (ถ้าเดิมเป็นทั้งวัน เอาออกจากทั้งสองช่วง) แล้วลงช่วงที่เลือก
+      pair.forEach(function(k2){
+        var l=OPD.template[k2]||[],j=k2===key?l.indexOf(old):(N.all0?l.findIndex(function(z){return opdTplSame(z,old);}):-1);
+        if(j>-1){if(k2===key)at=j;l.splice(j,1);}
+      });
+    }
+    targets.forEach(function(t){
+      var l=(OPD.template[t]||[]).filter(function(z){return !opdTplSame(z,e);}),ne={d:e.d,w:e.w.slice(),t:e.t};
+      if(t===key&&at>-1)l.splice(Math.min(at,l.length),0,ne);else l.push(ne);
+      OPD.template[t]=l;
+    });
   },opdYr,opdMo,[],'แม่แบบ: '+(ed?'แก้ ':'เพิ่ม ')+opdShort(d.name),opdSync);
-  opdTplNew={d:null,w:[],t:''};renderOpdTplModal();
+  opdTplNew={d:null,w:[],t:'',sp:sp};renderOpdTplModal();
   toast('✅ '+(ed?'แก้':'เพิ่ม')+' '+opdShort(d.name)+' ในแม่แบบ'+(opdSync?' · ปฏิทินเปลี่ยน '+n+' วัน':''),'ok');
 }
 function opdTplDel(x){
@@ -3976,6 +4111,7 @@ function renderOpdCfg(){
     return '<div class="oc-doc"><input type="color" value="'+esc(d.color)+'" onchange="opdDocSet(\''+d.id+'\',\'color\',this.value)" title="เปลี่ยนสี">'
       +'<input class="fi" value="'+esc(d.name)+'" onchange="opdDocSet(\''+d.id+'\',\'name\',this.value)">'
       +'<input class="fi" style="flex:0 0 100px;" value="'+esc(d.tag||'')+'" placeholder="ป้ายอัตโนมัติ" title="ป้ายที่ขึ้นเองเมื่อเลือกแพทย์ท่านนี้ เช่น Chest" onchange="opdDocSet(\''+d.id+'\',\'tag\',this.value)">'
+      +'<label style="font-size:11px;white-space:nowrap;display:flex;align-items:center;gap:3px;" title="ติ๊ก = มีแค่ในตาราง OR ไม่แสดงในส่วน OPD"><input type="checkbox"'+(d.orOnly?' checked':'')+' onchange="opdDocSet(\''+d.id+'\',\'orOnly\',this.checked?\'1\':\'\')">เฉพาะ OR</label>'
       +'<small>แสดงเป็น '+opdDocHTML(d)+'</small><button class="bsr" onclick="opdDelDoc(\''+d.id+'\')" type="button">ลบ</button></div>';
   }).join(''):'<div class="opd-info">ยังไม่มีรายชื่อ — เพิ่มด้านล่าง หรือดึงจากรายชื่อแพทย์ผ่าตัด</div>';
   document.getElementById('opdRoomList').innerHTML=opdRooms().map(function(rn,ri){
@@ -4010,6 +4146,7 @@ function opdImportDocs(){
 }
 function opdDocSet(id,f,val){
   var d=opdDoc(id);if(!d)return;val=String(val||'').trim();
+  if(f==='orOnly'){if(val)d.orOnly=1;else delete d.orOnly;opdMark('doctors');renderOpd();return;}
   if(f==='tag'){if(val)d.tag=val.slice(0,24);else delete d.tag;opdMark('doctors');renderOpd();return;}
   if(!val){renderOpd();return;}
   d[f]=f==='name'?val.replace(/\s+/g,' '):val;opdMark('doctors');renderOpd();
@@ -4061,7 +4198,7 @@ function opdSetCfg(k,val){
 function opdPrint(mode){
   var S=OPD.settings,y=opdYr,m=opdMo,h;
   if(mode==='week'){
-    h='<div class="wk-ttl">'+esc(opdWeekTitle(y,m))+'</div>'+opdWeekHTML(y,m,false)
+    h='<div class="wk-ttl">'+esc(opdWeekTitle(y,m))+'</div>'+opdWeekHTML(y,m,false)+'<div class="wk-orgap"></div>'+opdOrHTML(y,m,false)
       +(S.note?'<div class="wk-note">หมายเหตุ: '+esc(S.note)+'</div>':'');
   }else{
     var f=opdFocus,w=opdWeekSel,mv=opdMoveSrc;opdFocus=null;opdWeekSel=null;opdMoveSrc=null;
