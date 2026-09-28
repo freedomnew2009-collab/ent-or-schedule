@@ -1,4 +1,4 @@
-const CACHE = 'ent-or-v6.2';
+const CACHE = 'ent-or-v6.3';
 const ASSETS = [
   './index.html',
   './manifest.json',

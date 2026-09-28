@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>ENT OR Schedule · v6.2</title>
+<title>ENT OR Schedule · v6.3</title>
 <!-- PWA -->
 <link rel="manifest" href="manifest.json">
 <meta name="theme-color" content="#1E3A5F">
@@ -798,6 +798,8 @@ body{font-family:'Noto Sans Thai',sans-serif;background:var(--bg);color:var(--t)
 .oc-doc small{font-size:11px;color:var(--t3);white-space:nowrap;}
 
 #opdPrint{display:none;}
+.opd-pdf-h{font-size:18px;font-weight:700;color:var(--t);margin:0 0 10px;}
+.opd-pdf-box .wk-wrap,.opd-pdf-box .ot-wrap{overflow:visible;}
 
 @media (max-width: 768px){
   .opd-pg{padding:10px 10px 24px;}
@@ -809,27 +811,27 @@ body{font-family:'Noto Sans Thai',sans-serif;background:var(--bg);color:var(--t)
   .opd-docs{flex-wrap:nowrap;overflow-x:auto;padding-bottom:4px;-webkit-overflow-scrolling:touch;}
   .odc{flex-shrink:0;white-space:nowrap;}
   .opd-move{top:54px;}
-  /* มือถือ: เรียงเป็นการ์ดรายวัน อ่านง่ายกว่าตาราง 7 ช่อง */
-  .og{display:block;border:0;background:none;border-radius:0;overflow:visible;}
-  .og-wd,.oc.pad{display:none;}
-  .oc{border:1px solid var(--b2);border-radius:12px;margin-bottom:9px;min-height:0;overflow:hidden;background:var(--s);}
-  .oc-h{padding:8px 12px;min-height:42px;}
-  .oc-n{font-size:17px;}
-  .oc-wd{display:inline;}
-  .oc-half{font-size:11px;}
-  .oc-more{font-size:20px;}
-  .oc.we .oc-closed,.oc.closed .oc-closed{padding:6px;}
-  .oc.we.closed{opacity:.75;}
-  .oc.we.closed .oc-h{min-height:34px;padding:5px 12px;}
-  .oc.we.closed .oc-n{font-size:14px;}
-  .oc-sh{display:grid;grid-template-columns:28px minmax(0,1fr) minmax(0,1fr);gap:4px;padding:0 8px 3px;font-size:11px;font-weight:600;color:var(--t3);}
-  .oc-sh span{display:inline-flex;align-items:center;justify-content:center;gap:4px;}
-  .oc-rooms{gap:4px;padding:0 8px 8px;}
-  .oc-lv{margin:0 8px 5px;font-size:12px;padding:3px 9px;}
-  .or{grid-template-columns:28px minmax(0,1fr) minmax(0,1fr);gap:4px;min-height:46px;}
-  .or-n{font-size:13px;}
-  .os{min-height:46px;padding:6px 8px 6px 10px;}
-  .os-n{font-size:15px;}
+  /* มือถือ: เรียงเป็นการ์ดรายวัน อ่านง่ายกว่าตาราง 7 ช่อง (ตอนบันทึก PDF ใช้แบบตารางเหมือนคอม) */
+  html:not(.opd-pdfing) .og{display:block;border:0;background:none;border-radius:0;overflow:visible;}
+  html:not(.opd-pdfing) .og-wd,html:not(.opd-pdfing) .oc.pad{display:none;}
+  html:not(.opd-pdfing) .oc{border:1px solid var(--b2);border-radius:12px;margin-bottom:9px;min-height:0;overflow:hidden;background:var(--s);}
+  html:not(.opd-pdfing) .oc-h{padding:8px 12px;min-height:42px;}
+  html:not(.opd-pdfing) .oc-n{font-size:17px;}
+  html:not(.opd-pdfing) .oc-wd{display:inline;}
+  html:not(.opd-pdfing) .oc-half{font-size:11px;}
+  html:not(.opd-pdfing) .oc-more{font-size:20px;}
+  html:not(.opd-pdfing) .oc.we .oc-closed,html:not(.opd-pdfing) .oc.closed .oc-closed{padding:6px;}
+  html:not(.opd-pdfing) .oc.we.closed{opacity:.75;}
+  html:not(.opd-pdfing) .oc.we.closed .oc-h{min-height:34px;padding:5px 12px;}
+  html:not(.opd-pdfing) .oc.we.closed .oc-n{font-size:14px;}
+  html:not(.opd-pdfing) .oc-sh{display:grid;grid-template-columns:28px minmax(0,1fr) minmax(0,1fr);gap:4px;padding:0 8px 3px;font-size:11px;font-weight:600;color:var(--t3);}
+  html:not(.opd-pdfing) .oc-sh span{display:inline-flex;align-items:center;justify-content:center;gap:4px;}
+  html:not(.opd-pdfing) .oc-rooms{gap:4px;padding:0 8px 8px;}
+  html:not(.opd-pdfing) .oc-lv{margin:0 8px 5px;font-size:12px;padding:3px 9px;}
+  html:not(.opd-pdfing) .or{grid-template-columns:28px minmax(0,1fr) minmax(0,1fr);gap:4px;min-height:46px;}
+  html:not(.opd-pdfing) .or-n{font-size:13px;}
+  html:not(.opd-pdfing) .os{min-height:46px;padding:6px 8px 6px 10px;}
+  html:not(.opd-pdfing) .os-n{font-size:15px;}
   .opd-card{padding:14px 12px;}
   .ld{grid-template-columns:minmax(96px,120px) minmax(0,1fr) 34px 52px;gap:8px;}
   .ld .c4{display:none;}
@@ -870,7 +872,7 @@ body{font-family:'Noto Sans Thai',sans-serif;background:var(--bg);color:var(--t)
   <div class="sb-logo">
     <div class="ico">🏥</div>
     <h2>ENT OR Schedule</h2>
-    <p>แผนก หู คอ จมูก · v6.2</p>
+    <p>แผนก หู คอ จมูก · v6.3</p>
   </div>
   <div class="nav-sec">
     <div class="nav-lbl">เมนูหลัก</div>
@@ -963,6 +965,7 @@ body{font-family:'Noto Sans Thai',sans-serif;background:var(--bg);color:var(--t)
             <button class="bss" id="opdSyncBtn" onclick="opdLearnAsk()" type="button" title="ยึดปฏิทินเดือนที่เปิดอยู่ แล้วสร้างแม่แบบประจำสัปดาห์ใหม่ทั้งหมด">📤 ส่งปฏิทินไปสร้างแม่แบบ</button>
             <button class="bs" onclick="openOpdGen()" type="button">⚡ สร้างอัตโนมัติ</button>
             <button class="bss" onclick="opdPrint('cal')" type="button">🖨️ พิมพ์ปฏิทิน A4</button>
+            <button class="bss" onclick="opdSavePdf('month')" type="button" title="บันทึกปฏิทิน + ตารางประจำสัปดาห์ เป็นไฟล์ PDF หน้าตาเหมือนบนเว็บ">💾 บันทึก PDF</button>
           </div>
         </div>
         <div class="opd-sync" id="opdSync" style="margin:-4px 0 8px;"></div>
@@ -1002,6 +1005,7 @@ body{font-family:'Noto Sans Thai',sans-serif;background:var(--bg);color:var(--t)
           <div class="opd-link" id="opdTplLink"></div>
           <div style="display:flex;gap:7px;flex-wrap:wrap;margin-bottom:12px;">
             <button class="bss" onclick="opdLearnAsk()" type="button" id="opdLearnBtn">📥 ใช้ตารางเดือนนี้เป็นแม่แบบ</button>
+            <button class="bss" onclick="opdSavePdf('tpl')" type="button">💾 บันทึก PDF</button>
             <button class="bsr" onclick="opdTplClear()" type="button" style="padding:8px 12px;">🧹 ล้างแม่แบบ</button>
           </div>
           <div id="opdTplGrid"></div>
@@ -4323,6 +4327,81 @@ window.addEventListener('afterprint',function(){
   document.body.classList.remove('opd-printing');
   var st=document.getElementById('opdPageCss');if(st)st.textContent='';
 });
+// ── บันทึกเป็นไฟล์ PDF: ถ่ายภาพส่วนที่เห็นบนเว็บ แล้ววางลง A4 แนวนอน ──
+// ใช้ html-to-image (ให้เบราว์เซอร์วาดเอง สีและฟอนต์จึงตรงกับหน้าจอ) + jsPDF · โหลดเมื่อกดครั้งแรก
+function opdLoadLib(src,ready){
+  return new Promise(function(ok,no){
+    if(ready())return ok();
+    var sc=document.createElement('script');sc.src=src;
+    sc.onload=function(){ready()?ok():no(new Error('lib'));};
+    sc.onerror=function(){no(new Error('lib'));};
+    document.head.appendChild(sc);
+  });
+}
+// หัวกระดาษ + สำเนาของส่วนที่ต้องการ วางนอกจอด้วยความกว้างเท่าบนจอ (ไม่มีปุ่มกด/ไฮไลต์)
+function opdPdfPart(title,els){
+  // จอเล็ก (มือถือ) → ใช้ความกว้างแบบคอม ให้ได้ตารางเต็มหน้า ไม่ใช่การ์ดยาวหลายสิบหน้า
+  var w=Math.max(window.innerWidth<900?1400:0,Math.max.apply(null,els.map(function(e){return e.offsetWidth;})));
+  var box=document.createElement('div');
+  box.className='opd-pdf-box';box.style.cssText='position:fixed;left:-20000px;top:0;width:'+w+'px;padding:14px;background:'+getComputedStyle(document.body).backgroundColor+';';
+  box.innerHTML='<div class="opd-pdf-h">'+esc(title)+'</div>';
+  els.forEach(function(e){
+    var c=e.cloneNode(true);
+    c.removeAttribute('id');c.querySelectorAll('[id]').forEach(function(x){x.removeAttribute('id');});
+    c.querySelectorAll('.ot-go,.ot-add,.oc-more').forEach(function(x){x.remove();});
+    box.appendChild(c);
+  });
+  document.body.appendChild(box);
+  return box;
+}
+async function opdSavePdf(mode){
+  var ml=MTH[opdMo]+' '+(opdYr+543),S=OPD.settings;
+  showLdr('กำลังสร้าง PDF...');
+  var f=opdFocus,wk=opdWeekSel,mv=opdMoveSrc,boxes=[];
+  try{
+    await opdLoadLib('https://cdn.jsdelivr.net/npm/html-to-image@1.11.11/dist/html-to-image.js',function(){return !!window.htmlToImage;});
+    await opdLoadLib('https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js',function(){return !!(window.jspdf&&window.jspdf.jsPDF);});
+    opdFocus=null;opdWeekSel=null;opdMoveSrc=null;document.documentElement.classList.add('opd-pdfing');renderOpd();
+    var $=function(id){return document.getElementById(id);};
+    if(mode==='tpl'){
+      boxes.push(opdPdfPart('แม่แบบตารางประจำสัปดาห์ · '+S.unit+' · เทียบกับ '+ml,[$('opdTplGrid')]));
+    }else{
+      boxes.push(opdPdfPart(S.title+' '+S.unit+' · '+ml+' · เช้า '+S.am+' · บ่าย '+S.pm,[$('opdCal'),$('opdLegend')]));
+      boxes.push(opdPdfPart(opdWeekTitle(opdYr,opdMo),[$('opdWeek'),$('opdWeekNote')]));
+    }
+    var pdf=new window.jspdf.jsPDF({orientation:'landscape',unit:'mm',format:'a4'}),PW=297,PH=210,M=8,first=true;
+    for(var b=0;b<boxes.length;b++){
+      var cv=await window.htmlToImage.toCanvas(boxes[b],{pixelRatio:2,backgroundColor:getComputedStyle(document.body).backgroundColor,style:{position:'static',left:'0',top:'0'}}); // สำเนาอยู่นอกจอ ภาพต้องวาดที่ 0,0
+      var aw=PW-2*M,ah=PH-2*M,sc=Math.min(aw/cv.width,ah/cv.height);
+      if(cv.width*sc>=aw*0.6){
+        // พอดีหน้าเดียว
+        if(!first)pdf.addPage();first=false;
+        pdf.addImage(cv.toDataURL('image/jpeg',0.92),'JPEG',M+(aw-cv.width*sc)/2,M,cv.width*sc,cv.height*sc);
+      }else{
+        // ยาวมาก (เช่น จอมือถือ) → เต็มความกว้าง แบ่งหลายหน้า
+        var s2=aw/cv.width,sliceH=Math.floor(ah/s2);
+        for(var y=0;y<cv.height;y+=sliceH){
+          var part=document.createElement('canvas'),h=Math.min(sliceH,cv.height-y);
+          part.width=cv.width;part.height=h;part.getContext('2d').drawImage(cv,0,y,cv.width,h,0,0,cv.width,h);
+          if(!first)pdf.addPage();first=false;
+          pdf.addImage(part.toDataURL('image/jpeg',0.92),'JPEG',M,M,aw,h*s2);
+        }
+      }
+    }
+    var name=(mode==='tpl'?'แม่แบบตาราง OPD ':'ตาราง OPD ')+ml+'.pdf';
+    // ดาวน์โหลดเองพร้อมชื่อไฟล์ภาษาไทย · เปิดในแท็บใหม่ถ้าเบราว์เซอร์ไม่ยอมดาวน์โหลด
+    var url=URL.createObjectURL(pdf.output('blob'));
+    try{var a=document.createElement('a');a.href=url;a.download=name;document.body.appendChild(a);a.click();a.remove();}
+    catch(e){window.open(url,'_blank');}
+    setTimeout(function(){URL.revokeObjectURL(url);},60000);
+    toast('💾 บันทึก PDF แล้ว: '+name,'ok');
+  }catch(er){
+    toast(er&&er.message==='lib'?'❌ โหลดตัวสร้าง PDF ไม่ได้ (ต้องต่ออินเทอร์เน็ต) — ใช้ปุ่ม 🖨️ พิมพ์ แล้วเลือก "บันทึกเป็น PDF" แทนได้':'❌ สร้าง PDF ไม่สำเร็จ: '+(er&&er.message||er),'err');
+  }finally{
+    boxes.forEach(function(x){x.remove();});document.documentElement.classList.remove('opd-pdfing');
+    opdFocus=f;opdWeekSel=wk;opdMoveSrc=mv;renderOpd();hideLdr();
+  }
+}
 // ── UTILS ──
 function openModal(id){document.getElementById(id).classList.add('open');document.body.style.overflow='hidden';}
 function closeModal(id){
