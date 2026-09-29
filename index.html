@@ -300,6 +300,16 @@ body{font-family:'Noto Sans Thai',sans-serif;background:var(--bg);color:var(--t)
 .cal-case-more{font-size:10px;color:var(--t3);margin-top:2px;}
 .leave-tag{font-size:9px;color:var(--red);display:block;margin-top:2px;}
 .swap-tag{font-size:9px;color:var(--yel);display:block;margin-top:1px;}
+/* วันหยุดราชการ */
+.cal-day.hol{background:color-mix(in srgb, var(--red) 9%, transparent);}
+.cal-day.hol .cdn{color:var(--red);}
+.hol-tag{font-size:9px;font-weight:700;color:var(--red);display:block;margin-top:2px;line-height:1.3;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;cursor:pointer;}
+.dp-d.hol-d{background:var(--rd);color:var(--red);}
+.day-hol{margin:0 11px 8px;padding:5px 9px;border-radius:6px;background:var(--rd);color:var(--red);font-size:11px;font-weight:700;}
+.hol-row{display:flex;align-items:center;gap:8px;padding:7px 0;border-bottom:1px solid var(--b);font-size:12px;}
+.hol-row .hd{min-width:92px;color:var(--t2);font-weight:600;}
+.hol-row .hn{flex:1;color:var(--t);}
+.hol-yr{display:flex;align-items:center;justify-content:space-between;margin:12px 0 4px;}
 
 /* ─ PWA INSTALL BANNER ─ */
 .pwa-banner{position:fixed;bottom:0;left:0;right:0;z-index:700;background:var(--s);border-top:2px solid var(--teal);padding:12px 16px calc(12px + env(safe-area-inset-bottom,0px));display:none;align-items:center;gap:12px;box-shadow:0 -4px 20px rgba(0,0,0,.3);}
@@ -922,6 +932,7 @@ body{font-family:'Noto Sans Thai',sans-serif;background:var(--bg);color:var(--t)
     <div class="cal-pg">
       <div class="cal-hdr">
         <div class="cal-mnav"><button class="cnbtn" onclick="calNav(-1)">‹</button><div class="cal-mt" id="calTitle">–</div><button class="cnbtn" onclick="calNav(1)">›</button></div>
+        <button class="bss" onclick="openHolModal()" type="button" style="margin-right:auto;" title="เพิ่ม / ลบ วันหยุดราชการ">🎌 วันหยุดราชการ</button>
         <div class="cal-fbar" id="calFbar"></div>
       </div>
       <div id="calSummary"></div>
@@ -932,6 +943,7 @@ body{font-family:'Noto Sans Thai',sans-serif;background:var(--bg);color:var(--t)
       <div style="display:flex;gap:12px;margin-top:8px;flex-wrap:wrap;">
         <span style="font-size:10px;color:var(--t3);display:flex;align-items:center;gap:4px;"><span style="width:8px;height:8px;background:var(--td);border-radius:2px;display:inline-block;"></span>วัน OR</span>
         <span style="font-size:10px;color:var(--t3);display:flex;align-items:center;gap:4px;"><span style="width:8px;height:8px;background:var(--rd);border-radius:2px;display:inline-block;"></span>วันลาแพทย์</span>
+        <span style="font-size:10px;color:var(--t3);display:flex;align-items:center;gap:4px;"><span style="width:8px;height:8px;background:var(--red);border-radius:2px;display:inline-block;"></span>วันหยุดราชการ</span>
         <span style="font-size:10px;color:var(--t3);display:flex;align-items:center;gap:4px;"><span style="width:8px;height:8px;background:var(--yd);border-radius:2px;display:inline-block;"></span>สลับเวร</span>
       </div>
     </div>
@@ -1333,6 +1345,7 @@ body{font-family:'Noto Sans Thai',sans-serif;background:var(--bg);color:var(--t)
 </div>
 
 <div class="overlay" id="opdModal"><div class="modal sm" id="opdModalBox"></div></div>
+<div class="overlay" id="holModal"><div class="modal sm" id="holModalBox"></div></div>
 
 <div class="ldr" id="ldr"><div class="spinner"></div><div class="ldr-t" id="ldrTxt">กำลังโหลด...</div></div>
 <div class="toast" id="toast"></div>
@@ -1362,6 +1375,9 @@ var docs=[
 var ops=['Tonsillectomy (ตัดต่อมทอนซิล)','Septoplasty (ผ่าตัดผนังกั้นจมูก)','Tympanoplasty (ผ่าตัดเยื่อแก้วหู)','FESS (ผ่าตัดโพรงจมูก Endoscopic)','Myringotomy + Tube (ใส่ท่อหู)','Mastoidectomy (ผ่าตัดกระดูกหลังหู)','Adenoidectomy (ตัดต่อมอะดีนอยด์)','Direct Laryngoscopy (ส่องกล่องเสียง)','อื่น ๆ (ระบุในหมายเหตุ)'];
 var leaves=[];
 var swaps=[];
+// ── วันหยุดราชการ {'2026-10-13':'วันนวมินทรมหาราช'} — เก็บใน ENT_Config key holidays ──
+var holidays={};
+try{var _hj=JSON.parse(localStorage.getItem('ent_holidays')||'null');if(_hj&&typeof _hj==='object')holidays=_hj;}catch(e){}
 var _syncState='idle';
 // ── คิวรอส่ง: เคสที่ส่งขึ้น Sheet ไม่สำเร็จ (เน็ตหลุด/Sheet ไม่ตอบ) จะถูกเก็บไว้ส่งใหม่อัตโนมัติ ──
 var pendingRows=[];
@@ -1565,6 +1581,7 @@ function renderAll(){
       +'<div class="day-badge"><div class="dnum">'+d.getDate()+'</div><div class="dshort">'+DEN[dn]+'</div></div>'
       +'<div><div class="day-name">วัน'+DTH[dn]+'</div><div class="day-dlbl">'+fmtShort(d)+'</div></div>'
       +'</div><div class="day-cnt" id="cnt-'+s+'">0 ราย</div></div>'
+      +(holidays[s]?'<div class="day-hol">🎌 วันหยุดราชการ · '+esc(holidays[s])+'</div>':'')
       +'<div class="day-body" id="body-'+s+'"></div>'
       +'<div style="padding:0 11px 11px"><button class="add-day-btn" onclick="openAdd(\''+s+'\')">＋ เพิ่มนัดวัน'+DTH[dn]+'</button></div>'
       +'</div>';
@@ -1778,6 +1795,7 @@ function validateDocDate(diStr,dateStr){
   if(sw)return{ok:true,type:'swap',allowOv:false,msg:'ℹ️ '+shortN(doc.name)+' มีการสลับวันผ่าตัด ('+sw.type+')'+(sw.note?' · '+sw.note:'')+' — บันทึกได้'};
   var sched=doc.sched[dow]||[];
   if(sched.length===0)return{ok:false,type:'no-sched',allowOv:true,msg:shortN(doc.name)+' ไม่มีตารางผ่าตัดในวัน'+DTH[dow]+'นี้ — หากแพทย์จะมาจริง กด Override ด้านล่าง'};
+  if(holidays[dateStr])return{ok:true,type:'holiday',allowOv:false,msg:'🎌 วันนี้เป็นวันหยุดราชการ ('+holidays[dateStr]+') — ตรวจสอบก่อนบันทึก'};
   return{ok:true,type:'ok'};
 }
 
@@ -1943,10 +1961,12 @@ function renderCal(){
     var isOR=ORDAYS.includes(d.getDay()),isToday=d.getTime()===today.getTime(),hasCases=list.length>0;
     var dayLv=!other?leaves.filter(function(l){return l.status==='Approved'&&isoStr>=l.start&&isoStr<=l.end;}):[];
     var daySw=!other?swaps.filter(function(s){return s.date===isoStr;}):[];
+    var hol=!other?holidays[isoStr]:'';
     var el=document.createElement('div');
-    
+
     // ★ แก้ไขให้ทุกวัน (ที่ไม่ใช่วันของเดือนอื่น) มีคลาส clk เพื่อให้คลิกได้
-    el.className='cal-day'+(other?' other':'')+(isToday?' today-c':'')+(isOR&&!other?' or-day':'')+(!other?' clk':'')+(dayLv.length?' has-leave':'');
+    el.className='cal-day'+(other?' other':'')+(isToday?' today-c':'')+(isOR&&!other?' or-day':'')+(!other?' clk':'')+(dayLv.length?' has-leave':'')+(hol?' hol':'');
+    if(hol)el.title='🎌 '+hol;
     
     var docCountHTML=(function(){
       if(!hasCases)return '';
@@ -1966,6 +1986,7 @@ function renderCal(){
     })();
     el.innerHTML=
       '<div class="cdn-w"><span class="cdn">'+d.getDate()+'</span>'+(isOR&&!other?'<span class="or-tag">OR</span>':'')+'</div>'
+      +(hol?'<span class="hol-tag" onclick="event.stopPropagation();openHolModal(\''+isoStr+'\')">🎌 '+esc(hol)+'</span>':'')
       +(hasCases?'<div class="cal-cnt">'+list.length+' ราย</div>':'')
       +docCountHTML
       +dayLv.map(function(l){return '<span class="leave-tag">🏖 '+esc(shortN((docs[l.di]||{name:'–'}).name))+'</span>';}).join('')
@@ -1985,6 +2006,65 @@ function renderCal(){
 }
 
 function calNav(d){calMo+=d;if(calMo<0){calMo=11;calYr--;}if(calMo>11){calMo=0;calYr++;}renderCal();}
+
+// ── วันหยุดราชการ: เพิ่ม / ลบ จากหน้าปฏิทิน ──
+// วันหยุดที่วันที่ตายตัวทุกปี · วันพระ (มาฆบูชา วิสาขบูชา อาสาฬหบูชา เข้าพรรษา) และวันหยุดชดเชย เปลี่ยนทุกปี ต้องเพิ่มเอง
+var HOL_FIXED=[['01-01','วันขึ้นปีใหม่'],['04-06','วันจักรี'],['04-13','วันสงกรานต์'],['04-14','วันสงกรานต์'],['04-15','วันสงกรานต์'],['05-04','วันฉัตรมงคล'],['06-03','วันเฉลิมพระชนมพรรษา สมเด็จพระราชินี'],['07-28','วันเฉลิมพระชนมพรรษา ร.10'],['08-12','วันแม่แห่งชาติ'],['10-13','วันนวมินทรมหาราช'],['10-23','วันปิยมหาราช'],['12-05','วันพ่อแห่งชาติ'],['12-10','วันรัฐธรรมนูญ'],['12-31','วันสิ้นปี']];
+var holYr=null,holDate='';
+function saveHolLocal(){try{localStorage.setItem('ent_holidays',JSON.stringify(holidays));}catch(e){}}
+function holChanged(){saveHolLocal();renderCal();renderAll();renderHolModal();pushConfig();}
+function openHolModal(date){
+  holDate=date||iso(new Date(calYr,calMo,1));
+  holYr=parseD(holDate).getFullYear();
+  renderHolModal();openModal('holModal');
+  var n=document.getElementById('holName');if(n&&date&&holidays[date])n.select();
+}
+function holYrNav(d){holYr+=d;renderHolModal();}
+function renderHolModal(){
+  var box=document.getElementById('holModalBox');if(!box||holYr==null)return;
+  var pre=String(holYr)+'-';
+  var list=Object.keys(holidays).filter(function(k){return k.indexOf(pre)===0;}).sort();
+  var missing=HOL_FIXED.filter(function(f){return !holidays[pre+f[0]];}).length;
+  box.innerHTML='<div class="mhd"><div class="mtl">🎌 วันหยุดราชการ</div><button class="mcl" onclick="closeModal(\'holModal\')">✕</button></div>'
+    +'<div class="fr"><div class="fg"><label class="fl">วันที่</label><input class="fi" type="date" id="holDateIn" value="'+esc(holDate)+'" onchange="holPick(this.value)"></div>'
+    +'<div class="fg"><label class="fl">ชื่อวันหยุด</label><input class="fi" id="holName" placeholder="เช่น วันวิสาขบูชา, วันหยุดชดเชย" value="'+esc(holidays[holDate]||'')+'" onkeydown="if(event.key===\'Enter\')holAdd()"></div></div>'
+    +'<button class="bs" onclick="holAdd()" type="button" style="width:100%;min-height:44px;">'+(holidays[holDate]?'💾 แก้ชื่อวันหยุด':'＋ เพิ่มวันหยุด')+'</button>'
+    +'<div class="hol-yr"><button class="cnbtn" onclick="holYrNav(-1)" type="button">‹</button><b>ปี '+(holYr+543)+' · '+list.length+' วัน</b><button class="cnbtn" onclick="holYrNav(1)" type="button">›</button></div>'
+    +(list.length?list.map(function(k){
+      var d=parseD(k);
+      return '<div class="hol-row"><span class="hd">'+WTH[d.getDay()]+' '+d.getDate()+' '+MS[d.getMonth()]+'</span><span class="hn">'+esc(holidays[k])+'</span>'
+        +'<button class="bss" onclick="holPick(\''+k+'\')" type="button" title="แก้ไข">✏️</button><button class="bsr" onclick="holDel(\''+k+'\')" type="button">ลบ</button></div>';
+    }).join(''):'<div style="font-size:12px;color:var(--t3);padding:10px 0;">ยังไม่มีวันหยุดในปีนี้</div>')
+    +(missing?'<button class="bss" onclick="holAddFixed()" type="button" style="width:100%;margin-top:10px;">📋 เติมวันหยุดประจำปี '+(holYr+543)+' (วันที่ตายตัว '+missing+' วัน)</button>':'')
+    +'<div style="font-size:11px;color:var(--t3);margin-top:8px;">💡 วันพระ (มาฆบูชา วิสาขบูชา อาสาฬหบูชา เข้าพรรษา) และวันหยุดชดเชย เปลี่ยนทุกปี — เพิ่มเองตามประกาศ ครม.</div>'
+    +'<div class="mft"><button class="bs" onclick="closeModal(\'holModal\')" type="button">เสร็จ</button></div>';
+}
+function holPick(v){
+  if(!v)return;holDate=v;
+  var y=parseD(v).getFullYear();if(y!==holYr)holYr=y;
+  renderHolModal();
+  var n=document.getElementById('holName');if(n)n.focus();
+}
+function holAdd(){
+  var d=(document.getElementById('holDateIn').value||'').trim();
+  var n=(document.getElementById('holName').value||'').trim();
+  if(!/^\d{4}-\d{2}-\d{2}$/.test(d)){toast('⚠️ กรุณาเลือกวันที่','warn');return;}
+  if(!n){toast('⚠️ กรุณาใส่ชื่อวันหยุด','warn');document.getElementById('holName').focus();return;}
+  var ed=!!holidays[d];
+  holidays[d]=n;holDate=d;holYr=parseD(d).getFullYear();
+  holChanged();
+  var cnt=apts.filter(function(a){return a.date===d&&a.status!=='cancel';}).length;
+  toast((ed?'✅ แก้':'✅ เพิ่ม')+'วันหยุด '+fmtFull(d)+' · '+n+(cnt?' — ⚠️ มีนัดผ่าตัดวันนี้ '+cnt+' ราย':''),cnt?'warn':'ok');
+}
+function holDel(k){
+  if(!confirm('ลบวันหยุด '+fmtFull(k)+' ('+holidays[k]+')?'))return;
+  delete holidays[k];holChanged();toast('🗑️ ลบวันหยุดแล้ว','warn');
+}
+function holAddFixed(){
+  var pre=String(holYr)+'-',n=0;
+  HOL_FIXED.forEach(function(f){if(!holidays[pre+f[0]]){holidays[pre+f[0]]=f[1];n++;}});
+  holChanged();toast('✅ เพิ่มวันหยุดประจำปี '+(holYr+543)+' '+n+' วัน','ok');
+}
 
 function jumpTo(isoStr){
   var d=parseD(isoStr);
@@ -2012,6 +2092,7 @@ function renderDPGrid(){
   var diN=parseInt(document.getElementById('fDoc').value);
   var leg=document.getElementById('dpLegend');
   leg.innerHTML='<span class="dp-lgnd-item"><span class="dp-lgnd-dot" style="background:var(--td2)"></span>วัน OR</span>'
+    +'<span class="dp-lgnd-item"><span class="dp-lgnd-dot" style="background:var(--red)"></span>วันหยุดราชการ</span>'
     +(!isNaN(diN)?'<span class="dp-lgnd-item"><span class="dp-lgnd-dot" style="background:var(--yd)"></span>สลับเวร</span><span class="dp-lgnd-item"><span class="dp-lgnd-dot" style="background:var(--rd)"></span>วันลา</span>':'');
   var grid=document.getElementById('dpGrid');
   var first=new Date(dpYr,dpMo,1),sdow=first.getDay(),dim=new Date(dpYr,dpMo+1,0).getDate();
@@ -2032,10 +2113,12 @@ function renderDPGrid(){
     else if(isSel)cls+=' sel';
     else if(isLv)cls+=' leave-d';
     else if(isSw)cls+=' swap-d';
+    else if(holidays[s])cls+=' hol-d';
     else if(isOR)cls+=' orm';
     if(isT&&!isSel)cls+=' td-mark';
     var el=document.createElement('div');
     el.className=cls;el.textContent=d.getDate();
+    if(!other&&holidays[s])el.title='🎌 '+holidays[s];
     if(!other)el.onclick=(function(ss){return function(){dpSelectDate(ss);};})(s);
     grid.appendChild(el);
   });
@@ -2096,6 +2179,7 @@ function buildRSCal(){
     else if(isSel)cls+=' sel';
     else if(isLv)cls+=' leave-d';
     else if(isSw)cls+=' swap-d';
+    else if(holidays[s])cls+=' hol-d';
     else if(isOR)cls+=' orm';
     if(isT&&!isSel&&!other)cls+=' td-mark';
 
@@ -2662,6 +2746,13 @@ async function pullSheet(mode){
           }
         }catch(e){}
       }
+      // ★ วันหยุดราชการ — ถ้า Sheet ยังไม่มี key นี้ ใช้ค่าในเครื่องไปก่อน
+      if(data.config&&data.config.holidays!=null&&data.config.holidays!==''){
+        try{
+          var hd=(typeof data.config.holidays==='string')?JSON.parse(data.config.holidays):data.config.holidays;
+          if(hd&&typeof hd==='object'&&!Array.isArray(hd)){holidays=hd;saveHolLocal();}
+        }catch(e){}
+      }
       if(data.operations&&data.operations.length){
         ops=data.operations.map(function(o){return String(o.name||'').trim();}).filter(Boolean);
       }
@@ -2777,7 +2868,8 @@ async function pushSheetData(action,payload,label){
 }
 function pushLeaves(){pushSheetData('saveLeaves',{leaves:leaves},'วันลา');}
 function pushSwaps(){pushSheetData('saveSwaps',{swaps:swaps},'Override');}
-function pushConfig(){pushSheetData('saveConfig',{config:{orDays:JSON.stringify(ORDAYS)}},'วันผ่าตัด');}
+// saveConfig เขียนทับทั้งแท็บ ENT_Config จึงต้องส่งทุก key ไปด้วยกันเสมอ
+function pushConfig(){pushSheetData('saveConfig',{config:{orDays:JSON.stringify(ORDAYS),holidays:JSON.stringify(holidays)}},'ค่าตั้งระบบ');}
 
 // ★ แก้ไขให้หลังบันทึก Settings โหลดข้อมูลกลับมาอีกรอบเพื่อให้ชัวร์ว่าลง Google Sheets ได้ 100%
 async function saveSettings(){
