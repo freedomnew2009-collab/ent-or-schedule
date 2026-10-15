@@ -324,6 +324,27 @@ body{font-family:'Noto Sans Thai',sans-serif;background:var(--bg);color:var(--t)
 .set-sec{background:var(--s);border:1px solid var(--b);border-radius:var(--r);padding:16px 18px;margin-bottom:14px;}
 .set-sec h3{font-size:13px;font-weight:700;margin-bottom:11px;color:var(--teal);display:flex;align-items:center;gap:6px;}
 .set-sub{font-size:11px;color:var(--t3);margin:-4px 0 9px;}
+/* ผู้แก้ไข (Email) + ประวัติการแก้ไข */
+.sb-editor{display:flex;align-items:center;gap:6px;margin-top:8px;padding:5px 8px;border:1px solid var(--b2);border-radius:7px;font-size:10.5px;color:var(--t2);cursor:pointer;background:var(--s2);}
+.sb-editor span{flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
+.sb-editor.none{border-color:var(--yel);color:var(--yel);}
+.ed-cur{display:flex;align-items:center;gap:8px;flex-wrap:wrap;font-size:13px;}
+.ed-cur b{word-break:break-all;}
+.log-tools{display:flex;gap:7px;margin-bottom:10px;}
+.log-tools .fi{flex:1;}
+.log-list{max-height:520px;overflow-y:auto;border:1px solid var(--b);border-radius:var(--rs);}
+.log-row{padding:9px 12px;border-bottom:1px solid var(--b);font-size:12px;}
+.log-row:last-child{border-bottom:0;}
+.log-top{display:flex;align-items:center;gap:6px;flex-wrap:wrap;}
+.log-act{font-size:10.5px;font-weight:700;padding:1px 7px;border-radius:10px;background:var(--td);color:var(--teal);}
+.log-act.add{background:color-mix(in srgb, var(--green) 15%, transparent);color:var(--green);}
+.log-act.del{background:var(--rd);color:var(--red);}
+.log-sec{font-size:10.5px;color:var(--t3);}
+.log-item{font-weight:700;color:var(--t);}
+.log-det{color:var(--t2);margin-top:3px;line-height:1.55;word-break:break-word;}
+.log-meta{color:var(--t3);font-size:10.5px;margin-top:3px;word-break:break-all;}
+.log-empty{padding:16px;text-align:center;color:var(--t3);font-size:12px;line-height:1.6;}
+.log-empty.warn{color:var(--yel);}
 .fg{margin-bottom:11px;}
 .fl{font-size:11px;font-weight:600;color:var(--t2);margin-bottom:4px;display:block;}
 .fl span{color:var(--red);}
@@ -486,6 +507,10 @@ body{font-family:'Noto Sans Thai',sans-serif;background:var(--bg);color:var(--t)
   .btn-add{padding:7px 10px;font-size:11px;}
   .btn-add span{display:none;}
   .mob-menu-btn{display:flex;}
+  /* แถบเมนูล่างจอ (มือถือ) — เข้าหน้า OPD ได้ในแตะเดียว ไม่ต้องเปิดเมนู ☰ */
+  .mob-bottom-nav{display:block;}
+  .content{padding-bottom:calc(58px + env(safe-area-inset-bottom,0px));}
+  .sidebar{padding-bottom:calc(64px + env(safe-area-inset-bottom,0px));}
   /* สถิติแบบกะทัดรัด 4 ช่องแถวเดียว — เหลือพื้นที่ให้รายการเคสมากขึ้น */
   .stats-row{grid-template-columns:repeat(4,1fr);padding:8px 10px 0;gap:5px;}
   .stat-card{padding:6px 4px;flex-direction:column;align-items:center;gap:0;text-align:center;}
@@ -882,7 +907,8 @@ body{font-family:'Noto Sans Thai',sans-serif;background:var(--bg);color:var(--t)
   <div class="sb-logo">
     <div class="ico">🏥</div>
     <h2>ENT OR Schedule</h2>
-    <p>แผนก หู คอ จมูก · v6.3</p>
+    <p>แผนก หู คอ จมูก · v6.5</p>
+    <div class="sb-editor" id="sbEditor" onclick="openEditorModal()" title="Email ผู้แก้ไข — กดเพื่อเปลี่ยน"></div>
   </div>
   <div class="nav-sec">
     <div class="nav-lbl">เมนูหลัก</div>
@@ -894,6 +920,7 @@ body{font-family:'Noto Sans Thai',sans-serif;background:var(--bg);color:var(--t)
     <div class="nav-item" data-page="leave" onclick="showPage('leave')"><span class="ni">🏖️</span>วันลาแพทย์</div>
     <div class="nav-item" data-page="swap" onclick="showPage('swap')"><span class="ni">🔁</span>สลับวันผ่าตัด</div>
     <div class="nav-item" data-page="settings" onclick="showPage('settings')"><span class="ni">⚙️</span>ตั้งค่า</div>
+    <div class="nav-item" id="navInstall" onclick="installApp()"><span class="ni">📲</span>ติดตั้งแอพบนมือถือ</div>
   </div>
   <div class="sb-docs">
     <div class="sb-dlbl">กรองแพทย์</div>
@@ -1106,6 +1133,20 @@ body{font-family:'Noto Sans Thai',sans-serif;background:var(--bg);color:var(--t)
 
   <div class="page" id="page-settings">
     <div class="set-pg">
+      <div class="set-sec">
+        <h3>👤 Email ผู้แก้ไข (เครื่องนี้)</h3>
+        <p class="set-sub">ทุกครั้งที่บันทึก/แก้ไขข้อมูล ระบบจะจดว่า Email นี้เป็นผู้แก้ ลงแท็บ ENT_Log ใน Google Sheet</p>
+        <div class="ed-cur" id="setEditor"></div>
+      </div>
+      <div class="set-sec">
+        <h3>🕘 ประวัติการแก้ไข</h3>
+        <p class="set-sub">ใคร (Email) แก้อะไร เมื่อไหร่ — ทุกส่วนของแอพ ใหม่สุดอยู่บน (แสดง 150 รายการล่าสุด ดูทั้งหมดได้ที่แท็บ ENT_Log)</p>
+        <div class="log-tools">
+          <input class="fi" id="logQ" placeholder="ค้นหา Email / HN / ชื่อ / วันที่..." oninput="renderEditLog()">
+          <button class="bss" onclick="loadEditLog()" type="button">↻ โหลด</button>
+        </div>
+        <div class="log-list" id="logList"><div class="log-empty">กด ↻ โหลด เพื่อดูประวัติ</div></div>
+      </div>
       <div class="set-sec">
         <h3>🔗 เชื่อมต่อ Google Sheets</h3>
         <p class="set-sub">Deploy Google Apps Script เป็น Web App (Execute as: Me, Access: Anyone)</p>
@@ -1346,6 +1387,18 @@ body{font-family:'Noto Sans Thai',sans-serif;background:var(--bg);color:var(--t)
 
 <div class="overlay" id="opdModal"><div class="modal sm" id="opdModalBox"></div></div>
 <div class="overlay" id="holModal"><div class="modal sm" id="holModalBox"></div></div>
+<div class="overlay" id="editorModal"><div class="modal sm" id="editorBox"></div></div>
+<div class="overlay" id="installModal"><div class="modal sm" id="installBox"></div></div>
+
+<nav class="mob-bottom-nav" id="mobBottomNav">
+  <ul>
+    <li><a class="active" data-page="schedule" onclick="showPage('schedule')"><span class="mni">📋</span>ตารางผ่าตัด</a></li>
+    <li><a data-page="calendar" onclick="showPage('calendar')"><span class="mni">📅</span>ปฏิทิน</a></li>
+    <li><a data-page="opd" onclick="showPage('opd')"><span class="mni">👩‍⚕️</span>ออก OPD</a></li>
+    <li><a data-page="preop" onclick="showPage('preop')"><span class="mni">🩺</span>Pre-Op</a></li>
+    <li><a onclick="toggleSidebar()"><span class="mni">☰</span>เมนู</a></li>
+  </ul>
+</nav>
 
 <div class="ldr" id="ldr"><div class="spinner"></div><div class="ldr-t" id="ldrTxt">กำลังโหลด...</div></div>
 <div class="toast" id="toast"></div>
@@ -1508,6 +1561,8 @@ function validateTime(s){if(!s)return false;var m=s.match(/^(\d{1,2}):(\d{2})$/)
   renderDocSettings();renderOpList();renderORDaySettings();
   renderLeaveSelects();renderSwapSelects();
   renderLeaveTable();renderSwapTable();
+  renderEditor();
+  if(!getEditor())openEditorModal(true); // ครั้งแรก: ขอ Email ไว้จดว่าใครแก้ข้อมูล
   
   // ★ โหลดข้อมูลแบบ Auto-sync ทันทีที่เปิดเว็บ
   if(sheetCfg.url){
@@ -1532,6 +1587,7 @@ function showPage(pg){
   document.querySelectorAll('.nav-item').forEach(function(n){n.classList.remove('active');});
   document.getElementById('page-'+pg).classList.add('active');
   document.querySelector('.nav-item[data-page="'+pg+'"]').classList.add('active');
+  document.querySelectorAll('.mob-bottom-nav a').forEach(function(a){a.classList.toggle('active',a.dataset.page===pg);});
   var titles={schedule:'ตารางนัดผ่าตัด',calendar:'ปฏิทินรายเดือน',preop:'ตรวจสอบ Pre-Op',leave:'วันลาแพทย์',swap:'สลับวันผ่าตัด (Override)',settings:'ตั้งค่าระบบ',opd:'ตารางแพทย์ออกตรวจ OPD'};
   document.getElementById('pgTitle').textContent=titles[pg]||pg;
   document.getElementById('statsRow').style.display=pg==='schedule'?'grid':'none';
@@ -1542,7 +1598,7 @@ function showPage(pg){
   if(pg==='preop'){renderPreopPage();}
   if(pg==='opd'){renderOpd(true);}
   if(pg!=='opd')opdCancelMove(true);
-  if(pg==='settings'){renderDocSettings();renderOpList();renderORDaySettings();}
+  if(pg==='settings'){renderDocSettings();renderOpList();renderORDaySettings();renderEditor();loadEditLog();}
   if(pg==='leave'){renderLeaveSelects();renderLeaveTable();}
   if(pg==='swap'){renderSwapSelects();renderSwapTable();}
   closeSidebar();
@@ -2799,7 +2855,7 @@ async function pushAll(){
   showLdr('กำลังอัพโหลด...');setSyncBadge('syncing');
   try{
     var res=await fetch(sheetCfg.url,{method:'POST',headers:{'Content-Type':'text/plain'},
-      body:JSON.stringify({action:'pushAll',sheet:sheetCfg.sheet,appointments:apts.map(function(a){return serializeApt(a);}),doctors:docs,operations:ops,leaves:leaves,swaps:swaps})});
+      body:JSON.stringify(withEditor({action:'pushAll',sheet:sheetCfg.sheet,appointments:apts.map(function(a){return serializeApt(a);}),doctors:docs,operations:ops,leaves:leaves,swaps:swaps}))});
     var data=await res.json();hideLdr();setSyncBadge('synced');
     toast('✅ อัพโหลดสำเร็จ · '+(data.count||0)+' รายการ','ok');
   }catch(er){hideLdr();setSyncBadge('error');toast('❌ อัพโหลดไม่สำเร็จ: '+er.message,'err');}
@@ -2816,7 +2872,7 @@ async function pushRow(a){
   var row=serializeApt(a,doc.name);
   try{
     var res=await fetch(sheetCfg.url,{method:'POST',headers:{'Content-Type':'text/plain'},
-      body:JSON.stringify({action:'upsert',sheet:sheetCfg.sheet,row:row})});
+      body:JSON.stringify(withEditor({action:'upsert',sheet:sheetCfg.sheet,row:row}))});
     if(!res.ok)throw new Error('HTTP '+res.status);
     var data=await res.json();
     if(!data||(data.status!=='upserted'&&data.status!=='ok'))throw new Error(data&&data.status?String(data.status):'เซิร์ฟเวอร์ตอบกลับผิดปกติ');
@@ -2838,7 +2894,7 @@ async function flushPending(){
     var list=pendingRows.slice();
     for(var i=0;i<list.length;i++){
       var res=await fetch(sheetCfg.url,{method:'POST',headers:{'Content-Type':'text/plain'},
-        body:JSON.stringify({action:'upsert',sheet:sheetCfg.sheet,row:list[i]})});
+        body:JSON.stringify(withEditor({action:'upsert',sheet:sheetCfg.sheet,row:list[i]}))});
       if(!res.ok)break;
       var data=await res.json();
       if(!data||(data.status!=='upserted'&&data.status!=='ok'))break;
@@ -2860,7 +2916,7 @@ async function pushSheetData(action,payload,label){
   setSyncBadge('syncing');
   try{
     var res=await fetch(sheetCfg.url,{method:'POST',headers:{'Content-Type':'text/plain'},
-      body:JSON.stringify(Object.assign({action:action},payload))});
+      body:JSON.stringify(withEditor(Object.assign({action:action},payload)))});
     var data=await res.json();
     if(data&&data.status==='saved'){setSyncBadge('synced');}
     else{setSyncBadge('error');warnScriptOutdated();}
@@ -2870,6 +2926,77 @@ function pushLeaves(){pushSheetData('saveLeaves',{leaves:leaves},'วันล�
 function pushSwaps(){pushSheetData('saveSwaps',{swaps:swaps},'Override');}
 // saveConfig เขียนทับทั้งแท็บ ENT_Config จึงต้องส่งทุก key ไปด้วยกันเสมอ
 function pushConfig(){pushSheetData('saveConfig',{config:{orDays:JSON.stringify(ORDAYS),holidays:JSON.stringify(holidays)}},'ค่าตั้งระบบ');}
+
+// ── ผู้แก้ไข (Email) ──
+// เก็บไว้ในเครื่อง แล้วแนบไปกับทุกการบันทึก → Apps Script จดลงแท็บ ENT_Log ว่า Email ไหนแก้อะไร
+// (เป็นค่าที่ผู้ใช้กรอกเอง ไม่ได้ยืนยันตัวตนกับ Google)
+var EDITOR_KEY='ent_editor';
+function getEditor(){try{return localStorage.getItem(EDITOR_KEY)||'';}catch(e){return '';}}
+function withEditor(o){o.editor=getEditor();return o;}
+function openEditorModal(required){
+  var ov=document.getElementById('editorModal'),cur=getEditor();
+  ov.dataset.lock=(required&&!cur)?'1':'';
+  document.getElementById('editorBox').innerHTML='<div class="mhd"><div class="mtl">👤 Email ผู้ใช้งาน</div>'
+    +(ov.dataset.lock?'':'<button class="mcl" onclick="closeModal(\'editorModal\')" type="button">✕</button>')+'</div>'
+    +'<p class="set-sub" style="margin:0 0 12px;">ระบบจะจดว่า Email นี้เป็นผู้แก้ไขข้อมูล (นัดผ่าตัด วันลา สลับวัน ตาราง OPD ตั้งค่า) — กรอกครั้งเดียว เครื่องนี้จะจำไว้</p>'
+    +'<div class="fg"><label class="fl">Email</label><input class="fi" id="editorInp" type="email" inputmode="email" autocomplete="email" autocapitalize="off" placeholder="name@example.com" value="'+esc(cur)+'" onkeydown="if(event.key===\'Enter\')saveEditor()"></div>'
+    +'<div id="editorErr" style="display:none;color:var(--red);font-size:12px;margin:-4px 0 10px;">กรุณากรอก Email ให้ถูกต้อง</div>'
+    +'<button class="bs" style="width:100%;min-height:44px;" onclick="saveEditor()" type="button">💾 บันทึก</button>';
+  openModal('editorModal');
+  setTimeout(function(){var i=document.getElementById('editorInp');if(i&&!cur)i.focus();},80);
+}
+function saveEditor(){
+  var v=document.getElementById('editorInp').value.trim().toLowerCase();
+  if(!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(v)){document.getElementById('editorErr').style.display='block';return;}
+  try{localStorage.setItem(EDITOR_KEY,v);}catch(e){}
+  document.getElementById('editorModal').dataset.lock='';
+  closeModal('editorModal');renderEditor();
+  toast('✅ ตั้ง Email ผู้แก้ไขเป็น '+v,'ok');
+}
+function renderEditor(){
+  var v=getEditor(),sb=document.getElementById('sbEditor'),st=document.getElementById('setEditor');
+  if(sb){sb.className='sb-editor'+(v?'':' none');sb.innerHTML='👤 <span>'+(v?esc(v):'ยังไม่ได้ใส่ Email')+'</span>✎';}
+  if(st)st.innerHTML=(v?'<span>ผู้แก้ไข: <b>'+esc(v)+'</b></span>':'<span style="color:var(--yel)">ยังไม่ได้ใส่ Email</span>')
+    +'<button class="bss" onclick="openEditorModal()" type="button">✎ '+(v?'เปลี่ยน':'ใส่ Email')+'</button>';
+}
+
+// ประวัติการแก้ไข — อ่านจากแท็บ ENT_Log ผ่าน ?action=getLog
+var _logRows=null,_logLoading=false;
+async function loadEditLog(){
+  var el=document.getElementById('logList');if(!el||_logLoading)return;
+  if(!sheetCfg.url){el.innerHTML='<div class="log-empty">ยังไม่ได้ตั้งค่า URL</div>';return;}
+  _logLoading=true;
+  if(!_logRows)el.innerHTML='<div class="log-empty">กำลังโหลด...</div>';
+  try{
+    var res=await fetch(sheetCfg.url+'?action=getLog&n=150',{method:'GET',redirect:'follow'});
+    var txt=await res.text(),data=null;
+    try{data=JSON.parse(txt);}catch(e){}
+    // Code.gs เวอร์ชันเก่าไม่รู้จัก getLog จะส่งหน้าเว็บกลับมาแทน JSON
+    if(!data||data.status!=='ok'){
+      el.innerHTML='<div class="log-empty warn">'+(data&&data.message?'โหลดประวัติไม่สำเร็จ: '+esc(data.message)
+        :'⚠️ Code.gs ใน Apps Script ยังไม่รองรับประวัติการแก้ไข — อัพเดท Code.gs เป็นเวอร์ชัน v5.3 แล้ว Deploy ใหม่ (Manage deployments → ✎ Edit → New version)')+'</div>';
+    }else{_logRows=data.log||[];renderEditLog();}
+  }catch(er){
+    el.innerHTML='<div class="log-empty warn">โหลดประวัติไม่สำเร็จ: '+esc(er.message)+'</div>';
+  }
+  _logLoading=false;
+}
+function fmtLogTime(t){
+  var m=/^(\d{4})-(\d{2})-(\d{2}) (\d{2}:\d{2})/.exec(t||'');
+  return m?(+m[3])+' '+MS[+m[2]-1]+' '+String(+m[1]+543).slice(2)+' · '+m[4]:(t||'');
+}
+function renderEditLog(){
+  var el=document.getElementById('logList');if(!el||!_logRows)return;
+  var q=(document.getElementById('logQ').value||'').trim().toLowerCase();
+  var rows=_logRows.filter(function(r){return !q||[r.email,r.section,r.action,r.item,r.detail,r.time].join(' ').toLowerCase().indexOf(q)>-1;});
+  if(!rows.length){el.innerHTML='<div class="log-empty">'+(_logRows.length?'ไม่พบรายการที่ค้นหา':'ยังไม่มีประวัติการแก้ไข')+'</div>';return;}
+  el.innerHTML=rows.map(function(r){
+    var c=r.action==='เพิ่ม'?' add':r.action==='ลบ'?' del':'';
+    return '<div class="log-row"><div class="log-top"><span class="log-act'+c+'">'+esc(r.action)+'</span><span class="log-sec">'+esc(r.section)+'</span><span class="log-item">'+esc(r.item)+'</span></div>'
+      +(r.detail?'<div class="log-det">'+esc(r.detail)+'</div>':'')
+      +'<div class="log-meta">🕘 '+esc(fmtLogTime(r.time))+' · 👤 '+esc(r.email)+'</div></div>';
+  }).join('');
+}
 
 // ★ แก้ไขให้หลังบันทึก Settings โหลดข้อมูลกลับมาอีกรอบเพื่อให้ชัวร์ว่าลง Google Sheets ได้ 100%
 async function saveSettings(){
@@ -2882,7 +3009,7 @@ async function saveSettings(){
     var opRows=ops.map(function(name){return {name:name};});
     var res=await fetch(sheetCfg.url,{
       method:'POST',headers:{'Content-Type':'text/plain'},
-      body:JSON.stringify({action:'saveSettings',doctors:doctorRows,operations:opRows}),
+      body:JSON.stringify(withEditor({action:'saveSettings',doctors:doctorRows,operations:opRows})),
     });
     var data=await res.json();
     
@@ -2911,7 +3038,7 @@ function buildScript(){
   var el=document.getElementById('scriptBox');if(!el)return;
   el.textContent='กำลังโหลด Code.gs ...';
   // ดึงจากไฟล์ Code.gs ใน repo โดยตรง — ตัวอย่างจะตรงกับของจริงเสมอ
-  fetch('Code.gs?v=5').then(function(r){if(!r.ok)throw new Error(r.status);return r.text();})
+  fetch('Code.gs?v=5.3').then(function(r){if(!r.ok)throw new Error(r.status);return r.text();})
     .then(function(t){el.textContent=t;})
     .catch(function(){el.textContent='โหลดไม่สำเร็จ — เปิดไฟล์ Code.gs ใน GitHub repository แทน';});
 }
@@ -3170,7 +3297,7 @@ async function pushOpd(){
   var items=opdDirty.map(function(k){return {key:k,value:JSON.stringify(opdVal(k))};});
   try{
     var res=await fetch(sheetCfg.url,{method:'POST',headers:{'Content-Type':'text/plain'},
-      body:JSON.stringify({action:'saveOpd',items:items})});
+      body:JSON.stringify(withEditor({action:'saveOpd',items:items}))});
     var data=await res.json();
     if(data&&data.status==='saved'){
       opdServer=true;
@@ -4503,7 +4630,7 @@ function closeModal(id){
 
 document.querySelectorAll('.overlay').forEach(function(o){
   o.addEventListener('click',function(e){
-    if(e.target===o){
+    if(e.target===o&&o.dataset.lock!=='1'){
       o.classList.remove('open');
       if(!document.querySelector('.overlay.open,.dp-overlay.open'))document.body.style.overflow='';
     }
@@ -4814,17 +4941,40 @@ window.addEventListener('beforeinstallprompt',function(e){
   setTimeout(function(){ document.getElementById('pwaBanner').classList.add('show'); },2000);
 });
 window.addEventListener('load',function(){
-var _pib=document.getElementById('pwaInstallBtn');
-if(_pib)_pib.addEventListener('click',function(){
-  if(_pwaPrompt){
-    _pwaPrompt.prompt();
-    _pwaPrompt.userChoice.then(function(){
-      document.getElementById('pwaBanner').classList.remove('show');
-      _pwaPrompt=null;
-    });
+  var _pib=document.getElementById('pwaInstallBtn');
+  if(_pib)_pib.addEventListener('click',installApp);
+  if(isStandaloneApp()){var ni=document.getElementById('navInstall');if(ni)ni.style.display='none';}
+});
+// ลิงก์หลักของแอพ (GitHub Pages) — ติดตั้งเป็นแอพได้จากลิงก์นี้เท่านั้น
+// ลิงก์ Apps Script (/exec) เปิดหน้าเว็บใน iframe ของ Google จึงติดตั้งเป็นแอพไม่ได้
+var APP_HOME='https://freedomnew2009-collab.github.io/ent-or-schedule/';
+function isStandaloneApp(){return window.matchMedia('(display-mode:standalone)').matches||!!window.navigator.standalone;}
+function inAppsScript(){return /googleusercontent\.com$|script\.google\.com$/.test(location.hostname);}
+// ปุ่ม "ติดตั้ง" — ถ้า browser พร้อมติดตั้งให้เด้งหน้าติดตั้งเลย ไม่งั้นบอกวิธีติดตั้งเอง (เดิมกดแล้วไม่เกิดอะไรขึ้น)
+function installApp(){
+  if(_pwaPrompt&&!inAppsScript()){
+    var pr=_pwaPrompt;_pwaPrompt=null;
+    pr.prompt();
+    pr.userChoice.then(function(){document.getElementById('pwaBanner').classList.remove('show');}).catch(function(){});
+    return;
   }
-});
-});
+  var ua=navigator.userAgent||'';
+  var isIOS=/iPhone|iPad|iPod/i.test(ua)||(/Macintosh/.test(ua)&&navigator.maxTouchPoints>1);
+  var h='<div class="mhd"><div class="mtl">📲 ติดตั้งแอพบนมือถือ</div><button class="mcl" onclick="closeModal(\'installModal\')" type="button">✕</button></div>';
+  if(isStandaloneApp()){
+    h+='<p style="font-size:13px;line-height:1.7;">✅ ตอนนี้เปิดจากแอพที่ติดตั้งแล้ว</p>';
+  }else{
+    if(inAppsScript())h+='<p style="font-size:13px;line-height:1.7;margin-bottom:10px;">หน้านี้เปิดผ่านลิงก์ Google Apps Script ซึ่ง<b>ติดตั้งเป็นแอพไม่ได้</b> — กดปุ่มด้านล่างเพื่อเปิดลิงก์หลักของแอพ แล้วทำตามขั้นตอน</p>'
+      +'<a class="bs" href="'+APP_HOME+'" target="_blank" rel="noopener" style="display:flex;justify-content:center;align-items:center;min-height:44px;text-decoration:none;margin-bottom:12px;">🌐 เปิดลิงก์หลักของแอพ</a>';
+    h+='<div style="font-size:13px;line-height:1.85;color:var(--t2);">'
+      +(isIOS
+        ?'<b>iPhone / iPad (ต้องเปิดใน Safari)</b><br>1. แตะปุ่มแชร์ <b>⎋</b> (สี่เหลี่ยมมีลูกศรขึ้น) ด้านล่างจอ<br>2. เลื่อนลงเลือก <b>"เพิ่มไปยังหน้าจอโฮม"</b><br>3. แตะ <b>"เพิ่ม"</b> มุมขวาบน'
+        :'<b>Android (Chrome)</b><br>1. แตะ <b>⋮</b> มุมขวาบนของ Chrome<br>2. เลือก <b>"ติดตั้งแอป"</b> หรือ <b>"เพิ่มลงในหน้าจอหลัก"</b><br>3. แตะ <b>"ติดตั้ง"</b>')
+      +'</div><div style="font-size:11px;color:var(--t3);margin-top:12px;word-break:break-all;">ลิงก์หลักของแอพ: '+APP_HOME+'</div>';
+  }
+  document.getElementById('installBox').innerHTML=h;
+  openModal('installModal');
+}
 function dismissPWA(){
   document.getElementById('pwaBanner').classList.remove('show');
   try{ localStorage.setItem('pwa_dismissed','1'); }catch(e){}
@@ -4847,7 +4997,7 @@ window.addEventListener('appinstalled',function(){
       var txt=bn.querySelector('.pwa-text span');
       if(txt)txt.textContent='แตะปุ่มแชร์ ⎋ ด้านล่าง → เลือก "เพิ่มไปยังหน้าจอโฮม"';
       var btn=document.getElementById('pwaInstallBtn');
-      if(btn)btn.style.display='none';
+      if(btn)btn.textContent='วิธีติดตั้ง';
       bn.classList.add('show');
     },2500);
   });
