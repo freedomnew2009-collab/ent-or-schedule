@@ -907,7 +907,7 @@ body{font-family:'Noto Sans Thai',sans-serif;background:var(--bg);color:var(--t)
   <div class="sb-logo">
     <div class="ico">🏥</div>
     <h2>ENT OR Schedule</h2>
-    <p>แผนก หู คอ จมูก · v6.4</p>
+    <p>แผนก หู คอ จมูก · v6.5</p>
     <div class="sb-editor" id="sbEditor" onclick="openEditorModal()" title="Email ผู้แก้ไข — กดเพื่อเปลี่ยน"></div>
   </div>
   <div class="nav-sec">
@@ -920,6 +920,7 @@ body{font-family:'Noto Sans Thai',sans-serif;background:var(--bg);color:var(--t)
     <div class="nav-item" data-page="leave" onclick="showPage('leave')"><span class="ni">🏖️</span>วันลาแพทย์</div>
     <div class="nav-item" data-page="swap" onclick="showPage('swap')"><span class="ni">🔁</span>สลับวันผ่าตัด</div>
     <div class="nav-item" data-page="settings" onclick="showPage('settings')"><span class="ni">⚙️</span>ตั้งค่า</div>
+    <div class="nav-item" id="navInstall" onclick="installApp()"><span class="ni">📲</span>ติดตั้งแอพบนมือถือ</div>
   </div>
   <div class="sb-docs">
     <div class="sb-dlbl">กรองแพทย์</div>
@@ -1387,6 +1388,7 @@ body{font-family:'Noto Sans Thai',sans-serif;background:var(--bg);color:var(--t)
 <div class="overlay" id="opdModal"><div class="modal sm" id="opdModalBox"></div></div>
 <div class="overlay" id="holModal"><div class="modal sm" id="holModalBox"></div></div>
 <div class="overlay" id="editorModal"><div class="modal sm" id="editorBox"></div></div>
+<div class="overlay" id="installModal"><div class="modal sm" id="installBox"></div></div>
 
 <nav class="mob-bottom-nav" id="mobBottomNav">
   <ul>
@@ -4939,17 +4941,40 @@ window.addEventListener('beforeinstallprompt',function(e){
   setTimeout(function(){ document.getElementById('pwaBanner').classList.add('show'); },2000);
 });
 window.addEventListener('load',function(){
-var _pib=document.getElementById('pwaInstallBtn');
-if(_pib)_pib.addEventListener('click',function(){
-  if(_pwaPrompt){
-    _pwaPrompt.prompt();
-    _pwaPrompt.userChoice.then(function(){
-      document.getElementById('pwaBanner').classList.remove('show');
-      _pwaPrompt=null;
-    });
+  var _pib=document.getElementById('pwaInstallBtn');
+  if(_pib)_pib.addEventListener('click',installApp);
+  if(isStandaloneApp()){var ni=document.getElementById('navInstall');if(ni)ni.style.display='none';}
+});
+// ลิงก์หลักของแอพ (GitHub Pages) — ติดตั้งเป็นแอพได้จากลิงก์นี้เท่านั้น
+// ลิงก์ Apps Script (/exec) เปิดหน้าเว็บใน iframe ของ Google จึงติดตั้งเป็นแอพไม่ได้
+var APP_HOME='https://freedomnew2009-collab.github.io/ent-or-schedule/';
+function isStandaloneApp(){return window.matchMedia('(display-mode:standalone)').matches||!!window.navigator.standalone;}
+function inAppsScript(){return /googleusercontent\.com$|script\.google\.com$/.test(location.hostname);}
+// ปุ่ม "ติดตั้ง" — ถ้า browser พร้อมติดตั้งให้เด้งหน้าติดตั้งเลย ไม่งั้นบอกวิธีติดตั้งเอง (เดิมกดแล้วไม่เกิดอะไรขึ้น)
+function installApp(){
+  if(_pwaPrompt&&!inAppsScript()){
+    var pr=_pwaPrompt;_pwaPrompt=null;
+    pr.prompt();
+    pr.userChoice.then(function(){document.getElementById('pwaBanner').classList.remove('show');}).catch(function(){});
+    return;
   }
-});
-});
+  var ua=navigator.userAgent||'';
+  var isIOS=/iPhone|iPad|iPod/i.test(ua)||(/Macintosh/.test(ua)&&navigator.maxTouchPoints>1);
+  var h='<div class="mhd"><div class="mtl">📲 ติดตั้งแอพบนมือถือ</div><button class="mcl" onclick="closeModal(\'installModal\')" type="button">✕</button></div>';
+  if(isStandaloneApp()){
+    h+='<p style="font-size:13px;line-height:1.7;">✅ ตอนนี้เปิดจากแอพที่ติดตั้งแล้ว</p>';
+  }else{
+    if(inAppsScript())h+='<p style="font-size:13px;line-height:1.7;margin-bottom:10px;">หน้านี้เปิดผ่านลิงก์ Google Apps Script ซึ่ง<b>ติดตั้งเป็นแอพไม่ได้</b> — กดปุ่มด้านล่างเพื่อเปิดลิงก์หลักของแอพ แล้วทำตามขั้นตอน</p>'
+      +'<a class="bs" href="'+APP_HOME+'" target="_blank" rel="noopener" style="display:flex;justify-content:center;align-items:center;min-height:44px;text-decoration:none;margin-bottom:12px;">🌐 เปิดลิงก์หลักของแอพ</a>';
+    h+='<div style="font-size:13px;line-height:1.85;color:var(--t2);">'
+      +(isIOS
+        ?'<b>iPhone / iPad (ต้องเปิดใน Safari)</b><br>1. แตะปุ่มแชร์ <b>⎋</b> (สี่เหลี่ยมมีลูกศรขึ้น) ด้านล่างจอ<br>2. เลื่อนลงเลือก <b>"เพิ่มไปยังหน้าจอโฮม"</b><br>3. แตะ <b>"เพิ่ม"</b> มุมขวาบน'
+        :'<b>Android (Chrome)</b><br>1. แตะ <b>⋮</b> มุมขวาบนของ Chrome<br>2. เลือก <b>"ติดตั้งแอป"</b> หรือ <b>"เพิ่มลงในหน้าจอหลัก"</b><br>3. แตะ <b>"ติดตั้ง"</b>')
+      +'</div><div style="font-size:11px;color:var(--t3);margin-top:12px;word-break:break-all;">ลิงก์หลักของแอพ: '+APP_HOME+'</div>';
+  }
+  document.getElementById('installBox').innerHTML=h;
+  openModal('installModal');
+}
 function dismissPWA(){
   document.getElementById('pwaBanner').classList.remove('show');
   try{ localStorage.setItem('pwa_dismissed','1'); }catch(e){}
@@ -4972,7 +4997,7 @@ window.addEventListener('appinstalled',function(){
       var txt=bn.querySelector('.pwa-text span');
       if(txt)txt.textContent='แตะปุ่มแชร์ ⎋ ด้านล่าง → เลือก "เพิ่มไปยังหน้าจอโฮม"';
       var btn=document.getElementById('pwaInstallBtn');
-      if(btn)btn.style.display='none';
+      if(btn)btn.textContent='วิธีติดตั้ง';
       bn.classList.add('show');
     },2500);
   });
