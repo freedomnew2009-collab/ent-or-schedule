@@ -46,6 +46,21 @@ jobs:
             exit 1
           fi
           printf '%s' "$CLASPRC" > ~/.clasprc.json
+          # รองรับไฟล์ login ทั้งของ clasp 2.x และ 3.x (3.x เก็บเป็น {"tokens":{"default":{...}}})
+          # แปลงให้เป็นแบบที่ clasp 2.4.2 อ่านได้ — พิมพ์เฉพาะชื่อ key ไว้ตรวจ ไม่พิมพ์ค่า
+          node -e '
+            const fs=require("fs"),f=process.env.HOME+"/.clasprc.json";
+            let j;try{j=JSON.parse(fs.readFileSync(f,"utf8").trim());}
+            catch(e){console.log("::error::CLASPRC_JSON ไม่ใช่ JSON ที่ถูกต้อง — ต้อง copy เนื้อหาไฟล์ .clasprc.json ทั้งไฟล์ ตั้งแต่ { ถึง }");process.exit(1);}
+            console.log("keys:",Object.keys(j).join(","));
+            if(!j.token&&j.tokens){
+              const t=j.tokens.default||j.tokens[Object.keys(j.tokens)[0]]||{};
+              console.log("clasp 3 format, token keys:",Object.keys(t).join(","));
+              j={token:{access_token:t.access_token,refresh_token:t.refresh_token,scope:t.scope,token_type:t.token_type||"Bearer",expiry_date:t.expiry_date||0},
+                 oauth2ClientSettings:{clientId:t.client_id,clientSecret:t.client_secret,redirectUri:"http://localhost"},isLocalCreds:false};
+              fs.writeFileSync(f,JSON.stringify(j));console.log("converted to clasp 2 format");
+            }
+            if(!j.token||!j.token.refresh_token){console.log("::error::ไม่พบ refresh_token ใน CLASPRC_JSON — รัน npx @google/clasp@2.4.2 login ใหม่ แล้วใส่ Secret ใหม่");process.exit(1);}'
 
       # ดึงโปรเจกต์ปัจจุบันลงมาก่อน — เก็บ appsscript.json (ค่าเว็บแอป/สิทธิ์/timezone) ของเดิมไว้
       # เพราะ clasp push จะแทนที่ไฟล์ทั้งโปรเจกต์ด้วยสิ่งที่อยู่ในโฟลเดอร์
