@@ -891,6 +891,10 @@ body{font-family:'Noto Sans Thai',sans-serif;background:var(--bg);color:var(--t)
 #opdPrint .wk{min-width:0;}
 #opdPrint .wk-ttl{display:block;font-size:16px;font-weight:700;color:var(--teal);margin-bottom:6px;}
 #opdPrint .wk-e.dim{opacity:1;}
+/* Save PDF เต็มหน้า: แถวหัวตารางสูงเท่าเดิม แถวข้อมูลยืดแบ่งความสูงที่เพิ่ม */
+.opd-pdf-fill .og,.opd-pdf-fill .wk{grid-template-rows:min-content;align-content:stretch;}
+.opd-pdf-fill .oc-rooms .or{flex:1;}
+.opd-pdf-fill thead th{height:1px;}
 @media print{
   *{-webkit-print-color-adjust:exact;print-color-adjust:exact;}
   body.opd-printing{display:block;background:#fff;padding:0;min-height:0;}
@@ -4571,7 +4575,16 @@ function opdPdfPart(title,els){
     box.appendChild(c);
   });
   document.body.appendChild(box);
+  opdPdfFill(box,(210-16)/(297-16));
   return box;
+}
+// ภาพเตี้ยกว่าสัดส่วน A4 → ยืดแถวของตาราง (ปฏิทิน/ตารางสัปดาห์/OR/แม่แบบ) ให้สูงเต็มหน้า แทนที่จะเหลือที่ว่างครึ่งล่าง
+function opdPdfFill(box,ratio){
+  var extra=Math.floor(box.offsetWidth*ratio)-box.offsetHeight;if(extra<=0)return;
+  var gs=[].slice.call(box.querySelectorAll('.og,.wk,table'));if(!gs.length)return;
+  var hs=gs.map(function(g){return g.offsetHeight;}),sum=hs.reduce(function(a,b){return a+b;},0);
+  box.classList.add('opd-pdf-fill');
+  gs.forEach(function(g,k){g.style.height=(hs[k]+Math.floor(extra*hs[k]/sum))+'px';});
 }
 async function opdSavePdf(mode){
   var ml=MTH[opdMo]+' '+(opdYr+543),S=OPD.settings;
