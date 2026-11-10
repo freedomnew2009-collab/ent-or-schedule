@@ -907,6 +907,16 @@ body{font-family:'Noto Sans Thai',sans-serif;background:var(--bg);color:var(--t)
 .opd-pdf-fill .og,.opd-pdf-fill .wk{grid-template-rows:min-content;align-content:stretch;}
 .opd-pdf-fill .oc-rooms .or{flex:1;}
 .opd-pdf-fill .wk-c{justify-content:center;}
+/* PDF: ช่องสูงขึ้นแล้ว → ชื่อแพทย์ตัวใหญ่ขึ้น · ป้าย ทั้งวัน/Chest/ลา ลงบรรทัดที่ 2 ใต้ชื่อ */
+.opd-pdf-box .os.fill,.opd-pdf-box .os.gh{align-content:center;row-gap:3px;padding:4px 5px 4px 8px;}
+.opd-pdf-box .os.fill .os-n,.opd-pdf-box .os.gh .os-n{flex-basis:100%;font-size:14.5px;line-height:1.2;}
+.opd-pdf-box .os.span.fill .os-n{font-size:16px;}
+.opd-pdf-box .os-t,.opd-pdf-box .os-ad,.opd-pdf-box .os-w{font-size:11px;padding:0 6px;}
+.opd-pdf-box .wk-e{padding:6px 9px;}
+.opd-pdf-box .wk-e1 b{font-size:16px;}
+.opd-pdf-box .wk-e1 em{font-size:11px;}
+.opd-pdf-box .wk-e2{font-size:12.5px;}
+.opd-pdf-box .wk-e3{font-size:11.5px;}
 .wk-ss small{white-space:nowrap;}
 .opd-pdf-fill thead th{height:1px;}
 @media print{
@@ -4594,6 +4604,8 @@ function opdPdfPart(title,els){
 }
 // ภาพเตี้ยกว่าสัดส่วน A4 → ยืดแถวของตาราง (ปฏิทิน/ตารางสัปดาห์/OR/แม่แบบ) ให้สูงเต็มหน้า แทนที่จะเหลือที่ว่างครึ่งล่าง
 function opdPdfFill(box,ratio){
+  // สูงเกินสัดส่วน A4 (ชื่อตัวใหญ่/ข้อมูลเยอะ) → ขยายความกว้างทีละนิดจนพอดี ภาพจะได้เต็มกว้างไม่เหลือขอบข้าง
+  for(var w0=box.offsetWidth,w=w0;box.offsetHeight>box.offsetWidth*ratio&&w<w0*1.6;){w+=40;box.style.width=w+'px';}
   var extra=Math.floor(box.offsetWidth*ratio)-box.offsetHeight;if(extra<=0)return;
   var gs=[].slice.call(box.querySelectorAll('.og,.wk,table'));if(!gs.length)return;
   var hs=gs.map(function(g){return g.offsetHeight;}),sum=hs.reduce(function(a,b){return a+b;},0);
