@@ -892,8 +892,22 @@ body{font-family:'Noto Sans Thai',sans-serif;background:var(--bg);color:var(--t)
 #opdPrint .wk-ttl{display:block;font-size:16px;font-weight:700;color:var(--teal);margin-bottom:6px;}
 #opdPrint .wk-e.dim{opacity:1;}
 /* Save PDF เต็มหน้า: แถวหัวตารางสูงเท่าเดิม แถวข้อมูลยืดแบ่งความสูงที่เพิ่ม */
+/* ป้ายเล็ก (เฉพาะเช้า/ทั้งวัน/Chest/ลา/วันนี้) ห้ามตัดเป็น 2 บรรทัด · legend แต่ละข้อไม่บีบจนตัวหนังสือหัก */
+.oc-td,.oc-half,.os-t,.os-ad,.os-w,.os-tp{white-space:nowrap;line-height:1.5;}
+.os.void .os-n{white-space:nowrap;}
+.opd-legend{gap:6px 16px;}
+.opd-pdf-box .oc-more,.opd-pdf-box .os-tp,.opd-pdf-box .lg-tp{display:none;}
+.opd-pdf-box .os.gh{border:0;background:color-mix(in srgb, var(--dc) 15%, var(--s));box-shadow:inset 3px 0 0 var(--dc);}
+.opd-pdf-box .os.gh .os-n{color:var(--t);font-style:normal;opacity:1;}
+.opd-pdf-box .os.empty:not(.gh){border-color:var(--b);}
+.opd-legend>span{flex-shrink:0;white-space:nowrap;}
+/* ไฟล์ PDF/พิมพ์ = เอกสารประจำเดือน ไม่ต้องไฮไลต์ "วันนี้" */
+.opd-pdf-box .oc-td,#opdPrint .oc-td{display:none;}
+.opd-pdf-box .oc.today,#opdPrint .oc.today{box-shadow:none;}
 .opd-pdf-fill .og,.opd-pdf-fill .wk{grid-template-rows:min-content;align-content:stretch;}
 .opd-pdf-fill .oc-rooms .or{flex:1;}
+.opd-pdf-fill .wk-c{justify-content:center;}
+.wk-ss small{white-space:nowrap;}
 .opd-pdf-fill thead th{height:1px;}
 @media print{
   *{-webkit-print-color-adjust:exact;print-color-adjust:exact;}
