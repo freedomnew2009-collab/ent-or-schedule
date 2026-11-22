@@ -1,4 +1,4 @@
-const CACHE = 'ent-or-v6.6';
+const CACHE = 'ent-or-v6.7';
 const ASSETS = [
   './index.html',
   './manifest.json',
@@ -22,7 +22,7 @@ self.addEventListener('activate', function(e){
   e.waitUntil(
     caches.keys().then(function(keys){
       return Promise.all(
-        keys.filter(function(k){ return k !== CACHE; })
+        keys.filter(function(k){ return k !== CACHE && k !== 'ent-user'; })
             .map(function(k){ return caches.delete(k); })
       );
     })
